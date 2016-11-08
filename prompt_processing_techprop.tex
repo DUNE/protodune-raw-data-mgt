@@ -21,13 +21,14 @@
 \maketitle
 
 \begin{abstract}
-\noindent  This note describes design parameters of
-the Prompt Processing system in the Single-Phase \pd
-(CERN experiment \expname), and one particular design option for such system
+\noindent  Data Quality Monitoring (DQM) and Prompt Processing necessary for its implementation
+are important work areas  in the Single-Phase \pd (CERN experiment \expname).
+This note describes design parameters of the Prompt Processing system, and one particular design option for such system
 based on prioritized queue. We start with a brief summary of the data characteristics and data handling patterns
 as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,1212 \cite{docdb1212} and present
-the basic requirements as per  DocDB 1811 \cite{docdb1811}. A design is proposed which satisfies 
-these requirements.
+the basic requirements as per  DocDB 1811 \cite{docdb1811}. A data-driven design is proposed with
+a focus on dataflow and throughput which satisfies these requirements, and is based on dynamically prioritized
+jobs queue.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,10 +44,11 @@ Rates and volume of data coming from other detector components will be much smal
 and won't effect the overall scale of the data handling and processing system.
 
 Outline of the design of the raw data handling system is documented in  \cite{docdb1212} and other prior \pd documentation.
-According to it, the data is transmitted from the online buffer to the CERN EOS via a 20 Gbps full-duplex network connection.
+According to it, the data is transmitted from the online buffer to the CERN EOS \cite{eos}
+via a 20 Gbps full-duplex network connection.
 The EOS system serves as the hub and staging area for the \pd raw data from which
 it gets committed to the tape archive at CERN and also transmitted to FNAL and potentially
-other US and international locations. All or most links in the data transmission chain will be based on F-FTS.
+other US and international locations. All or most links in the data transmission chain will be based on F-FTS \cite{fts}.
 
 \subsection{Data Streams}
 \label{sec:streams}
@@ -172,6 +174,10 @@ It may include items such as:
 
 \end{itemize}
 
+\noindent Vizual infromation produced by this type of processing will be presented to the users
+via an interactive Wev interface and where necessary shall be preserved for record keeping,
+troubleshooting and other applications.
+
 \subsubsection{Other Applications of the TPC Data Processing Components}
 Results of the intermediate stages of Data Processing may need to be preserved, for
 example the data in graphic form for audit/run documentation purposes.
@@ -194,6 +200,7 @@ position-sensitive  detectors which are part of \textbf{BI}.
 
 \section{Prompt Processing as a DAG}
 \label{sec:dag}
+\subsection{TPC data}
 Data and processes involved in prompt processing as outlined in \ref{sec:outline} (for LArTPC) can be
 modeled together as a DAG. This is illustrated in Fig.\ref{fig:dag1}
 in the form of a high-level conceptual diagram.
@@ -211,13 +218,36 @@ The \textbf{ADC} and \textbf{FFT} components are conflated here for the followin
 different, both depend on data being decompressed. Since it makes sense to do decompression only once, it may
 be optimal to combine these two steps in a single unit of execution.
 
+\subsection{BI and CRT data}
 Processing for the \textbf{BI} and \textbf{CRT} data streams (see \ref{sec:streams}) will be different but will
-follow the same general logic.
+follow the same general logic. There will be initial simple steps involving unpacking of the data and collecting
+histograms, and later stages may include particle tracking and beam profile measurement, and beam
+composition. It is expected therefore that this processing will likewise be modeled as a DAG.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Design Parameters}
 \label{sec:parameters}
+
+\subsection{Computing Resources}
+\label{resources}
+The following computing resources are being considered for prompt processing:
+\begin{itemize}
+
+\item The ``neut'' cluster  \cite{neut} at CERN (HTCondor). See Appendix \ref{appendix:neut} for
+more detail.
+
+\item The lxbatch facility \cite{lxbatch} at CERN Tier-0 (LSF-based).
+
+\item Potentially, resources at a few US institutions such as FNAL and BNL.  This option is facilitated
+by utilizing EOS interfaces such as XRootD. Since the latency for these resources will be much larger
+than for local ones at CERN, this will only be appropriate for the portions of the workflow which
+are less time critical than others (e.g. visualization and histogramming for long-term record keeping).
+
+\end{itemize}
+
+\noindent Optimally, all available resources will be managed transparently in one unified system and
+the workload distribution will be dynamically adjustable.
 
 \subsection{Staging Data for Prompt Processing}
 \label{sec:staging}
@@ -226,7 +256,7 @@ serve the data for prompt processing for the following reasons:
 \begin{itemize}
 
 \item The online buffer is likely to operate at a significant data rate (see above) and additional I/O load on the
-buffer is undesirable due to practical limits on the storage bandwidth and in order to guarantee stability of
+buffer must be taken into consideration in order to guarantee stability of
 operation for the online buffer and DAQ in general.
 
 \item It can be be expected that the data arrives to EOS rather quickly after having been captured in the online buffer
@@ -239,20 +269,31 @@ allow to avoid implementaion of a special data transmission handling chain for p
 
 \end{itemize}
 
-\subsection{Location of the computing resource}
-As noted in \ref{sec:staging} it is undesirable for the prompt processing system to interface the online
-buffer directly due to the substantial additional I/O load on the buffer and its network infrastructure,
-and EOS is the preferred storage system.
+\subsection{Location of the computing resources}
+The CERN Tier-0 computing facility is located in the West Area. As to the ``neut'' cluster (\ref{resources}),
+there are two practical possibilities for its placement:
+\begin{itemize}
+\item In the CERN West Area (main campus)
+\item In or close to the extension of the North Area experimental hall (EHN1) where \expname is located
+\end{itemize}
 
-This has consequences for the optimal location of the computing resources i.e. the worker nodes
-committed to the system -- they need to be in the network proximity of EOS and not put extra
-load on the network link between \expname and the CERN central services. In practice this means
-that the prompt processing system needs to be located on the CERN main campus (the West Area)
-as opposed to Prevessin (the North Area).
+\noindent Each of these locations has advantages and disadvantages. If the first scenario,
+there is no additional I/O load on the online buffer (as noted in \ref{sec:staging}) and network proximity
+to EOS is a plus. At the same time, in case of outage of either the network link to \expname or EOS itself
+the prompt processing would unaboidably stall even as the experiment may still be taking data and recording
+it in its online buffer. This is undesirable.
 
-This argument is bolsered by the fact that EOS will also be the first common point for the data coming
-in three streams (\ref{sec:streams}): LArTPC, \textbf{BI} and \textbf{CRT}. The information contained
-in the two latter streams will be absolutely necessary for the prompt processing to be meaningful.
+Placement of the computing resources for prompt processing in the detector
+vicinity solves the above problem. However, it creates an additional I/O load on both
+the online buffer and on the network link between \expname and central storage.
+
+The situation is further complicated by the need to handle three data streams (\ref{sec:streams})
+in certain stages of processing: LArTPC, \textbf{BI} and \textbf{CRT}. The information contained
+in the two latter streams will be absolutely necessary for event reconstruction, which is one of the final
+stages in the processing chain. These challenges are been analysed at the time of writing and the
+final decision will be made at a later point. There may be potentially a third possibility, where
+some of the initial stages of the processing chain are located near the experiment, while
+advanced resontruction takes place at CERN Tier-0 facilities.
 
 
 \subsection{Prioritization of Processing Steps}
@@ -311,24 +352,6 @@ scripting
 An additional and obvious advantage of this approach is that an efficient and responsive Web interface to
 the system can be created with minimal effort.
 
-\subsection{Computing Resources}
-The following computing resources are being considered for prompt processing:
-\begin{itemize}
-
-\item The ``neut'' cluster  \cite{neut} at CERN (HTCondor)
-
-\item The lxbatch facility \cite{lxbatch} at CERN (LSF)
-
-\item Potentially, resources at a few US institutions such as FNAL and BNL.  This option is facilitated
-by utilizing EOS interfaces such as XRootD. Since the latency for these resources will be much larger
-than for local ones at CERN, this will only be appropriate for the portions of the workflow which
-are less time critical than others (e.g. visualization and histogramming for long-term record keeping).
-
-\end{itemize}
-
-\noindent Optimally, all available resources will be managed transparently in one unified system and
-the workload distribution will be dynamically adjustable.
-
 \subsection{Monitoring, Interfaces and Integration}
 The requirements for the prompt processing monitoring are listed in \cite{docdb1811}.
 We propose modular Web interface which can be configured to be used by itself, or integrated
@@ -357,11 +380,17 @@ the quickest turnaround time possible given the resources available.
 \item Timeouts will be enforced in each processing stage to ensure reliable throughput. Jobs
 failing due to the timeout conditions will be logged and triaged separately.
 
-\item A database will be used to marshal data to jobs, to keep and account for the states
-of jobs in various stages of processing (including errors and failures),
+\item A database will be used to manage the workflow and marshal data to jobs, to keep and
+account for the states of jobs in various stages of processing (including errors and failures),
 and to monitor the progress of execution.
 
 \end{itemize}
+
+\subsection{Implementing the workflow}
+In order to implement DAG as a functioning workflow, the following technique may be applied:
+each stage in the processing upon reaching successful completion will create entries in the database for its
+descendants. These entries will contain references to input data consisent with downsampling
+strategy presented in \ref{sec:downsampling}.
 
 \subsection{Just-in-Time Submission}
 \label{sec:justintime}
@@ -507,29 +536,61 @@ for record keeping.
 
 \end{enumerate}
 
+\newpage
+\appendix
+\section{The Neutrino Platform Computing Farm}
+\label{appendix:neut}
+\subsection{Purpose}
+The Neutrino Platform Computing Farm (sometimes referred to as the \textit{``neut cluster''} \cite{neut})
+serves as an imposrtant and flexible computing resource that can be utilized for a variety of tasks including simulation,
+reconstruction and software prototyping. It is proposed to utilize the cluster (or a part of it) as a core element
+of the Prompt Processing in \pd.
+
+\subsection{Hardware}
+The cluster comprises $\sim$300 DELL PowerEdge servers each containing directly attached HDD storage.
+The servers are interconnected via a network switch and
+also share a common NAS of 32\,TB capacity which simplifies software provisioning and
+sharing of data. There are plans to add more nodes to the cluster as well as to increase
+its storage.
+
+The cluster is located within the CERN network perimeter and has network access to central
+storage (e.g. EOS and CASTOR) and other  services at CERN.
+
+\subsection{Batch System and Monitoring}
+The cluster batch system of the \textit{``neut cluster''} is based on HTCondor\cite{htcondor}.
+There are plans to utilize ARDA \cite{arda} Dashboard for monitoring the cluster.
+ It is built as a Web service utilizing technologies necessary to achieve a high level of user interactivity.
+
+\subsection{Software}
+A variety of software is available on the cluster, including infrastructure elements such as DB server and
+Web server software, Web framework toolkit (Django), as well as simulation, reconstruction and analysis
+software such as ROOT \cite{root} and LArSoft \cite{larsoft}. Also installed is the FNAL middeware developed by FIFE
+\cite{fife}.
+
+
 \clearpage
 \begin{thebibliography}{1}
 \bibitem{docdb1086}
 {DUNE DocDB 1086: \textit{ protoDUNE/SP data scenarios with full stream (spreadsheet)}}\\
 \url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1086}
 
-%\bibitem{docdb186}
-%{DUNE DocDB 186: \textit{ ProtoDUNE Proposal}}\\
-%\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=186}
-
-
-%\bibitem{docdb1209}
-%{DUNE DocDB 1209: \textit{Basic Requirements for the protoDUNE Raw Data Mangement System}}\\
-%\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1209}
-
 
 \bibitem{docdb1212}
 {DUNE DocDB 1212: \textit{Design of the Data Management System for the protoDUNE Experiment}}\\
 \url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1212}
 
+
 \bibitem{docdb1811}
 {DUNE DocDB 1811: \textit{Prompt Processing System Requirements for the Single-Phase protoDUNE}}\\
 \url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1811}
+
+\bibitem{eos}
+{The CERN Exabyte Scale Storage}\\
+\url{http://information-technology.web.cern.ch/services/eos-service}
+
+\bibitem{fts}
+{The Fermilab File Transfer System}\\
+\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
 
 
 \bibitem{xrootd}
@@ -543,6 +604,30 @@ for record keeping.
 \bibitem{lxbatch}
 {The CERN batch computing service}\\
 \url{http://information-technology.web.cern.ch/services/batch}
+
+
+\bibitem{htcondor}
+{HTCondor}
+\url{https://research.cs.wisc.edu/htcondor/}
+
+\bibitem{arda}
+{The CERN Dashboard project}\\
+CERN-IT-NOTE-2007-048) and \url{http://dashboard.cern.ch/}
+
+\bibitem{root}
+{ROOT}\\
+\url{https://root.cern.ch/}
+
+
+\bibitem{larsoft}
+{The Liquid Argon Software (LArSoft) Collaboration}\\
+\url{http://larsoft.org/}
+
+\bibitem{fife}
+{Fabric for Intensity Frontier Experiments}\\
+\url{http://fife.fnal.gov/}
+
+
 
 \end{thebibliography}
 
