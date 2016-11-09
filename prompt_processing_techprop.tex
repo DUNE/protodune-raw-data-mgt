@@ -86,6 +86,7 @@ operators.
 
 
 \subsection{Scope of the Prompt Processing}
+\label{sec:scope}
 This is a compressed summary of information presented in \cite{docdb1811}.
 For more detailed explanation please see the source.
 
@@ -119,7 +120,7 @@ It includes items such as
 \item calculation of signal correlations for diagnostic purposes
 \end{itemize}
 
-\item[Reco] Results from running some type of reconstruction (perhaps simplified).
+\item[Reco] Results from running some type of reconstruction (perhaps greatly simplified).
 It may, for  example, provide a coarse count of straight muon track candidates.
 
 \end{description}
@@ -129,9 +130,19 @@ It may, for  example, provide a coarse count of straight muon track candidates.
 block since \textbf{FFT} will require uncompressed data in any case. Likewise, some other stages in the processing
 chain and visualization may be conflated in case writing out intermediate (transient) data creates an I/O bottleneck,
 while still preserving modularity to the largest extent possible. Such design decisions will be made at a later time.
-
 Note that the categories listed above can be thought of as stages of processing (for the most part), where
 the output of a stage serves as input to the next one. This can be conceptualized as a DAG (see \ref{sec:dag}).
+
+While defining the scope of \PP one needs to balance the computational costs and other costs of implementing
+a particular part of the chain vs the estimated net effect on overall DQM. For example, producing correlation
+plots of ``channel vs time'' before and after the \textbf{Sig} stage produces 2D projections of the raw event
+display (before any reconstruction) and based on prior experience constitutes a powerful tool for both
+visual and quantitative monitoring of the detector performance. The \textbf{Reco} stage is undoubtedly useful
+but it will require an order of magnitude more resources to implement, which will reduce resource availability
+for other part of \PP. It also requires a more sophisticated orchestration of data which would include
+merging with \textbf{BI} and \textbf{CRT} streams and at least rudimentary calibrations. It is unlikelty
+for these reasons that the \textbf{Reco} stage will be implemented in \PP but it's kept in the following
+description for sake of completeness.
 
 \subsubsection{Sampling (pre-scaling) the TPC Data in the Prompt Processing Chain}
 \label{sec:downsampling}
@@ -160,7 +171,7 @@ This can be achieved by two methods or some combination thereof:
 \subsubsection{Visualization}
 \label{sec:viz_intro}
 
-The \textit{Visualization} category of processing
+The \textit{Visualization} category of processing (\textbf{Vis})
  may take data output from any of the above listed stages in
 order to efficiently present it to the end-user. 
 % This stage will need to
@@ -176,13 +187,15 @@ It may include items such as:
 \item Various statistics dynamically updated over some some fixed time window.
 
 \item 2D displays of underlying values such as spectrograms of the \textbf{FFT}
-  output (vs wire), or time vs wire using output from \textbf{ADC} and \textbf{Sig}.
+  output (vs channel), or time vs channel number using output from \textbf{ADC} and \textbf{Sig}.
 
 \end{itemize}
 
 \noindent Vizual infromation produced by this type of processing will be presented to the users
 via an interactive Wev interface and where necessary shall be preserved for record keeping,
-troubleshooting and other applications.
+troubleshooting and other applications. It should be noted that certain types of visualizaion
+will result in massive amounts of output data so adequate design and planning for that stage
+must be in place.
 
 \subsubsection{Other Applications of the TPC Data Processing Components}
 Results of the intermediate stages of Data Processing may need to be preserved, for
@@ -200,7 +213,8 @@ systems (see \ref{sec:streams}). At a minimum this will include collection and p
 ADC spectra which will allow the operator to ascertain the beam status and performance
 and make sure the trigger is configured correctly (for both the beam and the cosmic tay trigger).
 In addition, there can be a stage that reconstructs the beam particle trajectories based on
-position-sensitive  detectors which are part of \textbf{BI}.
+position-sensitive  detectors which are part of \textbf{BI} or at least plots the beam profile
+at the points of measurement.
 
 
 
@@ -235,7 +249,7 @@ composition. It is expected therefore that this processing will likewise be mode
 \section{Design Parameters}
 \label{sec:parameters}
 
-\subsection{Computing Resources}
+\subsection{Computing Resources Available for \PP}
 \label{resources}
 The following computing resources are being considered for prompt processing:
 \begin{itemize}
@@ -255,7 +269,7 @@ are less time critical than others (e.g. visualization and histogramming for lon
 \noindent Optimally, all available resources will be managed transparently in one unified system and
 the workload distribution will be dynamically adjustable.
 
-\subsection{Staging Data for Prompt Processing}
+\subsection{Staging the Data}
 \label{sec:staging}
 CERN EOS appears to be the best suited platform from which to
 serve the data for prompt processing for the following reasons:
@@ -275,6 +289,11 @@ allow to avoid implementaion of a special data transmission handling chain for p
 
 \end{itemize}
 
+\noindent Advantages of EOS nonwithstanding, one must plan for the continency of it experiencing
+an outage due to network or any other kind of a problem. For that reason a fallback staging area
+must exist to allow for at least partial \PP to continue in the vicinity of the detector in case of
+an outage.
+
 \subsection{Location of the computing resources}
 The CERN Tier-0 computing facility is located in the West Area. As to the ``neut'' cluster (\ref{resources}),
 there are two practical possibilities for its placement:
@@ -293,16 +312,17 @@ Placement of the computing resources for prompt processing in the detector
 vicinity solves the above problem. However, it creates an additional I/O load on both
 the online buffer and on the network link between \expname and central storage.
 
-The situation is further complicated by the need to handle three data streams (\ref{sec:streams})
-in certain stages of processing: LArTPC, \textbf{BI} and \textbf{CRT}. The information contained
-in the two latter streams will be absolutely necessary for event reconstruction, which is one of the final
-stages in the processing chain. These challenges are been analysed at the time of writing and the
-final decision will be made at a later point. There may be potentially a third possibility, where
-some of the initial stages of the processing chain are located near the experiment, while
-advanced resontruction takes place at CERN Tier-0 facilities.
+The situation is complicated in case the \PP system needs to handle three data streams (\ref{sec:streams})
+in certain stages of processing: LArTPC, \textbf{BI} and \textbf{CRT}. Ways to ensure these
+data are available for \PP are being investigated at the time of writing.
+
+The final decision regarding placement of the computing resources will be made at a later time.
+In addition to the two options presented above there may be potentially a third possibility where
+some of the initial stages of the processing chain are located near the experiment, while more
+advanced resontruction takes place at CERN Tier-0 facilities or even at FNAL.
 
 
-\subsection{Prioritization of Processing Steps}
+\subsection{Prioritization of Processing Steps and Timeout Strategy}
 \label{sec:priority}
 Quick turnaround is the key for the prompt processing to be useful. For each processing category
 to be complete it must include the visualization component in order to make the results available
@@ -311,26 +331,25 @@ important compared to timely completion of all steps (NB. with downsampling of t
 \ref{sec:downsampling}).
 
 A use case may help to illustrate this. Let's assume a predetermined fraction of the events needs to
-be reconstructed (perhaps with simplified algorithm aimed at identifying cosmic muon candidates).
+be visualized as described in \ref{sec:scope}.
+% (perhaps with simplified algorithm aimed at identifying cosmic muon candidates).
 This information needs to be made available to the operators as quickly as possbile in order to ascertain the performance
 of the detector at a level of confidence much higher than that provided by ADC histograms.
-Consider the case where the \textbf{FFT} and \textbf{Sig} parts (see \ref{sec:categories})
-completed satisfactorily but are consuming a fraction of the computing resource so large that
-the  \textbf{Reco} stage is starved of resources and takes a very long time to complete, making
+Consider the case where the \textbf{FFT} stage (see \ref{sec:categories})
+is running successfully but is consuming a fraction of the computing resource so large that
+the \textbf{Sig} stage is starved and takes a longer time to complete, making
 it less relevant and less useful. This situation can be prevented by prioritizing each step higher
 than the preceding one (again, with downsampling as per \ref{sec:downsampling}). In many
 cases having a ``visual product'' to present the data to the operator is crucial (e.g. histograms,
 event displays etc) so corresponding processes need to have sufficiently high priority.
-
 It is therefore necessary to provide a mechanism for flexible prioritization of the different
 classes of jobs running in the prompt processing system.
 
-\subsection{Timeout}
 There can be various reasons why a job may take than is practical, thus consuming valuable resources
-and creating a bottleneck -- from bugs in software to a type of event which is genuinly difficult to reconstruct.
+and creating a bottleneck -- from bugs in software to a type of event which is genuinly difficult to analyze.
 These jobs need to be triaged, diagnosed and documented separately from the main workflow and perhaps
 using a different computing resource. For this reason, maximum allowed execution time (effectively a timeout)
-will need to be set for each processing category in prompt processing chain.
+will need to be set for each processing category in prompt processing chain in order to prevent stalling of the system.
 
 
 \subsection{Workflow: Automation And State}
@@ -358,15 +377,24 @@ scripting
 An additional and obvious advantage of this approach is that an efficient and responsive Web interface to
 the system can be created with minimal effort.
 
-\subsection{Monitoring, Interfaces and Integration}
-The requirements for the prompt processing monitoring are listed in \cite{docdb1811}.
+\subsection{Delivery of DQM results, Monitoring, Interfaces and Integration}
+
+The requirements for monitoring the results of the \PP are listed in \cite{docdb1811}.
 We propose modular Web interface which can be configured to be used by itself, or integrated
-with other elements of the \expname monitoring. 
+with other elements of the \expname monitoring. A useful functionality that may be included in DQM
+is to produce an automatic alarm when some of the benchmark parameters of the data are outside
+of predetermined limits.
 % The issues of the design of the corresponding web service and integration with other monitoring
 % components (such as those in DAQ) will be addressed at a later time.
 
-The prompt processing system will need to interface with the data handling system (i.e.~F-FTS). A simple example
-would be prevention of the data being purged from EOS while it's still needed for processing.
+Depending on the design, the \PP system may need to interface the data handling system (i.e.~F-FTS).
+A simple example would be prevention of the data being purged from EOS while it's still needed for processing.
+It is possible that an additional DAQ interface will be required to ensure that raw data is passed to the
+\PP system.
+
+Monitoring of the status of the \PP facility (such as a cluster located in EHN1) will  be done
+with tools like ARDA \cite{arda}.
+
 
 \section{The Proposed Design}
 \label{sec:design}
@@ -386,7 +414,7 @@ the quickest turnaround time possible given the resources available.
 \item Timeouts will be enforced in each processing stage to ensure reliable throughput. Jobs
 failing due to the timeout conditions will be logged and triaged separately.
 
-\item A database will be used to manage the workflow and marshal data to jobs, to keep and
+\item A \textbf{database} will be used to manage the workflow and marshal data to jobs, to keep and
 account for the states of jobs in various stages of processing (including errors and failures),
 and to monitor the progress of execution.
 
@@ -432,7 +460,7 @@ jobs of a specific type.
 \end{figure}
 
 For example, if we consider the DAG depicted in Fig.\ref{fig:dag1}, then ``Type 1''
-is \textbf{ADC/FFT}, ``Type 2'' is \textbf{Sig}, and ``Type 3'' is \textbf{Reco}. For illustration purposes,
+is \textbf{ADC/FFT}, ``Type 2'' is \textbf{Sig}, and ``Type 3'' is \textbf{Vis}. For illustration purposes,
 the queues in this diagram have different depths $(i,j,k)$  -- which may indeed happen in practice.
 
 Jobs consume data produced in the previous stage of prompt processing. For that reason, they
