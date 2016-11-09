@@ -11,6 +11,7 @@
 %\newcommand{\pdsp}{pD/SP\xspace}
 \newcommand{\xrd}{XRootD\xspace}
 \newcommand{\expname}{\textit{NP04}\xspace}
+\newcommand{\PP}{Prompt Processing\xspace}
 
 \title{A Design of the Prompt Processing System for the Single-Phase \pd experiment (\expname)}
 \date{\today}
@@ -21,14 +22,14 @@
 \maketitle
 
 \begin{abstract}
-\noindent  Data Quality Monitoring (DQM) and Prompt Processing necessary for its implementation
+\noindent  Data Quality Monitoring (DQM) and \PP necessary for its implementation
 are important work areas  in the Single-Phase \pd (CERN experiment \expname).
-This note describes design parameters of the Prompt Processing system, and one particular design option for such system
-based on prioritized queue. We start with a brief summary of the data characteristics and data handling patterns
-as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,1212 \cite{docdb1212} and present
-the basic requirements as per  DocDB 1811 \cite{docdb1811}. A data-driven design is proposed with
-a focus on dataflow and throughput which satisfies these requirements, and is based on dynamically prioritized
-jobs queue.
+This note describes design parameters of the Prompt Processing system, and one
+particular design option for such system. We start with a brief summary of the data characteristics
+and data handling patterns as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,
+1212 \cite{docdb1212} and present the basic requirements as per  DocDB 1811 \cite{docdb1811}.
+A design of the \PP System is proposed with a focus on dataflow, throughput and pre-scaling of
+the input data which satisfies these requirements. It employs a dynamically prioritized job queue.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,19 +37,24 @@ jobs queue.
 \section{Overview}
 \subsection{Data Scenarios and Data Handling}
 \label{sec:rawdata}
-Quantitative information about scenarios for data taking in \pd is collected and maintained in \cite{docdb1086}. The following parameters
-are assumed at the time of writing: the raw data rate
-produced by the LArTPC will be $\sim$1.4\,GB/s after lossless compression, and to size up
-the system and account for contingencies rates up to 3\,GB/s are under consideration.
+Quantitative information about scenarios for data taking in \pd is collected and maintained in \cite{docdb1086}.
+The raw data rate produced by the LArTPC is assumed tl be $\sim$1.4\,GB/s after lossless compression. This is based on
+the assumption that a large number of Cosmic Ray triggers will be produced in addition to beam triggers, leading
+to a virtually uniform trigger rate in and out of spill. In order to size up
+the system and account for vsrious contingencies rates up to 3\,GB/s are under consideration.
 Rates and volume of data coming from other detector components will be much smaller
 and won't effect the overall scale of the data handling and processing system.
 
 Outline of the design of the raw data handling system is documented in  \cite{docdb1212} and other prior \pd documentation.
 According to it, the data is transmitted from the online buffer to the CERN EOS \cite{eos}
 via a 20 Gbps full-duplex network connection.
-The EOS system serves as the hub and staging area for the \pd raw data from which
+The EOS system serves as the hub for the \pd raw data from which
 it gets committed to the tape archive at CERN and also transmitted to FNAL and potentially
-other US and international locations. All or most links in the data transmission chain will be based on F-FTS \cite{fts}.
+other US and international locations.  It will also be one of the principal staging areas for \PP. 
+
+All or most links in the data transmission chain will be based on F-FTS \cite{fts} will allows us
+to reuse an existing and well supported technology which has been determined to satisfy
+the \pd requirements.
 
 \subsection{Data Streams}
 \label{sec:streams}
