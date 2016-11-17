@@ -13,7 +13,7 @@
 \newcommand{\expname}{\textit{NP04}\xspace}
 \newcommand{\PP}{Prompt Processing\xspace}
 
-\title{A Design of the Prompt Processing System for the Single-Phase \pd experiment (\expname)}
+\title{A Design of the Prompt Processing System for \expname}
 \date{\today}
 \author{N. Benekos, M.\,Potekhin and B.\,Viren}
 
@@ -24,20 +24,28 @@
 \begin{abstract}
 \noindent  Data Quality Monitoring (DQM) and \PP necessary for its implementation
 are important work areas  in the Single-Phase \pd (CERN experiment \expname).
-This note describes design parameters of the Prompt Processing system, and one
-particular design option for such system. We start with a brief summary of the data characteristics
+This note describes design parameters of the \pd Prompt Processing System (\textbf{p3s}).
+ We start with a brief summary of the data characteristics
 and data handling patterns as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,
 1212 \cite{docdb1212} and present the basic requirements as per  DocDB 1811 \cite{docdb1811}.
-A design of the \PP System is proposed with a focus on dataflow, throughput and pre-scaling of
-the input data which satisfies these requirements. It employs a dynamically prioritized job queue.
+A design is proposed with a focus on automation, low latency and high throughput which
+satisfies these requirements. It employs a pilot-based mechanism for computational payload
+deployment and a dynamically prioritized job queue to ensure timely delivery of time-critical data.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Overview}
-\subsection{Data Scenarios and Data Handling}
+\subsection{Motivation}
+The LArTPC in \expname is a very large and complex device instrumented with highly sensitive electronics.
+Experience with previously built smaller prototypes as well as current experiments utilizing this technology
+(e.g. $\mu$BooNE) demonstrate the importance of Data Quality Management (DQM) at all stages of the detector
+integration and data taking. In order to accomplish this, the \underline{p}rotoDUNE \underline{P}rompt
+\underline{P}rocessing \underline{S}ystem (\texttt{p3s}) will be put in place.
+
+\subsection{\expname Data Scenarios and Data Handling}
 \label{sec:rawdata}
-Quantitative information about scenarios for data taking in \pd is collected and maintained in \cite{docdb1086}.
+Quantitative information about scenarios for data taking in the Single-Phase \pd is collected and maintained in \cite{docdb1086}.
 The raw data rate produced by the LArTPC is assumed tl be $\sim$1.4\,GB/s after lossless compression. This is based on
 the assumption that a large number of Cosmic Ray triggers will be produced in addition to beam triggers, leading
 to a virtually uniform trigger rate in and out of spill. In order to size up
@@ -62,36 +70,37 @@ the \pd requirements.
 For reasons that are outside of the scope of this paper the experimental raw data in \expname will come
 as three distinct streams at the time they are captured:
 \begin{itemize}
-\item The LArTPC stream which is the dominant in terms of rate and volume
-\item \textbf{BI} (Beam Instrumentation) Stream containing data from Cherenkov and TOF systems
-\item \textbf{CRT} (Cosmic Ray Tagger)
+\item \textbf{LArTPC} The TPC  stream which is the dominant in terms of rate and volume
+\item \textbf{BI} Data from Cherenkov and TOF systems
+\item \textbf{CRT} Cosmic Ray Tagger data
 \end{itemize}
 
 \noindent All three streams will follow a similar path in that they will be transmitted from their respective
 online buffers to mass storage (which in this case is EOS, see \ref{sec:staging}). An important differentiating
-frature of the \textbf{BI} stream is that the data wil be bundled in pieces potentially as large as coveing
-a SPS cycle which is in tens of seconds. It can be assume that the data in all three streams will be tagged
+feature of the \textbf{BI} data is that it wil be bundled in pieces potentially as large as coveing
+a SPS cycle which is in tens of seconds. It can be assumed that the data in all three streams will be tagged
 with time stamps derived from the same source which is crucial for matching of these date in every step
 of processing.
 
 \subsection{Goals}
 \label{sec:outline}
-According to \cite{docdb1811}  prompt processing needs to occur on the scale
-of tens of minutes (or better) from the time the data was taken. Its purpose is to
+According to \cite{docdb1811}  the data needs to undergo prompt processing on the scale
+of tens of minutes (or better) from the time it was taken. Its purpose is to
 provide a more in-depth data QA and assessment of the detector's health and operating conditions
-than is afforded by most basic histogramming e.g.~of the ADC counts in individual channels. Most calculations
-done as a part of prompt processing will result in some sort of a ``visual product'', for example a histogram,
-plot, event display or a summary table in order to provide optimal accessibility to the experiment
-operators.
+than is afforded by most basic histogramming e.g.~of the ADC counts in individual channels
+(which will be a part of the generic DAQ monitoring). Most calculations done in the course of prompt
+processing will result in some sort of a ``visual product'', for example a histogram, plot, event display
+or a summary table in order to provide information to the experiment operators in a timely manner.
+Since the volume of visual and numeric informaiton pertinent to DQM may be large and hard
+to quickly comprehend, there will be automated alerts to the operators when certain parameters
+are outside of their nominal range.
 
 
-\subsection{Scope of the Prompt Processing}
+\subsection{The Scope of the Prompt Processing}
 \label{sec:scope}
-This is a compressed summary of information presented in \cite{docdb1811}.
-For more detailed explanation please see the source.
-
 \subsubsection{TPC Data Processing}
 \label{sec:categories}
+This is a compressed summary of information presented in \cite{docdb1811}.
 The categories are as follows:
 
 \begin{description}
@@ -137,12 +146,16 @@ While defining the scope of \PP one needs to balance the computational costs and
 a particular part of the chain vs the estimated net effect on overall DQM. For example, producing correlation
 plots of ``channel vs time'' before and after the \textbf{Sig} stage produces 2D projections of the raw event
 display (before any reconstruction) and based on prior experience constitutes a powerful tool for both
-visual and quantitative monitoring of the detector performance. The \textbf{Reco} stage is undoubtedly useful
-but it will require an order of magnitude more resources to implement, which will reduce resource availability
-for other part of \PP. It also requires a more sophisticated orchestration of data which would include
-merging with \textbf{BI} and \textbf{CRT} streams and at least rudimentary calibrations. It is unlikelty
-for these reasons that the \textbf{Reco} stage will be implemented in \PP but it's kept in the following
-description for sake of completeness.
+visual and quantitative monitoring of the detector performance.
+
+The \textbf{Reco} stage may provide information on the detector performance which is more complete
+and sensitive to potential anomalies than signal processing alone. However, doing full and high-quality
+event reconstruction would require substantial resources to implement which will reduce resource availability
+for other parts of \PP. It also requires a sophisticated orchestration of data flow which would include
+merging with \textbf{BI} and \textbf{CRT} streams and at least rudimentary calibrations. 
+For these reasons, reconstruction will be limited to high-speed clustering and hit detection algorithms.
+One useful applicaiton of this type of reconstruction would be correlating clusters and hits with
+the beam profile.
 
 \subsubsection{Sampling (pre-scaling) the TPC Data in the Prompt Processing Chain}
 \label{sec:downsampling}
@@ -572,6 +585,17 @@ for record keeping.
 
 \newpage
 \appendix
+\section{Glossary}
+\begin{description}
+
+\item [CRT] Cosmic Ray Tagger
+
+\item [BI] Beam Instrumentation
+
+\item[\tt{p3s}] \pd Prompt Processing System
+
+\end{description}
+
 \section{The Neutrino Platform Computing Farm}
 \label{appendix:neut}
 \subsection{Purpose}
@@ -600,6 +624,9 @@ A variety of software is available on the cluster, including infrastructure elem
 Web server software, Web framework toolkit (Django), as well as simulation, reconstruction and analysis
 software such as ROOT \cite{root} and LArSoft \cite{larsoft}. Also installed is the FNAL middeware developed by FIFE
 \cite{fife}.
+
+Initial setup of XRootD\cite{xrootd} has been performed, which will allow to quickly implement storage federation
+on the cluster if needed.
 
 
 \clearpage
