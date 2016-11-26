@@ -13,7 +13,7 @@
 \newcommand{\expname}{\textit{NP04}\xspace}
 \newcommand{\PP}{Prompt Processing\xspace}
 
-\title{A Design of the Prompt Processing System for \expname}
+\title{A Design of the \pd/\expname Prompt Processing System}
 \date{\today}
 \author{N. Benekos, M.\,Potekhin and B.\,Viren}
 
@@ -24,7 +24,7 @@
 \begin{abstract}
 \noindent  Data Quality Monitoring (DQM) and \PP necessary for its implementation
 are important work areas  in the Single-Phase \pd (CERN experiment \expname).
-This note describes design parameters of the \pd Prompt Processing System (\textbf{p3s}).
+This note describes design parameters of the \textit{\pd Prompt Processing System} (\textbf{p3s}).
  We start with a brief summary of the data characteristics
 and data handling patterns as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,
 1212 \cite{docdb1212} and present the basic requirements as per  DocDB 1811 \cite{docdb1811}.
@@ -39,9 +39,9 @@ deployment and a dynamically prioritized job queue to ensure timely delivery of 
 \subsection{Motivation}
 The LArTPC in \expname is a very large and complex device instrumented with highly sensitive electronics.
 Experience with previously built smaller prototypes as well as current experiments utilizing this technology
-(e.g. $\mu$BooNE) demonstrate the importance of Data Quality Management (DQM) at all stages of the detector
-integration and data taking. In order to accomplish this, the \underline{p}rotoDUNE \underline{P}rompt
-\underline{P}rocessing \underline{S}ystem (\texttt{p3s}) will be put in place.
+(e.g. $\mu$BooNE) has demonstrated the importance of Data Quality Management (DQM) at all stages of
+the detector integration and data taking. In order to accomplish this, the \underline{p}rotoDUNE
+\underline{P}rompt \underline{P}rocessing \underline{S}ystem (\texttt{p3s}) will be put in place.
 
 \subsection{\expname Data Scenarios and Data Handling}
 \label{sec:rawdata}
@@ -56,7 +56,7 @@ and won't effect the overall scale of the data handling and processing system.
 Outline of the design of the raw data handling system is documented in  \cite{docdb1212} and other prior \pd documentation.
 According to it, the data is transmitted from the online buffer to the CERN EOS \cite{eos}
 via a 20 Gbps full-duplex network connection.
-The EOS system serves as the hub for the \pd raw data from which
+The EOS system serves as the hub for the \pd raw data distribution from which
 it gets committed to the tape archive at CERN and also transmitted to FNAL and potentially
 other US and international locations.  It will also be one of the principal staging areas for \PP. 
 
@@ -67,11 +67,11 @@ the \pd requirements.
 \subsection{Data Streams}
 \label{sec:streams}
 
-For reasons that are outside of the scope of this paper the experimental raw data in \expname will come
-as three distinct streams at the time they are captured:
+For reasons that are outside of the scope of this document  the experimental raw data in \expname
+will come as three distinct streams at the time they are captured:
 \begin{itemize}
-\item \textbf{LArTPC} The TPC  stream which is the dominant in terms of rate and volume
-\item \textbf{BI} Data from Cherenkov and TOF systems
+\item \textbf{LArTPC} The TPC  stream which is dominant in terms of rate and volume
+\item \textbf{BI} Beam Instrumentation data from Cherenkov, TOF and other systems
 \item \textbf{CRT} Cosmic Ray Tagger data
 \end{itemize}
 
@@ -82,13 +82,17 @@ a SPS cycle which is in tens of seconds. It can be assumed that the data in all 
 with time stamps derived from the same source which is crucial for matching of these date in every step
 of processing.
 
-\subsection{Goals}
+\subsection{Goals and Time Scale}
 \label{sec:outline}
 According to \cite{docdb1811}  the data needs to undergo prompt processing on the scale
-of tens of minutes (or better) from the time it was taken. Its purpose is to
-provide a more in-depth data QA and assessment of the detector's health and operating conditions
-than is afforded by most basic histogramming e.g.~of the ADC counts in individual channels
-(which will be a part of the generic DAQ monitoring). Most calculations done in the course of prompt
+of \textit{tens of minutes} (or better) from the time it was taken, with the benchmark number of
+10\,min often being quoted for reference purposes. This is motivated by the need to have
+\textit{actionable} DQM information in time for operators to take action and prevent loss
+of useable data and/or valuable beam time.
+
+The goal is to provide a more in-depth data QA and assessment of the detector's health and operating
+conditions than is afforded by functionality implemented as a part of the generic monitoring running as
+artDAQ processes on the DAQ machines. Most calculations done in the course of prompt
 processing will result in some sort of a ``visual product'', for example a histogram, plot, event display
 or a summary table in order to provide information to the experiment operators in a timely manner.
 Since the volume of visual and numeric informaiton pertinent to DQM may be large and hard
@@ -105,20 +109,21 @@ The categories are as follows:
 
 \begin{description}
 
-\item[DAQ] A summary of DAQ-level data (with no decompression) such as summaries of data
+\item[DAQ (no data decompression)] A summary of DAQ-level data  such as summaries of data
  rates  or summaries of any metadata, status codes the provided by the DAQ etc.
-This processing is a candidate for running directly within artDAQ
-monitor processes instead of prompt-processing and is included here
-for completeness.
+Parts of this functionality will exist within the artDAQ monitor processes, perhaps with
+additional detail provided by the prompt processing system.
 
-\item[ADC] A summary of ADC-level data e.g. mean/RMS (requires data decompression).
+\item[ADC (requires data decompression)] A summary of ADC-level data e.g. mean/RMS
+values at channel level and as a statistics over various groupings and level of detail
+(ASIC, FEMB, RCE, APA etc).
 
 
 \item[FFT] A summary of the ADC-level data in frequency space. It requires running a discrete Fourier
 transform (FFT) on channel waveforms. This largely  provides measures of noise and its
 evolution.
 
-\item[Sig] A summary of the data \textit{after signal processing}.
+\item[SIG] A summary of the data \textit{after signal processing}.
 The processing is in  both time domain and in frequency domain (so uses the output of FFT).
 It includes items such as
 \begin{itemize}
@@ -129,7 +134,7 @@ It includes items such as
 \item calculation of signal correlations for diagnostic purposes
 \end{itemize}
 
-\item[Reco] Results from running some type of reconstruction (perhaps greatly simplified).
+\item[RECO] Results from running some type of reconstruction (perhaps greatly simplified).
 It may, for  example, provide a coarse count of straight muon track candidates.
 
 \end{description}
@@ -144,11 +149,11 @@ the output of a stage serves as input to the next one. This can be conceptualize
 
 While defining the scope of \PP one needs to balance the computational costs and other costs of implementing
 a particular part of the chain vs the estimated net effect on overall DQM. For example, producing correlation
-plots of ``channel vs time'' before and after the \textbf{Sig} stage produces 2D projections of the raw event
+plots of ``channel vs time'' before and after the \textbf{SIG} stage produces 2D projections of the raw event
 display (before any reconstruction) and based on prior experience constitutes a powerful tool for both
 visual and quantitative monitoring of the detector performance.
 
-The \textbf{Reco} stage may provide information on the detector performance which is more complete
+The \textbf{RECO} stage may provide information on the detector performance which is more complete
 and sensitive to potential anomalies than signal processing alone. However, doing full and high-quality
 event reconstruction would require substantial resources to implement which will reduce resource availability
 for other parts of \PP. It also requires a sophisticated orchestration of data flow which would include
@@ -161,15 +166,14 @@ the beam profile.
 \label{sec:downsampling}
 The categories of processing as outlined above may have drastically different resource requirements.
 %i.e. the ability to select a fractional sample of the data stream as is progresses through the chain, at every stage.
-For example, if 100 cores are allocated to FFT calculation this may be done for approximately 10\% of the events
+As a very rough estimate, if 100 cores are allocated to FFT calculation this may be done for approximately 10\% of the events
 in streaming mode. Then, depending on the type of deconvolution being employed (1D vs 2D) this step
 may require an order of magnitude more CPU to complete. To stay within reasonable footprint,
 it may be necessary to put only a fraction of the output of the FFT stage through deconvolution stage
 (note that the FFT output is valuable in and by itself since it allows to ascertain noise conditions in individual channels
-on a continuous basis). Event reconstruction will in turn require even more CPU
-and so it may also be necessary to scale down the number of
-events at this stage (while still aiming for quick turnaround). So effectively we are considering ``downsampling''
-or ``prescaling'' 
+on a continuous basis). Event reconstruction may require even more CPU depending on the desired level of complexity
+and so it may also be necessary to scale down the number of events at this stage (while still aiming for quick turnaround).
+Consideration is therefore given to ``downsampling'' or ``prescaling'' 
 of data as it progresses in the prompt processing chain, whereby a certain predetermined fraction of the data
 produced in a prompt processing stage is selected for processing in the next stage.
 This can be achieved by two methods or some combination thereof:
@@ -178,7 +182,10 @@ This can be achieved by two methods or some combination thereof:
 \item Reading only a fraction of events from a given input file
 \end{itemize}
 
-\noindent Parameters governing this fractional data selection must be dynamically configurable.
+\noindent Implementing the latter mode of data access is very important since it reduces
+the volume of the data being copied and/or read by running processes by avoiding
+operations on whole files.
+Parameters governing this fractional data selection must be dynamically configurable.
 
 
 \subsubsection{Visualization}
@@ -200,7 +207,7 @@ It may include items such as:
 \item Various statistics dynamically updated over some some fixed time window.
 
 \item 2D displays of underlying values such as spectrograms of the \textbf{FFT}
-  output (vs channel), or time vs channel number using output from \textbf{ADC} and \textbf{Sig}.
+  output (vs channel), or time vs channel number using output from \textbf{ADC} and \textbf{SIG}.
 
 \end{itemize}
 
@@ -214,7 +221,7 @@ must be in place.
 Results of the intermediate stages of Data Processing may need to be preserved, for
 example the data in graphic form for audit/run documentation purposes.
 Also, there could be a potential for large processing efficiency
-gains to be made if the entire data can be run through the \textit{Sig} processing followed by ZS.
+gains to be made if the entire data can be run through the \textit{SIG} processing followed by ZS.
 Certain portion of log files produced during prompt processing may contain information useful
 for future reference and debugging, so provisions will be made to capture these data.
 
@@ -350,7 +357,7 @@ This information needs to be made available to the operators as quickly as possb
 of the detector at a level of confidence much higher than that provided by ADC histograms.
 Consider the case where the \textbf{FFT} stage (see \ref{sec:categories})
 is running successfully but is consuming a fraction of the computing resource so large that
-the \textbf{Sig} stage is starved and takes a longer time to complete, making
+the \textbf{SIG} stage is starved and takes a longer time to complete, making
 it less relevant and less useful. This situation can be prevented by prioritizing each step higher
 than the preceding one (again, with downsampling as per \ref{sec:downsampling}). In many
 cases having a ``visual product'' to present the data to the operator is crucial (e.g. histograms,
@@ -374,7 +381,7 @@ needs of the experiment, and it will be necessary to automate the prompt process
 Automation can be achieved in  number of different ways. In the simples case, processes belonging to a particular stage
 of processing can be waiting for files produced by the previous stage and matching a particular name pattern
 (in a fashion similar to the ``dropbox'' mechanism). This design eschews the use of a database and it is effectively
-the file system which keeps the state of the workflow. For example, jobs performing calculations in the \textbf{Sig}
+the file system which keeps the state of the workflow. For example, jobs performing calculations in the \textbf{SIG}
 stage could be waiting for files containing the output of the \textbf{FFT} stage. These scheme is conceptually simple but has a number of
 disadvantages, such as
 \begin{itemize}
@@ -473,7 +480,7 @@ jobs of a specific type.
 \end{figure}
 
 For example, if we consider the DAG depicted in Fig.\ref{fig:dag1}, then ``Type 1''
-is \textbf{ADC/FFT}, ``Type 2'' is \textbf{Sig}, and ``Type 3'' is \textbf{Vis}. For illustration purposes,
+is \textbf{ADC/FFT}, ``Type 2'' is \textbf{SIG}, and ``Type 3'' is \textbf{Vis}. For illustration purposes,
 the queues in this diagram have different depths $(i,j,k)$  -- which may indeed happen in practice.
 
 Jobs consume data produced in the previous stage of prompt processing. For that reason, they
@@ -588,11 +595,19 @@ for record keeping.
 \section{Glossary}
 \begin{description}
 
+\item [artDAQ] The online software platform based on the \textit{art} framework and utilized in \pd
+
 \item [CRT] Cosmic Ray Tagger
+
+\item [DAG] Directed Acyclic Graph
 
 \item [BI] Beam Instrumentation
 
-\item[\tt{p3s}] \pd Prompt Processing System
+\item [F-FTS] Fermi File Transfer System
+
+\item [p3s] \pd Prompt Processing System
+
+\item [RCE] Reconfigurable Cluster Element
 
 \end{description}
 
