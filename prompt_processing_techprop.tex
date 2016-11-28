@@ -12,6 +12,7 @@
 \newcommand{\xrd}{XRootD\xspace}
 \newcommand{\expname}{\textit{NP04}\xspace}
 \newcommand{\PP}{Prompt Processing\xspace}
+\newcommand{\PPS}{\textbf{p3s}\xspace}
 
 \title{A Design of the \pd/\expname Prompt Processing System}
 \date{\today}
@@ -24,24 +25,31 @@
 \begin{abstract}
 \noindent  Data Quality Monitoring (DQM) and \PP necessary for its implementation
 are important work areas  in the Single-Phase \pd (CERN experiment \expname).
-This note describes design parameters of the \textit{\pd Prompt Processing System} (\textbf{p3s}).
+This note describes design parameters of the \textit{\pd Prompt Processing System} (\PPS).
  We start with a brief summary of the data characteristics
-and data handling patterns as documented in DocDB\,1086 \cite{docdb1086}, DocDB\,
-1212 \cite{docdb1212} and present the basic requirements as per  DocDB 1811 \cite{docdb1811}.
-A design is proposed with a focus on automation, low latency and high throughput which
-satisfies these requirements. It employs a pilot-based mechanism for computational payload
-deployment and a dynamically prioritized job queue to ensure timely delivery of time-critical data.
+and data handling patterns as documented in DocDB\,1086 \cite{docdb1086}, DocDB\ and
+1212 \cite{docdb1212}. We present the basic requirements as per  DocDB 1811 \cite{docdb1811}
+which differ in many  respects from those of Workload Management
+Systems utilized on the Grid (for example, a job may be removed from the system entirely
+if the overall workflow is stalling due to limtied CPU, job priorities may depend on
+the time a particular piece of data was produced etc). A design is proposed with a focus
+on low latency, high throughput and automation which satisfies these requirements. It employs a pilot-based mechanism for
+computational payload deployment and a dynamically prioritized job queue to ensure timely
+delivery of time-critical data.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Overview}
+\subsection{Terminology}
+Some of the terms, acronyms and abbreviations used in this document are explained in the glossary in Appendix \ref{sec:glossary}.
+
 \subsection{Motivation}
 The LArTPC in \expname is a very large and complex device instrumented with highly sensitive electronics.
 Experience with previously built smaller prototypes as well as current experiments utilizing this technology
 (e.g. $\mu$BooNE) has demonstrated the importance of Data Quality Management (DQM) at all stages of
 the detector integration and data taking. In order to accomplish this, the \underline{p}rotoDUNE
-\underline{P}rompt \underline{P}rocessing \underline{S}ystem (\texttt{p3s}) will be put in place.
+\underline{P}rompt \underline{P}rocessing \underline{S}ystem (\textbf{p3s}) will be put in place.
 
 \subsection{\expname Data Scenarios and Data Handling}
 \label{sec:rawdata}
@@ -53,9 +61,9 @@ the system and account for vsrious contingencies rates up to 3\,GB/s are under c
 Rates and volume of data coming from other detector components will be much smaller
 and won't effect the overall scale of the data handling and processing system.
 
-Outline of the design of the raw data handling system is documented in  \cite{docdb1212} and other prior \pd documentation.
-According to it, the data is transmitted from the online buffer to the CERN EOS \cite{eos}
-via a 20 Gbps full-duplex network connection.
+Outline of the design of the raw data handling system is documented in  \cite{docdb1212} and other
+prior \pd documentation. According to it, the data is transmitted from the online buffer to the
+CERN EOS \cite{eos} via a 20\,Gbps full-duplex network connection.
 The EOS system serves as the hub for the \pd raw data distribution from which
 it gets committed to the tape archive at CERN and also transmitted to FNAL and potentially
 other US and international locations.  It will also be one of the principal staging areas for \PP. 
@@ -92,8 +100,8 @@ of useable data and/or valuable beam time.
 
 The goal is to provide a more in-depth data QA and assessment of the detector's health and operating
 conditions than is afforded by functionality implemented as a part of the generic monitoring running as
-artDAQ processes on the DAQ machines. Most calculations done in the course of prompt
-processing will result in some sort of a ``visual product'', for example a histogram, plot, event display
+artDAQ processes on the DAQ machines. Most calculations done in \PPS
+will result in some sort of a ``visual product'', for example a histogram, plot, event display
 or a summary table in order to provide information to the experiment operators in a timely manner.
 Since the volume of visual and numeric informaiton pertinent to DQM may be large and hard
 to quickly comprehend, there will be automated alerts to the operators when certain parameters
@@ -162,18 +170,18 @@ For these reasons, reconstruction will be limited to high-speed clustering and h
 One useful applicaiton of this type of reconstruction would be correlating clusters and hits with
 the beam profile.
 
-\subsubsection{Sampling (pre-scaling) the TPC Data in the Prompt Processing Chain}
+\subsubsection{Sampling (pre-scaling) the TPC Data in \PPS}
 \label{sec:downsampling}
 The categories of processing as outlined above may have drastically different resource requirements.
 %i.e. the ability to select a fractional sample of the data stream as is progresses through the chain, at every stage.
 As a very rough estimate, if 100 cores are allocated to FFT calculation this may be done for approximately 10\% of the events
 in streaming mode. Then, depending on the type of deconvolution being employed (1D vs 2D) this step
-may require an order of magnitude more CPU to complete. To stay within reasonable footprint,
+may require an order of magnitude more CPU to complete. To stay within a reasonable footprint,
 it may be necessary to put only a fraction of the output of the FFT stage through deconvolution stage
 (note that the FFT output is valuable in and by itself since it allows to ascertain noise conditions in individual channels
-on a continuous basis). Event reconstruction may require even more CPU depending on the desired level of complexity
-and so it may also be necessary to scale down the number of events at this stage (while still aiming for quick turnaround).
-Consideration is therefore given to ``downsampling'' or ``prescaling'' 
+on a continuous basis). Event reconstruction may require even more CPU depending on the desired level of precision and/or
+complexity and so it may also be necessary to scale down the number of events at this stage
+(while still aiming for quick turnaround). Consideration is therefore given to ``downsampling'' or ``prescaling'' 
 of data as it progresses in the prompt processing chain, whereby a certain predetermined fraction of the data
 produced in a prompt processing stage is selected for processing in the next stage.
 This can be achieved by two methods or some combination thereof:
@@ -221,7 +229,7 @@ must be in place.
 Results of the intermediate stages of Data Processing may need to be preserved, for
 example the data in graphic form for audit/run documentation purposes.
 Also, there could be a potential for large processing efficiency
-gains to be made if the entire data can be run through the \textit{SIG} processing followed by ZS.
+gains to be made if the entire data can be run through the \textbf{SIG} processing followed by ZS.
 Certain portion of log files produced during prompt processing may contain information useful
 for future reference and debugging, so provisions will be made to capture these data.
 
@@ -266,12 +274,12 @@ composition. It is expected therefore that this processing will likewise be mode
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Design Parameters}
+\section{\PPS Design Parameters}
 \label{sec:parameters}
 
-\subsection{Computing Resources Available for \PP}
+\subsection{Computing Resources}
 \label{resources}
-The following computing resources are being considered for prompt processing:
+The following computing resources are being considered for use in \PPS:
 \begin{itemize}
 
 \item The ``neut'' cluster  \cite{neut} at CERN (HTCondor). See Appendix \ref{appendix:neut} for
@@ -329,18 +337,18 @@ the prompt processing would unaboidably stall even as the experiment may still b
 it in its online buffer. This is undesirable.
 
 Placement of the computing resources for prompt processing in the detector
-vicinity solves the above problem. However, it creates an additional I/O load on both
-the online buffer and on the network link between \expname and central storage.
+vicinity solves the above problem. If the data in the online buffer are accessed locally
+this will create an additional I/O load on the local storage system. There is an option for \PPS
+to read data from EOS since the bandwidth in the direction opposite to the main flow of data
+is essentially unallocated. In case of a network outage p3s can be reconfigured to read
+data from the online buffer, subject to caveats as explained above.
+Final decision regarding placement of the computing resources will be made at a later time.
+It is possible that some of the initial stages of the processing chain will located near the
+experiment, while more advanced resontruction takes place at CERN Tier-0 facilities or even at FNAL.
 
-The situation is complicated in case the \PP system needs to handle three data streams (\ref{sec:streams})
-in certain stages of processing: LArTPC, \textbf{BI} and \textbf{CRT}. Ways to ensure these
-data are available for \PP are being investigated at the time of writing.
-
-The final decision regarding placement of the computing resources will be made at a later time.
-In addition to the two options presented above there may be potentially a third possibility where
-some of the initial stages of the processing chain are located near the experiment, while more
-advanced resontruction takes place at CERN Tier-0 facilities or even at FNAL.
-
+The situation is complicated if it is decided that \PPS needs to handle all three data streams
+(\ref{sec:streams}) in some stages of processing: LArTPC, \textbf{BI} and \textbf{CRT}.
+Ways to ensure these data are available for \PP are being investigated at the time of writing.
 
 \subsection{Prioritization of Processing Steps and Timeout Strategy}
 \label{sec:priority}
@@ -520,7 +528,7 @@ diminish over time so it must be replenished in order to remain at an appropriat
 existing software created for this purpose in other experiments (e.g. the AutoPyFactory from ATLAS).
 
 \item Data arriving from DAQ and its online buffer to EOS triggers the mechanism which makes entries in the queue for the
-first stage of processing (e.g. ADC/FFT). Entries for this first stage are arraned in the LIFO manner. In other words, preference
+first stage of processing (e.g. ADC/FFT). Entries for this first stage are arranged in the LIFO manner. In other words, preference
 in the queue order is given to the most recent data detected, in order to ensure that the output contains the freshest
 data to help the processing remain prompt and current. Note that this is different from conventional production or analysis --
 first of all, processing is done on a fraction of data, and second, the data is prioritized by its timestamp.
@@ -553,7 +561,7 @@ implemented as a periodic table sweep and application of rules which will be con
 \end{itemize}
 
 \section{Summary}
-A design of the Prompt Processing system for \expname is proposed. Variations are possible
+A design of the \pd Prompt Processing system (\PPS) for \expname is proposed. Variations are possible
 while the version which currently appears optimal is outlined below:
 
 
@@ -593,6 +601,7 @@ for record keeping.
 \newpage
 \appendix
 \section{Glossary}
+\label{sec:glossary}
 \begin{description}
 
 \item [artDAQ] The online software platform based on the \textit{art} framework and utilized in \pd
@@ -601,23 +610,32 @@ for record keeping.
 
 \item [DAG] Directed Acyclic Graph
 
+\item [SQM] Data Quality Management
+
+\item [EHN1] Extension of the North Area Experimental Hall whre \expname will be located
+
+\item [EOS] Disk-based mass storage at CERN
+
 \item [BI] Beam Instrumentation
 
 \item [F-FTS] Fermi File Transfer System
 
+\item [``neut''] The \textit{CERN Neutrino Platform} Computing Farm
+
 \item [p3s] \pd Prompt Processing System
 
-\item [RCE] Reconfigurable Cluster Element
+\item [RCE] Reconfigurable Cluster Element (element of DAQ)
 
+\item [SAM] Metadata and file catalog system deployed at FNAL
 \end{description}
 
 \section{The Neutrino Platform Computing Farm}
 \label{appendix:neut}
 \subsection{Purpose}
 The Neutrino Platform Computing Farm (sometimes referred to as the \textit{``neut cluster''} \cite{neut})
-serves as an imposrtant and flexible computing resource that can be utilized for a variety of tasks including simulation,
-reconstruction and software prototyping. It is proposed to utilize the cluster (or a part of it) as a core element
-of the Prompt Processing in \pd.
+serves as an imposrtant and flexible computing resource that can be utilized for a variety of tasks including
+simulation, reconstruction and software prototyping. It is proposed to utilize the cluster (or a substantial part of it) as the
+core element of the Prompt Processing in \pd.
 
 \subsection{Hardware}
 The cluster comprises $\sim$300 DELL PowerEdge servers each containing directly attached HDD storage.
