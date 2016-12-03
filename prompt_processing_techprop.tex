@@ -332,13 +332,23 @@ there are two practical possibilities for its placement:
 
 \noindent Each of these locations has advantages and disadvantages. If the first scenario,
 there is no additional I/O load on the online buffer (as noted in \ref{sec:staging}) and network proximity
-to EOS is a plus. At the same time, in case of outage of either the network link to \expname or EOS itself
+to EOS is a plus. At the same time, there are two potential issues with this option:
+\begin{itemize}
+\item  In case of outage of either the network link to \expname or EOS itself
 the prompt processing would unaboidably stall even as the experiment may still be taking data and recording
-it in its online buffer. This is undesirable.
+it in its online buffer. 
+\item Data transfer from EHN1 to EOS takes a certain amount of time which may be relatively small (minutes, as defined
+in a typical F-FTS configuration and used in practice)
+but not negligible compared to the overall target latency of \PPS.
+\end{itemize}
 
-Placement of the computing resources for prompt processing in the detector
-vicinity solves the above problem. If the data in the online buffer are accessed locally
-this will create an additional I/O load on the local storage system. There is an option for \PPS
+
+\noindent \textbf{Placement of the computing resources for prompt processing in the detector
+vicinity with access to the online buffer solves both problems}. If the data in the online buffer are accessed locally
+this will create an additional I/O load on the local storage system which, however, is
+not expected to be large and in general at a few percent level of total.
+
+There is also an option for \PPS
 to read data from EOS since the bandwidth in the direction opposite to the main flow of data
 is essentially unallocated. In case of a network outage p3s can be reconfigured to read
 data from the online buffer, subject to caveats as explained above.
