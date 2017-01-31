@@ -1,16 +1,25 @@
 \documentclass[a4paper]{jpconf}
 \usepackage{graphicx}
 \begin{document}
-\title{Preparing a paper using \LaTeXe\ for publication in \jpcs}
+\title{Design of the protoDUNE experiment data management infrastructure}
 
-\author{Jacky Mucklow}
+\author{S Fuess$^1$, R Illingworth$^1$, M Mengel$^1$, A Norman$^1$, M Potekhin$^2$ and B Viren$^2$}
 
-\address{Production Editor, \jpcs, \iopp, Dirac House, Temple Back, Bristol BS1~6BE, UK}
+\address{$^1$ Fermi National Accelerator Laboratory, Batavia, IL 60510, USA}
+\address{$^2$ Brookhaven National Laboratory, Upton, NY 11973, USA}
 
-\ead{jacky.mucklow@iop.org}
+\ead{potekhin@bnl.gov}
 
 \begin{abstract}
-All articles {\it must} contain an abstract. This document describes the  preparation of a conference paper to be published in \jpcs\ using \LaTeXe\ and the \cls\ class file. The abstract text should be formatted using 10 point font and indented 25 mm from the left margin. Leave 10 mm space after the abstract before you begin the main text of your article. The text of your article should start on the same page as the abstract. The abstract follows the addresses and should give readers concise information about the content of the article and indicate the main results obtained and conclusions drawn. As the abstract is not part of the text it should be complete in itself; no table numbers, figure numbers, references or displayed mathematical expressions should be included. It should be suitable for direct inclusion in abstracting services and should not normally exceed 200 words. The abstract should generally be restricted to a single paragraph. Since contemporary information-retrieval systems rely heavily on the content of titles and abstracts to identify relevant articles in literature searches, great care should be taken in constructing both.
+The Deep Underground Neutrino Experiment (DUNE) will employ a uniquely large (40kt) Liquid Argon
+Time Projection chamber as the main component of its Far Detector. In order to validate this design and
+characterize the detector performance an ambitious experimental program (called ``protoDUNE'') has been
+created which includes a beam test of a large-scale DUNE prototype at CERN. The amount of data to be collected
+in this test is substantial and on par with the LHC experiments in LHC Run 1. The protoDUNE experiment
+will require careful design of the DAQ and data handling systems, as well as mechanisms to distribute data to
+a number of the DUNE distributed computing sites. We present our approach to solving these problems by
+leveraging the expertise and components created at Fermilab, in a broader context of integration with the
+systems at other National Laboratories in the US as well as at CERN and other European sites. 
 \end{abstract}
 
 \section{Introduction}
