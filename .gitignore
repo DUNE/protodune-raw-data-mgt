@@ -4,8 +4,10 @@ auto
 *.aux
 *.fls
 *.log
+*.clo
 *.out
 *.toc
+*.dvi
 *.gz
 pdrdm.pdf
 prompt_processing_reqs.pdf
@@ -13,6 +15,8 @@ prompt_processing_techprop.pdf
 protoDUNE-DMS-design.pdf
 neut-buffer.pdf
 spbf.pdf
+CHEP16-protoDUNE-Paper.pdf
+JPCSLaTeXGuidelines.pdf
 *.fdb_latexmk
 *.bbl
 *.blg
