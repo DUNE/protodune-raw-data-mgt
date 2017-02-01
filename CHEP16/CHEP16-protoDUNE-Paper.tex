@@ -106,21 +106,34 @@ The following nominal parameters define the expected data rates and volume in NP
 \end{itemize}
 
 
-\subsection{Raw Data Flow in \pd: the Concept}
+\section{Raw Data Flow in \pd}
 \label{sec:raw_concept}
 %%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[tbh]
-\centering\includegraphics[width=\linewidth]{figures/placeholder.JPG}
+\centering\includegraphics[width=\linewidth]{figures/protoDUNE_data_flow_2017_v1.png}
 \caption{\label{fig:raw_concept}Conceptual diagram of the flow of raw data in \pd}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent
+Internals of the DAQ and Online Monitoring in \pd are outside of the scope of this document. We'll note
+however one detail of the online architecture which is: the ``outer layer'' of DAQ i.e. the system where the
+data exists in a format suitable for writing into files consists of a few \textit{Event Builders} -- machines which
+assemble complete readout frames from data fragments obtained from an inner layer of DAQ,
+the \textit{Board Readers}. The Event Builders write the data  to the \textit{Online Buffer}, a storage system
+which is attached to the \pd DAQ.  At the time of writing the plan is to implement the buffer based on a COTS
+storage system from DELL. A backup (auxiliary) option is a XRootD cluster that may be deployed on existing
+CERN hardware, and a small prototype has been tested.
+
+In the following, we shall consider the handling and management of the data after it arrives to the Online Buffer. 
 Conceptual diagram of the raw data flow in \pd is presented in Fig.\ref{fig:raw_concept}. It shows the general logic
-of data flow, and does not include specific assumptions about what system will be used to actually move the data.
-It also reflects the central role of the EOS
-system at CERN (the high-performance distributed disk storage) in the \pd raw data management scheme. This is motivated by the experience
-and architecture of the LHC experiments. EOS serves as the staging area from which the data gets committed to archival tape storage at
+of data flow and also reflects the central role of the EOS system at CERN (the high-performance distributed disk storage)
+in the raw data management scheme. This is motivated by the experience and architecture of the LHC experiments
+as well as the \pd data characteristics presented above in Sec.~\ref{sec:np04_data_rate}.
+The elements in this diagram which contain ``FTS'' in their label correspond to components and instances of the
+Fermi FTS system which transports data between a few endpoints. One instance is re
+
+The EOS system serves as the staging area from which the data gets committed to archival tape storage at
 CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data centers such as FNAL and others.
 It is also used to provide input to QA and other express processing streams at CERN (which fall into the ``prompt use'' category).
 This scheme assumes that there is no conceptual difference between NP02 and NP04 in terms of the general pattern of data flow.
