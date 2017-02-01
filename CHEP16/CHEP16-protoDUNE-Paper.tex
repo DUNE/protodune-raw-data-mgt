@@ -1,7 +1,14 @@
 \documentclass[a4paper]{jpconf}
 \usepackage{graphicx}
+
+\usepackage{xspace}
+
+
+\newcommand{\pd}{protoDUNE\xspace}
+%\newcommand{\filesize}{5\,GB\ }
+
 \begin{document}
-\title{Design of the protoDUNE experiment data management infrastructure}
+\title{Design of the \pd experiment data management infrastructure}
 
 \author{S Fuess$^1$, R Illingworth$^1$, M Mengel$^1$, A Norman$^1$, M Potekhin$^2$ and B Viren$^2$}
 
@@ -11,59 +18,97 @@
 \ead{potekhin@bnl.gov}
 
 \begin{abstract}
-The Deep Underground Neutrino Experiment (DUNE) will employ a uniquely large (40kt) Liquid Argon
-Time Projection chamber as the main component of its Far Detector. In order to validate this design and
-characterize the detector performance an ambitious experimental program (called ``protoDUNE'') has been
-created which includes a beam test of a large-scale DUNE prototype at CERN. The amount of data to be collected
-in this test is substantial and on par with the LHC experiments in LHC Run 1. The protoDUNE experiment
-will require careful design of the DAQ and data handling systems, as well as mechanisms to distribute data to
-a number of the DUNE distributed computing sites. We present our approach to solving these problems by
+The Deep Underground Neutrino Experiment (DUNE) will employ a uniquely large 40kt Liquid Argon
+Time Projection Chamber (LArTPC) as the main component of its Far Detector.
+In order to validate this design and characterize the detector performance an
+ambitious experimental program (called ``\pd'') has been
+initiated which includes a beam test of large-scale prototypes of single-phase and dual-phase LArTPC
+at CERN. The amount of data to be collected in this test is substantial and on par with the LHC experiments
+in LHC Run 1. The protoDUNE experiment will require careful design of the DAQ, data handling and
+data quality monitoring systems. There are also substantial requirements for data distribution
+to a number of DUNE computing sites. We present our approach to solving these problems by
 leveraging the expertise and components created at Fermilab, in a broader context of integration with the
 systems at other National Laboratories in the US as well as at CERN and other European sites. 
 \end{abstract}
 
 \section{Introduction}
-These guidelines show how to prepare articles for publication in \jpcs\ using \LaTeX\ so they can be published quickly and accurately. Articles will be refereed by the \corg s but the accepted PDF will be published with no editing, proofreading or changes to layout. It is, therefore, the author's responsibility to ensure that the content and layout are correct.  This document has been prepared using \cls\ so serves as a sample document. The class file and accompanying documentation are available from \verb"http://jpcs.iop.org".
+The \pd program will help validate various DUNE technology aspects before proceeding with
+the construction of the large-scale principal DUNE detectors at the Sanford Underground Research Facility.
+The program is designed for measurements with a test beam provided by a dedicated target and beamline system
+at the CERN SPS accelerator complex. It has the potential to be an important platform for realistic
+Liquid Argon Time Projection Chamber (LArTPC) detector characterization (e.g. PID, shower response, etc.)
+utilizing controlled conditions of a test-beam experimental setup. The program includes two
+large LArTPC prototypes based on two different technologies --- single-phase and dual-phase TPCs.
+The dual-phase prototype was given the official designation as a CERN experiment \textbf{NP02},
+while the single-phase was designated as \textbf{NP04}. Both are to be deployed at CERN in 2017
+and scheduled to take data in 2018.
 
-\section{Preparing your paper}
-\verb"jpconf" requires \LaTeXe\ and  can be used with other package files such
-as those loading the AMS extension fonts 
-\verb"msam" and \verb"msbm" (these fonts provide the 
-blackboard bold alphabet and various extra maths symbols as well as 
-symbols useful in figure captions); an extra style file \verb"iopams.sty" is 
-provided to load these packages and provide extra definitions for bold Greek letters. 
-\subsection{Headers, footers and page numbers}
-Authors should {\it not} add headers, footers or page numbers to the pages of their article---they will
-be added by \iopp\ as part of the production process.
+While both apparatuses will share a few common computing infrastructure elements, their
+respective design of DAQ and buffer as well as operations are largely independent.
+The focus of this paper is on the data management for the
+single-phase LArTPC (NP04). This detector  functions without amplification in the medium
+(liquid Argon) and is in essence a very large ionization chamber equipped with a large
+number of readout electrodes (wires), each with its own electronics chain.
+In the DUNE design, the front-end electronics is situated within the cryostat and operates at cryogenic
+temperatures in order to minimize noise (the so-called ``cold electronics design'').
 
-\subsection{{\cls\ }package options}
-The \cls\ class file has two options `a4paper' and `letterpaper':
-\begin{verbatim}
-\documentclass[a4paper]{jpconf}
-\end{verbatim}
+Both NP02 and NP04 will be placed in an extension of the CERN North Area Experimental Hall.
+Each prototype will be have a dedicated optical fiber network connection to the CERN central storage facilities
+located in the West Area campus of CERN. The nominal bandwidth of these dedicated network connections
+will be 20\,Gbps for each experiment.
 
-or \begin{verbatim}
-\documentclass[letterpaper]{jpconf}
-\end{verbatim}
 
-\begin{center}
-\begin{table}[h]
-\caption{\label{opt}\cls\ class file options.}
-%\footnotesize\rm
-\centering
-\begin{tabular}{@{}*{7}{l}}
-\br
-Option&Description\\
-\mr
-\verb"a4paper"&Set the paper size and margins for A4 paper.\\
-\verb"letterpaper"&Set the paper size and margins for US letter paper.\\
-\br
-\end{tabular}
-\end{table}
-\end{center}
+\section{The NP04 Data Characteristics}
 
-The default paper size is A4 (i.e., the default option is {\tt a4paper}) but this can be changed to Letter by 
-using \verb"\documentclass[letterpaper]{jpconf}". It is essential that you do not put macros into the text which alter the page dimensions.
+In order to provide the necessary precision for reconstruction of the ionization patterns in the LArTPC, the
+design has the following characteristics:
+\begin{itemize}
+\item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
+\item High digitization frequency (which is essential to ensure a precise position measurement along the drift direction)
+\end{itemize}
+
+\noindent
+Another factor is the relatively slow drift velocity of electrons in Liquid Argon, which is of the order of millimeters per microsecond,
+depending on the drift volume voltage and other parameters. This leads to a substantial readout window
+(of the order of milliseconds) required to collect all of the ionization in the Liquid Argon volume due the event of interest.
+All these factor combined lead to a considerable amount of data per readout window.
+A LArTPC event may be compared to a stack of thousands of digital  photographs.
+
+There are data reduction (compression) techniques that may be applicable to \pd raw data in order to reduce its size. 
+At the time of writing it is assumed that only the lossless algorithms will be applied during the compression of the \pd raw data.
+One example is the Huffman algorithm, while others are also considered.
+
+It is foreseen that the total amount of data to be produced by the \pd detectors will be of the order of a few
+petabytes (including commissioning runs with cosmic rays). Instantaneous and average data rates in the data transmission chain are expected to be
+substantial (see \ref{sec:func_reqs} and \ref{sec:np04_data_rate}).
+For these reasons, capturing data streams generated by the protoDUNE DAQ systems, buffering of the data, performing fast QA analysis,
+and transporting the data to sites external to CERN for processing (e.g. FNAL, BNL, etc.) requires significant resources and adequate planning.
+
+\subsection{Raw Data Flow in \pd: the Concept}
+\label{sec:raw_concept}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[tbh]
+\centering\includegraphics[width=\linewidth]{figures/placeholder.JPG}
+\caption{\label{fig:raw_concept}Conceptual diagram of the flow of raw data in \pd}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent
+Conceptual diagram of the raw data flow in \pd is presented in Fig.\ref{fig:raw_concept}. It shows the general logic
+of data flow, and does not include specific assumptions about what system will be used to actually move the data.
+It also reflects the central role of the EOS
+system at CERN (the high-performance distributed disk storage) in the \pd raw data management scheme. This is motivated by the experience
+and architecture of the LHC experiments. EOS serves as the staging area from which the data gets committed to archival tape storage at
+CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data centers such as FNAL and others.
+It is also used to provide input to QA and other express processing streams at CERN (which fall into the ``prompt use'' category).
+This scheme assumes that there is no conceptual difference between NP02 and NP04 in terms of the general pattern of data flow.
+
+Data centers at BNL and NERSC are placed in this diagram for illustration purposes. Any other institution possessing adequate
+resources can participate in this data distriburtion scheme if desired.
+
+
+
+
 
 \section{The title, authors, addresses and abstract} 
 The code for setting the title page information is slightly different from
