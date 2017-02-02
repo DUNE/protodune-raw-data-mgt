@@ -1,6 +1,6 @@
 \documentclass[a4paper]{jpconf}
 \usepackage{graphicx}
-
+\usepackage{url}
 \usepackage{xspace}
 
 
@@ -33,7 +33,7 @@ systems at other National Laboratories in the US as well as at CERN and other Eu
 
 \section{Introduction}
 The \pd program will help validate various DUNE technology aspects before proceeding with
-the construction of the large-scale principal DUNE detectors at the Sanford Underground Research Facility.
+the construction of the large-scale principal DUNE detectors at the Sanford Underground Research Facility \cite{cdrVol1, cdrVol4}.
 The program is designed for measurements with a test beam provided by a dedicated target and beamline system
 at the CERN SPS accelerator complex. It has the potential to be an important platform for realistic
 Liquid Argon Time Projection Chamber (LArTPC) detector characterization (e.g. PID, shower response, etc.)
@@ -116,31 +116,28 @@ The following nominal parameters define the expected data rates and volume in NP
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent
-Internals of the DAQ and Online Monitoring in \pd are outside of the scope of this document. We'll note
-however one detail of the online architecture which is: the ``outer layer'' of DAQ i.e. the system where the
-data exists in a format suitable for writing into files consists of a few \textit{Event Builders} -- machines which
-assemble complete readout frames from data fragments obtained from an inner layer of DAQ,
-the \textit{Board Readers}. The Event Builders write the data  to the \textit{Online Buffer}, a storage system
-which is attached to the \pd DAQ.  At the time of writing the plan is to implement the buffer based on a COTS
-storage system from DELL. A backup (auxiliary) option is a XRootD cluster that may be deployed on existing
+Internals of the DAQ and Online Monitoring in \pd are outside of the scope of this document but we'll note
+a few details relevant for the topic at hand. The DAQ has of a few interconnected layers. The ``outer layer''
+i.e. the system where the data is put together in a format suitable for writing into files consists of a
+few \textit{Event Builders} -- computers which assemble complete readout frames from data
+fragments obtained from the inner layer of DAQ, the \textit{Board Readers}. The Event Builders write the
+data  to the \textit{Online Buffer}, a storage system which is attached to the \pd DAQ.  At the time of
+writing the plan is to implement the buffer based on a COTS storage system from DELL.
+A backup (auxiliary) option is a XRootD \cite{xrootd} cluster that may be deployed on existing
 CERN hardware, and a small prototype has been tested.
 
 In the following, we shall consider the handling and management of the data after it arrives to the Online Buffer. 
 Conceptual diagram of the raw data flow in \pd is presented in Fig.\ref{fig:raw_concept}. It shows the general logic
-of data flow and also reflects the central role of the EOS system at CERN (the high-performance distributed disk storage)
-in the raw data management scheme. This is motivated by the experience and architecture of the LHC experiments
+of data flow and also reflects the central role of the EOS system at CERN (the high-performance distributed disk storage
+\cite{eos}) in the raw data management scheme.
+This is motivated by the experience and architecture of the LHC experiments
 as well as the \pd data characteristics presented above in Sec.~\ref{sec:np04_data_rate}.
 The elements in this diagram which contain ``FTS'' in their label correspond to components and instances of the
-Fermi FTS system which transports data between a few endpoints. One instance is re
+\textit{Fermi FTS} system \cite{fts} which transports data between a few endpoints. One instance is re
 
 The EOS system serves as the staging area from which the data gets committed to archival tape storage at
 CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data centers such as FNAL and others.
 It is also used to provide input to QA and other express processing streams at CERN (which fall into the ``prompt use'' category).
-This scheme assumes that there is no conceptual difference between NP02 and NP04 in terms of the general pattern of data flow.
-
-Data centers at BNL and NERSC are placed in this diagram for illustration purposes. Any other institution possessing adequate
-resources can participate in this data distriburtion scheme if desired.
-
 
 
 
@@ -238,7 +235,7 @@ In the online version of \jpcs\ references will be linked to their original sour
 Two different styles of referencing are in common use: the Harvard alphabetical system and the Vancouver numerical system.  For \jpcs, the Vancouver numerical system is preferred but authors should use the Harvard alphabetical system if they wish to do so. In the numerical system references are numbered sequentially throughout the text within square brackets, like this [2], and one number can be used to designate several references.  
 
 \subsection{Using \BibTeX}
-We highly recommend the {\ttfamily\textbf\selectfont iopart-num} \BibTeX\ package by Mark~A~Caprio \cite{iopartnum}, which is included with this documentation.
+We highly recommend the which is included with this documentation.
 
 \subsection{Reference lists}
 A complete reference should provide the reader with enough information to locate the article concerned, whether published in print or electronic form, and should, depending on the type of reference, consist of:  
@@ -583,8 +580,29 @@ Using the graphicx package figures can be included using code such as:
 
 \section*{References}
 \begin{thebibliography}{9}
-\bibitem{iopartnum} IOP Publishing is to grateful Mark A Caprio, Center for Theoretical Physics, Yale University, for permission to include the {\tt iopart-num} \BibTeX package (version 2.0, December 21, 2006) with  this documentation. Updates and new releases of {\tt iopart-num} can be found on \verb"www.ctan.org" (CTAN). 
+
+\bibitem{cdrVol1} DUNE CDR Vol 1 -- The LBNF and DUNE Projects: \url{http://arxiv.org/abs/1601.05471}
+
+\bibitem{cdrVol4} DUNE CDR Vol 4 -- The DUNE Detectors at LBNF: \url{http://arxiv.org/abs/1601.02984}
+
+\bibitem{xrootd}
+{XRootD}\\
+\url{http://www.xrootd.org}
+
+\bibitem{eos}
+{The CERN Exabyte Scale Storage}\\
+\url{http://information-technology.web.cern.ch/services/eos-service}
+
+\bibitem{fts}
+{The Fermilab File Transfer System}\\
+\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
+
+
 \end{thebibliography}
+
+
+
+
 
 \end{document}
 
