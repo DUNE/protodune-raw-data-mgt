@@ -1,0 +1,267 @@
+\documentclass[pdftex,12pt,letter]{article}
+\usepackage[binary-units=true]{siunitx}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{color}
+\usepackage[pdftex,pdfpagelabels,bookmarks,hyperindex,hyperfigures]{hyperref}
+\usepackage{xspace}
+%\usepackage[firstpage]{draftwatermark}
+
+
+\bibliographystyle{unsrt}
+
+\newcommand{\fixme}[1]{\textbf{FIXME: #1}}    
+\newcommand{\pd}{protoDUNE\xspace}
+
+\title{Planning of the \pd Prompt Processing System}
+\date{\today}
+\author{M.Potekhin, B. Viren}
+
+\begin{document}
+%\SetWatermarkText{DRAFT}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{3}
+
+\maketitle
+
+\begin{abstract}
+\noindent The purpose of this document is to inform the leadership
+of the Single-Phase \pd experiment (NA04) about the scope, deliverables,
+schedules, interfaces and other crucial characteristics of the prompt processing
+system (p3s).
+\end{abstract}
+
+% \tableofcontents
+
+\pagebreak
+
+\section{Overview}
+We will use the name ``p3s'' to refer to the \textit{\pd Prompt Processing System.}
+The primary purpose of p3s is to support \textit{Data Quality Monitoring} (DQM) in \pd.
+The following шtems will be covered in this document:
+\begin{itemize}
+\item p3s scope and deliverables
+\item minimum required capabilities and functionality of p3s at key points in time 
+
+\item a set of milestones in about 2 months time increments, including relevant testing
+
+\item resource assessment including the effort profile in FTEs and people assigned to the task
+
+\item outline of risk assessment 
+\end{itemize}
+
+
+\section{The scope of p3s}
+\subsection{The p3s data input and output}
+It has been decided that the boundary between the DAQ and other online and
+offline systems
+(i.e. data handling and prompt processing) exists in the form of the Online Buffer
+which is attached to DAQ. 
+The ``\pd/SP Data Scenarios'' spreadsheet~\cite{docdb1086}
+describes  possible running conditions and estimates for their
+resulting data volumes and rates and interpretations in terms of
+network and disk bandwidth. 
+
+Data is written to the buffer as files containing
+necessary header information and are assumed to be ready to be committed to mass
+storage (disk and tape) without further modifications. Most of data handling will
+be done using F-FTS \cite{docdb1212,fts}. The p3s may read these data from
+either of the two locations:
+\begin{itemize}
+\item the Online Buffer itself (via a network protocol such as XRootD~\cite{xrootd})
+\item CERN EOS~\cite{eos}
+\end{itemize}
+
+\noindent Calculations done in p3s 
+will result in some sort of a ``visual product'', for example a histogram, plot, event display
+or a summary table in order to provide information to the experiment operators in a timely manner
+via a Web interface and if necessary also as data stored as files. 
+Since the volume of visual and numeric informaiton pertinent to DQM may be large and hard
+to quickly comprehend, there will be automated alerts to the operators when certain parameters
+are outside of their nominal range.
+
+A portion of the data produced by p3s will
+be copied to mass storage for preservation and distributed to the Collaboration for
+bookkeeping and operations support purposes.
+
+
+\subsection{p3s and the Online Monitoring as complementary systems}
+The p3s fills the gap between the very low latency Online Monitoring (OM)
+system which is engineered as a component of DAQ on one hand, and
+the general offline processing on the other. Conceptually, they both serve
+the same purpose of generating time-critical DQM information on a short time
+scale needed to ascertain the condition and performance of both the detector
+and the DAQ and are complementary to each other. 
+The benchmark turnaround time for p3s jobs 
+according to the requirements set forth in a separate document 
+\cite{docdb1811}  is set at 10\,min for reference purposes,
+of course there will be several jobs types and execution times will
+vary for many reasons. This time scale fulfills the need to have \textit{actionable}
+DQM information in time for operators to take action and prevent loss
+of useable data and/or valuable beam time.
+
+By having p3s as a separate
+component in addition to the OM the following issues are adressed:
+\begin{itemize}
+
+\item \textbf{scalability}: DAQ and OM operate in a purpose-built computing environment characterized
+by an extremely high bandwidth and a relatively limited CPU budget, as dictated by the
+primary mission of these systems. Scaling up computational capabilities of DAQ
+is still possible but likely to be prohibitevely expensive due to nature and cost of
+the hardware used in DAQ. The prompt processing system from the very beginning
+was conceptualized as built upon common (and in fact recycled) general purpose hardware
+with ample CPU and somewhat limited network bandwidth. This makes scaling out of
+the system very economical and even allows for inclusion of opportunistic resources
+with very few requirements to be met.
+
+\item \textbf{test of data integrity}: OM will consume data in the form of network streams generated
+by the DAQ specifically for that purpose, i.e.~OM won't operate on actual \textit{files} generated
+by the DAQ. This achieves a degree of simplicity of data handling and very low latency
+in distributing the data to CPU, but also precludes the possibility to ascertain that the data
+in its final form (i.e.~as finalized files on disk prepared for sinking to mass storage) is indeed
+formatted correctly and is otherwise valid in that shape. The p3s whose input is precisely the finished
+files coming out of DAQ serves in that role in addition to others.
+
+\item \textbf{coupling/dependency}: 
+The p3s almost entirely independent of DAQ since it only has to comply with the format
+of the raw data file which should be relatively stable
+throughout the data taking period. Payloads running in p3s can be quickly modified
+and adapted to new conditions and requirements during \pd commissioning and
+data taking periods without impacting operation of DAQ and its most immediate
+monioring needs (fulfilled by the OM).
+
+\item \textbf{access to data and monitoring software}:
+It is expected that access to DAQ, OM and monitoring data generated in the latter will be
+restricted to a very limited number of people to reduce operational risks 
+(e.g.~it is undesirable to have a hundred users browsing histograms coming out of OM
+or introduce new algorithms into the online monitoring). Being more scalable and 
+decoupled from the core DAQ the p3s will allow to make visual and data products
+more widely accessible to the Collaboration and enable more users to contribute
+to creating and modifying payloads ``in situ'' as the experiment progresses.
+
+
+\end{itemize}
+
+
+
+\subsection{Categories of Jobs in p3s}
+\label{sec:scope}
+
+\label{sec:categories}
+This is a compressed summary of information presented in \cite{docdb1811}.
+For now we focus only on TPC Data Processing with the Photon Detector Data
+to be considered at a later date. The categories are as follows:
+
+\begin{description}
+
+\item[DAQ (no data decompression)] A summary of DAQ-level data  such as summaries of data
+ rates  or summaries of any metadata, status codes the provided by the DAQ etc.
+Most of this functionality will exist in OM so this is optional in p3s, with may perhaps
+provide additional level of detail and logging.
+
+\item[ADC (requires data decompression)] A summary of ADC-level data e.g. mean/RMS
+values at channel level and as a statistics over various groupings and level of detail
+(ASIC, FEMB, RCE, APA etc).
+
+
+\item[FFT] A summary of the ADC-level data in frequency space. It requires running a discrete Fourier
+transform (FFT) on channel waveforms. This largely  provides measures of noise and its
+evolution.
+
+\item[SIG] A summary of the data \textit{after signal processing}.
+The processing is in  both time domain and in frequency domain (so uses the output of FFT).
+It includes items such as
+\begin{itemize}
+\item ``stuck code'' mitigation
+\item coherent noise removal
+\item noise subtraction and filtering
+\item deconvolution of the response function
+\item calculation of signal correlations for diagnostic purposes
+\end{itemize}
+
+\item[RECO] Results from running some type of reconstruction (perhaps greatly simplified).
+It may, for  example, provide a coarse count of straight muon track candidates.
+
+\end{description}
+
+\section{Deliverables}
+
+
+\clearpage
+\begin{thebibliography}{1}
+
+\bibitem{docdb1086}
+{DUNE DocDB 1086: \textit{ protoDUNE/SP data scenarios with full stream (spreadsheet)}}\\
+\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1086}
+
+
+
+
+\bibitem{docdb1212}
+{DUNE DocDB 1212: \textit{Design of the Data Management System for the protoDUNE Experiment}}\\
+\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1212}
+
+\bibitem{fts}
+{The Fermilab File Transfer System}\\
+\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
+
+
+\bibitem{xrootd}
+{XRootD}\\
+\url{http://www.xrootd.org}
+
+\bibitem{eos}
+{The CERN Exabyte Scale Storage}\\
+\url{http://information-technology.web.cern.ch/services/eos-service}
+
+
+
+\bibitem{docdb1811}
+{DUNE DocDB 1811: \textit{Prompt Processing System Requirements for the Single-Phase protoDUNE}}\\
+\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1811}
+
+
+
+\bibitem{neut}
+{Neutrino Computing Cluster at CERN}\\
+\url{https://twiki.cern.ch/twiki/bin/view/CENF/NeutrinoClusterCERN}
+
+\bibitem{lxbatch}
+{The CERN batch computing service}\\
+\url{http://information-technology.web.cern.ch/services/batch}
+
+
+\bibitem{htcondor}
+{HTCondor}
+\url{https://research.cs.wisc.edu/htcondor/}
+
+\bibitem{arda}
+{The CERN Dashboard project}\\
+CERN-IT-NOTE-2007-048) and \url{http://dashboard.cern.ch/}
+
+\bibitem{root}
+{ROOT}\\
+\url{https://root.cern.ch/}
+
+
+\bibitem{larsoft}
+{The Liquid Argon Software (LArSoft) Collaboration}\\
+\url{http://larsoft.org/}
+
+\bibitem{fife}
+{Fabric for Intensity Frontier Experiments}\\
+\url{http://fife.fnal.gov/}
+
+
+
+\end{thebibliography}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
