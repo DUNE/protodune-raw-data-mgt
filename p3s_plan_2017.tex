@@ -147,9 +147,8 @@ to creating and modifying payloads ``in situ'' as the experiment progresses.
 
 
 \subsection{Categories of Jobs in p3s}
-\label{sec:scope}
-
 \label{sec:categories}
+
 This is a compressed summary of information presented in \cite{docdb1811}.
 For now we focus only on TPC Data Processing with the Photon Detector Data
 to be considered at a later date. The categories are as follows:
@@ -186,8 +185,178 @@ It may, for  example, provide a coarse count of straight muon track candidates.
 
 \end{description}
 
-\section{Deliverables}
+\subsection{The Hardware}
+It is anticipated that only a limited amount of new hardware will need to be procured
+for p3s. The hardware base of the system will mainly consist of the compute servers
+which currently belong to the \textit{neut} cluster of the CERN Neutrino Platform
+\cite{neut}
+and its DQM partition named \textit{neutdqm}. Other facilities such as \textit{lxbatch}
+\cite{lxbatch}
+and others may be added if and when they become available since p3s is a pilot-based
+system which facilitates federation of resources, and is batch-system-agnostic.
 
+In addition to compute servers, a small number Web and DB servers will be necessary
+which possess adequate performance characteristics. Storage requirements are being
+scoped out at this point in time.
+
+
+
+\section{Required Capabilities}
+\label{sec:capabilities}
+
+The p3s must have capabilties to support categories of processing outlined
+in Sec.\,\ref{sec:categories}. The term ``task'' is used here to designate a set
+of related jobs, for a example a processing chain where each job consumes
+data produced by its predecessor. The p3s supports description of tasks as DAGs
+and also supports task templates for ease of operation.
+ The first job in the chain reads data from
+the Online Buffer or EOS. In the limiting case, a task may contain just one payload
+job. Submission of individual \textit{ad hoc} jobs by users is also supported.
+
+\begin{description}
+\item[Job and Task Management]\ 
+\begin{itemize}
+
+\item automatic generation of tasks upon arrival of fresh data to the buffer
+
+\item distribution of jobs to processing resources assigned to p3s
+
+\item management of tasks i.e.~orchestration of execution of jobs within
+a task according to the dependencies between jobs
+
+\item prioritization of tasks and jobs (during assignmenet to processing slots)
+ including automated dynamic changes of priorities in order to ensure completion
+of critical tasks
+
+\end{itemize} 
+
+\item[User and System interfaces]\ 
+\begin{itemize}
+
+\item full remote control of the system by operators via appropriate interfaces
+
+\item interface to the Online Buffer and EOS in order to access the input data
+
+\item interface to F-FTS necessary to move a portion of p3s output to external
+sites and mass storage
+
+\item Web interface for task monitoring and debugging of p3s
+
+
+\end{itemize} 
+
+\item[Web Access to Data]\ 
+\begin{itemize}
+
+\item the data produced by p3s will be made available to the users via a Web service
+(e.g. a Web page populated with plots selected according to user-specified criteria)
+
+\item for the data which is preserved as data files (as opposed to visual products)
+there will be a catalog accessible via a browser/Web page
+
+\end{itemize} 
+
+\end{description}
+
+\section{Components and Deliverables}
+
+The core of p3s is a Django-based \cite{django} application written in Python. The
+deliverables in the systems category are as follows:
+
+\begin{description}
+\item[p3s server] --- a Web service which supports task management capabilities as per Sec.\,\ref{sec:capabilities}
+
+\item[user tools] --- such as CLI clients necessary to manipulate the state of the system, submit
+and manage tasks in the manual mode if necessary, and to perform general management and
+maintenance of the system
+
+\item[data server] --- a Web/network service which makes visual and data products produced by p3s
+available to the users
+
+\item[data network access] --- a XRootD-based service continuously running on the DQM cluster
+and communicating with small-footprint XRootD service running on the Online Buffer, and also EOS.
+
+\item[Web and DB servers] --- needed as a platform to support the items listed above. These
+can be based on a variety of products and offer a degree of interoperability.
+
+\end{description}
+
+\noindent 
+
+\section{Timeline and Milestones}
+
+The items below include system deployment, functional and integration testing:
+
+\begin{description}
+
+\item[March'17: p3s dev server] --- a continuously running instance of p3s deployed on the DQM cluster,
+utilizing the ``Django development server'' and \textit{sqlite} database back-end. LArSoft payloads as
+test case. Visual and data products served from the same server.
+
+\item[April'17: XRootD] --- a continuously running XRootD service deployed on the DQM cluster with
+fully functional interface to EOS and ongoing test transfers.
+
+\item[June'17: full chain] --- an instance of p3s running on dev server/sqlite with automated
+generation of workflows
+\begin{itemize}
+\item DAQ vertical slice readiness
+\end{itemize}
+
+\item[July'17: Web Service for Visual and Data Products] --- an instance of a Web server optimized
+for delivery of visual and data products produced by p3s.
+
+\item[August'17] --- p3s migration to Apache and PostgreSQL. Integration testing with the
+DAQ Online Buffer.
+
+\item[September'17] --- p3s/DAQ integration testing
+\begin{itemize}
+\item Full DAQ test readiness
+\end{itemize}
+
+\item[Q4'17] --- p3s stress and scalability testing, additional development
+
+\item[Q1'18] --- continuous p3s operation with realistic workloads, running
+MC/Reco jobs in utility mode
+
+\item[Q2'18]\ 
+\begin{itemize}
+\item Full data taking readiness
+\end{itemize}
+
+\end{description}
+
+
+\section{Resources}
+
+\subsection{Effort Levels}
+
+Development/engineering
+\begin{itemize}
+\item M.Potekhin (BNL) --- 100\%FTE
+\item B.Viren (BNL) --- 10\%FTE
+\end{itemize}
+
+\noindent System administration and support
+
+\begin{itemize}
+\item N.Benekos (CERN) --- 50\%FTE
+\item G.Savage (FNAL) --- 50\%FTE
+\end{itemize}
+
+\subsection{Mat\'eriel}
+To be useful, p3s needs O(100) cores during its operation. In addition,
+a small number of adequately configured machines are needed for
+deployment of Web and DB servers to support the p3s function.
+
+It is a working assumption at the time of writing that a significant portion of
+the \textit{neut} cluster \cite{neut} will be assigned for p3s use as \pd ramps up
+its operations in 2017 and into 2018.
+
+
+\section{Risk Assessment}
+
+Technologies used in p3s are not new, they are mature and tested in the field, which reduces
+overall implementation risk.
 
 \clearpage
 \begin{thebibliography}{1}
@@ -232,28 +401,9 @@ It may, for  example, provide a coarse count of straight muon track candidates.
 {The CERN batch computing service}\\
 \url{http://information-technology.web.cern.ch/services/batch}
 
-
-\bibitem{htcondor}
-{HTCondor}
-\url{https://research.cs.wisc.edu/htcondor/}
-
-\bibitem{arda}
-{The CERN Dashboard project}\\
-CERN-IT-NOTE-2007-048) and \url{http://dashboard.cern.ch/}
-
-\bibitem{root}
-{ROOT}\\
-\url{https://root.cern.ch/}
-
-
-\bibitem{larsoft}
-{The Liquid Argon Software (LArSoft) Collaboration}\\
-\url{http://larsoft.org/}
-
-\bibitem{fife}
-{Fabric for Intensity Frontier Experiments}\\
-\url{http://fife.fnal.gov/}
-
+\bibitem{django}
+{Django}\\
+\url{https://docs.djangoproject.com/en/1.10/}
 
 
 \end{thebibliography}
