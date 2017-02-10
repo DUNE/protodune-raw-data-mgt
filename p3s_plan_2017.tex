@@ -54,6 +54,10 @@ The following шtems will be covered in this document:
 
 
 \section{The scope of p3s}
+p3s is a platform for management of automated DQM/prompt processing streams
+in \pd. As a work item, it is an infrastructure element and does not include the actual software for
+computational payloads --- this is the responsibility of the Reco and other working groups.
+
 \subsection{The p3s data input and output}
 It has been decided that the boundary between the DAQ and other online and
 offline systems
@@ -101,8 +105,9 @@ of course there will be several jobs types and execution times will
 vary for many reasons. This time scale fulfills the need to have \textit{actionable}
 DQM information in time for operators to take action and prevent loss
 of useable data and/or valuable beam time.
-
-By having p3s as a separate
+\ \\
+\\
+\noindent By having p3s as a separate 
 component in addition to the OM the following issues are adressed:
 \begin{itemize}
 
@@ -185,7 +190,7 @@ It may, for  example, provide a coarse count of straight muon track candidates.
 
 \end{description}
 
-\subsection{The Hardware}
+\subsection{The Scope of Hardware}
 It is anticipated that only a limited amount of new hardware will need to be procured
 for p3s. The hardware base of the system will mainly consist of the compute servers
 which currently belong to the \textit{neut} cluster of the CERN Neutrino Platform
@@ -207,11 +212,16 @@ scoped out at this point in time.
 The p3s must have capabilties to support categories of processing outlined
 in Sec.\,\ref{sec:categories}. The term ``task'' is used here to designate a set
 of related jobs, for a example a processing chain where each job consumes
-data produced by its predecessor. The p3s supports description of tasks as DAGs
-and also supports task templates for ease of operation.
- The first job in the chain reads data from
+data produced by its predecessor. Jobs can be used to add a wide range
+of functionalty to the system, e.g.~copy a fraction of data to mass storage
+if necessary or produce a set of PNG files based on intermediate ROOT files,
+or perhaps generate an alarm if a certain metric falls out of prescribed range.
+
+The p3s supports description of tasks as DAGs and also supports task templates
+for ease of operation. The first job in the chain reads data from
 the Online Buffer or EOS. In the limiting case, a task may contain just one payload
-job. Submission of individual \textit{ad hoc} jobs by users is also supported.
+job; there is no set limit on the number of jobs in the DAG or its topology.
+Submission of individual \textit{ad hoc} jobs by users is also supported.
 
 \begin{description}
 \item[Job and Task Management]\ 
@@ -285,7 +295,8 @@ can be based on a variety of products and offer a degree of interoperability.
 
 \section{Timeline and Milestones}
 
-The items below include system deployment, functional and integration testing:
+The items below include system deployment, functional and integration testing.
+Critical milestones are marked by bullets.
 
 \begin{description}
 
@@ -356,7 +367,23 @@ its operations in 2017 and into 2018.
 \section{Risk Assessment}
 
 Technologies used in p3s are not new, they are mature and tested in the field, which reduces
-overall implementation risk.
+overall implementation risk. The remaining risk factors are
+\begin{itemize}
+
+\item insufficient allocation of hardware to p3s i.e.~failure to assign a sufficient number
+of \textit{neut} cores to p3s and/or provide sufficiently capable machines to support Web
+and DB functionality
+
+\item lack of coordination across DAQ/DQM teams which may delay functional and integration
+testing
+
+\item late F-FTS deployment which will delay functional and integration testing of p3s access
+to data in EOS and usage of mass storage for its output data
+
+\item lack of manpower to provide robust sysadmin and other crucial support for the DQM
+cluster and its core services (Web/DB)
+
+\end{itemize}
 
 \clearpage
 \begin{thebibliography}{1}
