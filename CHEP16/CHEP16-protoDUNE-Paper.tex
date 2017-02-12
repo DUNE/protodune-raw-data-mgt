@@ -80,9 +80,10 @@ There are data reduction (compression) techniques that are applicable to \pd raw
 Only the lossless algorithms will be applied during the compression of the NP04 raw data
 (e.g. Huffman algorithm and others).
 
-Instantaneous and average data rates in the data transmission chain are expected to be substantial, 
+ As explained in Sec.\,\ref{sec:np04_data_rate} below,
+instantaneous and average data rates in the data transmission chain are expected to be substantial, 
 and the total amount of data to be produced by NP04 will be of the order of a few
-petabytes (including commissioning runs with cosmic rays) (see Sec.~\ref{sec:np04_data_rate}).
+petabytes (including commissioning runs with cosmic rays).
 
 \section{The NP04 Data Characteristics}
 \label{sec:np04_data_rate}
@@ -99,7 +100,7 @@ The following nominal parameters define the expected data rates and volume in NP
 \noindent This results in the following nominal data characteristics:
 \begin{itemize}
 \item Instantaneous rate (in DAQ): 11.5\,GB/s
-\item Average rate (including injestion to mass storage): 3.3\,GB/s
+\item Average rate (including ingestion into mass storage): 3.3\,GB/s
 \item Total data volume during the projected run period: 1.2\,PB
 \item Buffer to store 3 days worth of data: 850\,TB
 
@@ -115,20 +116,41 @@ The following nominal parameters define the expected data rates and volume in NP
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-\noindent
-Internals of the DAQ and Online Monitoring in \pd are outside of the scope of this document but we'll note
-a few details relevant for the topic at hand. The DAQ has of a few interconnected layers. The ``outer layer''
-i.e. the system where the data is put together in a format suitable for writing into files consists of a
-few \textit{Event Builders} -- computers which assemble complete readout frames from data
-fragments obtained from the inner layer of DAQ, the \textit{Board Readers}. The Event Builders write the
-data  to the \textit{Online Buffer}, a storage system which is attached to the \pd DAQ.  At the time of
-writing the plan is to implement the buffer based on a COTS storage system from DELL.
-A backup (auxiliary) option is a XRootD \cite{xrootd} cluster that may be deployed on existing
-CERN hardware, and a small prototype has been tested.
+\subsection{DAQ and the Online Buffer}
+Details of the DAQ design and Online Monitoring in \pd are outside of the scope
+of this document but we'll note a few details relevant for the topic at hand.
 
-In the following, we shall consider the handling and management of the data after it arrives to the Online Buffer. 
-Conceptual diagram of the raw data flow in \pd is presented in Fig.\ref{fig:raw_concept}. It shows the general logic
-of data flow and also reflects the central role of the EOS system at CERN (the high-performance distributed disk storage
+The DAQ has of a few interconnected layers of computers.
+The ``outer layer'' of the system where the data is put together in a format
+suitable for writing into files consists of 10
+ \textit{Event Builders} -- dedicated computers equipped with quad 10Gbps NICs to ensure the necessary
+bandwidth. Interconnectivity is provided by a high-bandwidth switch such as Brocade ICX 7750
+or equivanent. Their function is to assemble complete readout frames from data
+fragments obtained from the inner layer of DAQ, the \textit{Board Readers}. The Event Builders write the
+resulting data  to the \textit{Online Buffer} which is attached to the \pd DAQ. 
+The design of this buffer is inspired by a system sucessfully employed in ATLAS experiment
+and is based on a COTS storage hardware from DELL which features a high degree of redundnacy.
+It is structured as 3 identical high-capacity storage system, i.e.~scales vertically. Each system contains
+\begin{itemize}
+
+\item Two front-end nodes (DELL R620)
+\item Storage Controller (DELL MD3420)
+\item Four expansion shelves (DELL MD1220)
+\item A total of 120 HDDs
+\end{itemize}
+
+\noindent 
+A backup (auxiliary) option is to implement the buffer as a a XRootD \cite{xrootd} cluster
+that may be deployed on existing general purpose hardware provided by the \textit{CERN
+Neutrino Platform}\cite{cenf}.
+A small prototype of such system has been tested.
+
+
+\subsection{Data Flow}
+In the following, we shall consider the handling and management of the data after it is committed
+to the Online Buffer.  Conceptual diagram of the raw data flow in \pd is presented in
+Fig.\ref{fig:raw_concept}. It shows the general logic of data flow and also reflects
+the central role of the EOS system at CERN (the high-performance distributed disk storage
 \cite{eos}) in the raw data management scheme.
 This is motivated by the experience and architecture of the LHC experiments
 as well as the \pd data characteristics presented above in Sec.~\ref{sec:np04_data_rate}.
@@ -136,10 +158,12 @@ The elements in this diagram which contain ``FTS'' in their label correspond to 
 \textit{Fermi FTS} system \cite{fts} which transports data between a few endpoints. One instance is re
 
 The EOS system serves as the staging area from which the data gets committed to archival tape storage at
-CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data centers such as FNAL and others.
-It is also used to provide input to QA and other express processing streams at CERN (which fall into the ``prompt use'' category).
+CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data
+centers such as FNAL and others. It is also used to provide input to the prompt processing system
+which support the Data Quality Moniotring in \pd.
 
-
+\section{Data Quality Monitoring}
+Data Quality Monitoring (DQM) plays an imporant role in \pd.
 
 
 \section{The title, authors, addresses and abstract} 
@@ -553,17 +577,17 @@ Note that it may be necessary to adjust the size of the figures (using optional 
 
 \begin{figure}[h]
 \begin{minipage}{14pc}
-\includegraphics[width=14pc]{figures/placeholder.JPG}
+\includegraphics[width=14pc]{figures/placeholder.jpg}
 \caption{\label{label}Figure caption for first of two sided figures.}
 \end{minipage}\hspace{2pc}%
 \begin{minipage}{14pc}
-\includegraphics[width=14pc]{figures/placeholder.JPG}
+\includegraphics[width=14pc]{figures/placeholder.jpg}
 \caption{\label{label}Figure caption for second of two sided figures.}
 \end{minipage} 
 \end{figure}
 
 \begin{figure}[h]
-\includegraphics[width=14pc]{figures/placeholder.JPG}\hspace{2pc}%
+\includegraphics[width=14pc]{figures/placeholder.jpg}\hspace{2pc}%
 \begin{minipage}[b]{14pc}\caption{\label{label}Figure caption for a narrow figure where the caption is put at the side of the figure.}
 \end{minipage}
 \end{figure}
@@ -588,6 +612,12 @@ Using the graphicx package figures can be included using code such as:
 \bibitem{xrootd}
 {XRootD}\\
 \url{http://www.xrootd.org}
+
+\bibitem{cenf}
+{CERN Neutrino Platform}\\
+\url{http://home.cern/about/experiments/cern-neutrino-platform}
+
+
 
 \bibitem{eos}
 {The CERN Exabyte Scale Storage}\\
