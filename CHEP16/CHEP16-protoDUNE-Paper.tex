@@ -66,24 +66,23 @@ DUNE/\pd design has the following characteristics which are common with other re
 \begin{itemize}
 \item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
 \item High digitization frequency (essential for precision)
+\item Considerable duration of the readout window (a few ms), which is due to the relatively
+low drift velocity of ionization electrons in Liquid Argon, of the order of mm/$\mu$s.
 \end{itemize}
 
-\noindent
-Another factor is the relatively slow drift velocity of electrons in Liquid Argon, which is of the order of mm/$\mu$s.
-This leads to a substantial readout window width
-(of the order of milliseconds). All this results in a considerable amount of data per single event readout.
-A LArTPC event may be compared to a stack of thousands of digital  photographs. A photon detector
-integrated into the TPC will also record data but its rate and volume are expected to be quite small
-compared to the TPC data so it won't be addressed here.
+\noindent All these factors result in a considerable amount of data collected per single event readout.
+A DUNE/\pd event may be compared to a stack of thousands of digital  snapshots of the signal
+collected from the electrodes.  As detailed in Sec.\,\ref{sec:np04_data_rate} below,
+instantaneous and average data rates in the data transmission chain are expected to be substantial, 
+and the total amount of data to be produced by NP04 will be of the order of a few
+petabytes (especially if one includes commissioning runs with cosmic rays).
+
+A photon detector integrated into the TPC will also record data but its rate and volume are
+expected to be quite small compared to the TPC data so it won't be addressed here.
 
 There are data reduction (compression) techniques that are applicable to \pd raw data in order to reduce its size. 
 Only the lossless algorithms will be applied during the compression of the NP04 raw data
 (e.g. Huffman algorithm and others).
-
- As explained in Sec.\,\ref{sec:np04_data_rate} below,
-instantaneous and average data rates in the data transmission chain are expected to be substantial, 
-and the total amount of data to be produced by NP04 will be of the order of a few
-petabytes (including commissioning runs with cosmic rays).
 
 \section{The NP04 Data Characteristics}
 \label{sec:np04_data_rate}
@@ -101,7 +100,7 @@ The following nominal parameters define the expected data rates and volume in NP
 \begin{itemize}
 \item Instantaneous rate (in DAQ): 11.5\,GB/s
 \item Average rate (including ingestion into mass storage): 3.3\,GB/s
-\item Total data volume during the projected run period: 1.2\,PB
+\item Total data volume during the projected run period: 1.2\,PB (commisioning not included)
 \item Buffer to store 3 days worth of data: 850\,TB
 
 \end{itemize}
@@ -109,16 +108,9 @@ The following nominal parameters define the expected data rates and volume in NP
 
 \section{Raw Data Flow in \pd}
 \label{sec:raw_concept}
-%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[tbh]
-\centering\includegraphics[width=\linewidth]{figures/protoDUNE_data_flow_2017_v1.png}
-\caption{\label{fig:raw_concept}Conceptual diagram of the flow of raw data in \pd}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%
-
 \subsection{DAQ and the Online Buffer}
 Details of the DAQ design and Online Monitoring in \pd are outside of the scope
-of this document but we'll note a few details relevant for the topic at hand.
+of this document but it is helpful to note a few details relevant for the topic at hand.
 
 The DAQ has of a few interconnected layers of computers.
 The ``outer layer'' of the system where the data is put together in a format
@@ -126,36 +118,53 @@ suitable for writing into files consists of 10
  \textit{Event Builders} -- dedicated computers equipped with quad 10Gbps NICs to ensure the necessary
 bandwidth. Interconnectivity is provided by a high-bandwidth switch such as Brocade ICX 7750
 or equivanent. Their function is to assemble complete readout frames from data
-fragments obtained from the inner layer of DAQ, the \textit{Board Readers}. The Event Builders write the
+fragments obtained from the inner layer of DAQ, the \textit{Board Readers}.
+
+The Event Builders create the necessary file-level header information and write the
 resulting data  to the \textit{Online Buffer} which is attached to the \pd DAQ. 
 The design of this buffer is inspired by a system sucessfully employed in ATLAS experiment
 and is based on a COTS storage hardware from DELL which features a high degree of redundnacy.
 It is structured as 3 identical high-capacity storage system, i.e.~scales vertically. Each system contains
 \begin{itemize}
 
-\item Two front-end nodes (DELL R620)
-\item Storage Controller (DELL MD3420)
-\item Four expansion shelves (DELL MD1220)
-\item A total of 120 HDDs
+\item Two front-end nodes (DELL R620 or similar)
+\item Storage Controller (DELL MD3420 or similar)
+\item Four expansion shelves (DELL MD1220 or similar)
+\item A total of $\sim$120 HDDs
 \end{itemize}
 
-\noindent 
+\noindent In addition to redundancy, the high HDD count is the main factor which allows
+to sink \pd data to the disk at the high rate according to the experiment plan (Sec.\,\ref{sec:np04_data_rate})
+and have enough headroom for robust operation.
+
+
 A backup (auxiliary) option is to implement the buffer as a a XRootD \cite{xrootd} cluster
 that may be deployed on existing general purpose hardware provided by the \textit{CERN
 Neutrino Platform}\cite{cenf}.
 A small prototype of such system has been tested.
 
 
-\subsection{Data Flow}
-In the following, we shall consider the handling and management of the data after it is committed
-to the Online Buffer.  Conceptual diagram of the raw data flow in \pd is presented in
-Fig.\ref{fig:raw_concept}. It shows the general logic of data flow and also reflects
-the central role of the EOS system at CERN (the high-performance distributed disk storage
-\cite{eos}) in the raw data management scheme.
-This is motivated by the experience and architecture of the LHC experiments
-as well as the \pd data characteristics presented above in Sec.~\ref{sec:np04_data_rate}.
-The elements in this diagram which contain ``FTS'' in their label correspond to components and instances of the
-\textit{Fermi FTS} system \cite{fts} which transports data between a few endpoints. One instance is re
+\subsection{The logic of the Data Flow}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[tbh]
+\centering\includegraphics[width=0.85\linewidth]{figures/protoDUNE_data_flow_2017_v1.png}
+\caption{\label{fig:raw_concept}Conceptual diagram of the flow of raw data in \pd}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+In the following, we shall consider handling and management of the raw data after it is
+written by the Event Builders to the Online Buffer.  Conceptual diagram of the raw data
+flow in \pd is presented in Fig.\ref{fig:raw_concept} which shows the general logic of data flow
+and also reflects the central role of the EOS system at CERN (the high-performance distributed
+disk storage \cite{eos}) in the raw data management scheme.
+Reliance on EOS is motivated by the experience and architecture of the LHC experiments
+as well as the \pd data characteristics presented above in Sec.\,\ref{sec:np04_data_rate}.
+
+The elements in this diagram which contain ``FTS'' in their label correspond to components and
+instances of the \textit{Fermi FTS} system \cite{fts} which transports data between a few endpoints.
+There is more than once instance of FTS in the data transmission chain.
+
+One instance is re
 
 The EOS system serves as the staging area from which the data gets committed to archival tape storage at
 CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data
