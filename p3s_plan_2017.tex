@@ -106,65 +106,42 @@ archived to mass storage and made available for distribution to the
 collaboration.
 
 
-\subsection{p3s and the Online Monitoring as complementary systems}
-The p3s fills the gap between the very low latency Online Monitoring (OM)
-system which is engineered as a component of DAQ on one hand, and
-the general offline processing on the other. Conceptually, they both serve
-the same purpose of generating time-critical DQM information on a short time
-scale needed to ascertain the condition and performance of both the detector
-and the DAQ and are complementary to each other. 
-The benchmark turnaround time for p3s jobs 
-according to the requirements set forth in a separate document 
-\cite{docdb1811}  is set at 10\,min for reference purposes,
-of course there will be several jobs types and execution times will
-vary for many reasons. This time scale fulfills the need to have \textit{actionable}
-DQM information in time for operators to take action and prevent loss
-of useable data and/or valuable beam time.
-\ \\
-\\
-\noindent By having p3s as a separate 
-component in addition to the OM the following issues are adressed:
-\begin{itemize}
+\subsection{Processing Contexts Comparison}
 
-\item \textbf{scalability}: DAQ and OM operate in a purpose-built computing environment characterized
-by an extremely high bandwidth and a relatively limited CPU budget, as dictated by the
-primary mission of these systems. Scaling up computational capabilities of DAQ
-is still possible but likely to be prohibitevely expensive due to nature and cost of
-the hardware used in DAQ. The prompt processing system from the very beginning
-was conceptualized as built upon common (and in fact recycled) general purpose hardware
-with ample CPU and somewhat limited network bandwidth. This makes scaling out of
-the system very economical and even allows for inclusion of opportunistic resources
-with very few requirements to be met.
+It is useful to delineate three different processing contexts relevant
+to protoDUNE: online monitoring (OM), p3s and production processing
+(PP).  They differ in terms of the amount of data, available CPU and
+latency of results as illustrated in table~\ref{tab:contexts}.
 
-\item \textbf{test of data integrity}: OM will consume data in the form of network streams generated
-by the DAQ specifically for that purpose, i.e.~OM won't operate on actual \textit{files} generated
-by the DAQ. This achieves a degree of simplicity of data handling and very low latency
-in distributing the data to CPU, but also precludes the possibility to ascertain that the data
-in its final form (i.e.~as finalized files on disk prepared for sinking to mass storage) is indeed
-formatted correctly and is otherwise valid in that shape. The p3s whose input is precisely the finished
-files coming out of DAQ serves in that role in addition to others.
+\begin{table}[h]
+  \centering
+  \begin{tabular}[h]{r|ccc}
+    & triggers & avail & results \\
+    & processed &  CPU & available \\
+    \hline
+    OM: & $\sim 10$\% & tens & 1 min \\
+    p3s: & $\sim 1$\% & hundreds & 10 min \\
+    PP: & 100\% & thousands & months \\
+  \end{tabular}
+  \caption{Qualitative comparison of online monitoring, prompt data quality monitoring and production processing.}
+  \label{tab:contexts}
+\end{table}
 
-\item \textbf{coupling/dependency}: 
-  The running of p3s jobs is almost entirely independent from the operation of DAQ.
-  The interface between the two consists of notification of the readiness of a potential raw file to be ingested and for p3s jobs to know how to read and unpack it.  This interface, once established, is expected to be relatively stable.
-  Payload jobs run by p3s can be quickly modified
-and adapted to produce new types of results during \pd commissioning and
-data taking periods without impacting operation of DAQ.
+While OM might return results with a latency less than a minute from
+large fractions of the raw data it runs in a very constrained
+environment.  To achieve this performance while remaining affordable
+(hardware-wise), the algorithms selected to run in this environment
+must be limited to using a bare minimum of CPU.  At the other extreme,
+all data will eventually be processed by CPU-intensive algorithms in
+production processing.  In order for PP to keep up with the data some
+tens of thousands of dedicated cores are required.  Instead, it is
+expected that just the first full production pass will conclude some
+months after the protoDUNE run has completed.  
 
-%%%% (bv) I don't really think this is a distinction.  why can't 100 users browse OM results?
-%%%%
-%% \item \textbf{access to data and monitoring software}:
-%% It is expected that access to DAQ, OM and monitoring data generated in the latter will be
-%% restricted to a very limited number of people to reduce operational risks 
-%% (e.g.~it is undesirable to have a hundred users browsing histograms coming out of OM
-%% or introduce new algorithms into the online monitoring). Being more scalable and 
-%% decoupled from the core DAQ the p3s will allow to make visual and data products
-%% more widely accessible to the Collaboration and enable more users to contribute
-%% to creating and modifying payloads ``in situ'' as the experiment progresses.
-
-
-\end{itemize}
-
+The p3s thus fills a gap and provides useful trade-offs between OM and
+PP.  It allows some CPU intensive processing on a small subset of the
+data to be available promptly enough to be actionable to assure high
+quality data continues to be acquired. 
 
 
 \subsection{Categories of Jobs in p3s}
