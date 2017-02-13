@@ -7,6 +7,8 @@
 \usepackage{color}
 \usepackage[pdftex,pdfpagelabels,bookmarks,hyperindex,hyperfigures]{hyperref}
 \usepackage{xspace}
+\usepackage{amssymb}
+
 %\usepackage[firstpage]{draftwatermark}
 
 
@@ -56,39 +58,52 @@ The following шtems will be covered in this document:
 \section{The scope of p3s}
 p3s is a platform for management of automated DQM/prompt processing streams
 in \pd. As a work item, it is an infrastructure element and does not include the actual software for
-computational payloads --- this is the responsibility of the Reco and other working groups.
+computational payloads --- this is the responsibility of the DAQ, Reco and other working groups with interest in producing prompt DQM results.
 
 \subsection{The p3s data input and output}
-It has been decided that the boundary between the DAQ and other online and
-offline systems
-(i.e. data handling and prompt processing) exists in the form of the Online Buffer
-which is attached to DAQ. 
-The ``\pd/SP Data Scenarios'' spreadsheet~\cite{docdb1086}
-describes  possible running conditions and estimates for their
-resulting data volumes and rates and interpretations in terms of
-network and disk bandwidth. 
+\label{sec:io}
 
-Data is written to the buffer as files containing
-necessary header information and are assumed to be ready to be committed to mass
-storage (disk and tape) without further modifications. Most of data handling will
-be done using F-FTS \cite{docdb1212,fts}. The p3s may read these data from
-either of the two locations:
+From the point of view of raw data flow, the boundary between online and offline scope is the Online Buffer which is a storage system attached to DAQ computers.
+It exists primarily to assure continued DAQ operation in the event of an outage of the link to the CERN network.
+The ``\pd/SP Data Scenarios'' spreadsheet~\cite{docdb1086}
+describes expected running conditions and provides estimates
+of data volumes and rates relevant to this boundary.
+
+All raw files written by the DAQ to the buffer will be transferred to CERN EOS
+using the Fermilab file transfer system (F-FTS) \cite{docdb1212,fts}.
+F-FTS takes responsibility for purging any and all files it is given and can do so in a configurable manner.
+
+The prompt processing DQM jobs will ingest a small percentage ($\lesssim$1\%) of raw data files.
+The files are assumed to be served via XRootD~\cite{xrootd}.
+This allows flexibility in ingesting files from one or both of:
 \begin{itemize}
-\item the Online Buffer itself (via a network protocol such as XRootD~\cite{xrootd})
+\item the Online Buffer
 \item CERN EOS~\cite{eos}
 \end{itemize}
+Ingesting can be done by staging entire files locate disk via an agent provided by p3s.
+Alternatively, jobs which require only a portion of data in one file may directly access that via XRootD.
 
-\noindent Calculations done in p3s 
-will result in some sort of a ``visual product'', for example a histogram, plot, event display
-or a summary table in order to provide information to the experiment operators in a timely manner
-via a Web interface and if necessary also as data stored as files. 
-Since the volume of visual and numeric informaiton pertinent to DQM may be large and hard
-to quickly comprehend, there will be automated alerts to the operators when certain parameters
-are outside of their nominal range.
+A p3s processing may be composed of a number of jobs.  
+Jobs may communicate via intermediate files which are managed by p3s.
+Final output files produce by these jobs are then presented to end users by p3s in a number of ways described below.
+The final output files can be categorized in the following way
 
-A portion of the data produced by p3s will
-be copied to mass storage for preservation and distributed to the Collaboration for
-bookkeeping and operations support purposes.
+\begin{description}
+\item[graphics] files in PNG or SVG format representing histograms, plots, event displays, etc.
+\item[summary] files in JSON format provides ancillary information for graphics files including captions or other information that may be directly rendered by a user interface.
+\item[reference] files which should be retained for browsing by the user and which may include logs or intermediate results. 
+\end{description}
+
+\noindent The two end-user interfaces that p3s will provide are:
+
+\begin{description}
+\item[web pages] a web server which allows browsing of all results, and include features such as refreshing of specific time critical results
+\item[notifications] a system that interprets \textit{summary} files to provide alarm notification via email, mobile push, or other means.
+\end{description}
+
+As needed, some portion of the files produced by p3s jobs will be
+archived to mass storage and made available for distribution to the
+collaboration.
 
 
 \subsection{p3s and the Online Monitoring as complementary systems}
@@ -130,21 +145,22 @@ formatted correctly and is otherwise valid in that shape. The p3s whose input is
 files coming out of DAQ serves in that role in addition to others.
 
 \item \textbf{coupling/dependency}: 
-The p3s almost entirely independent of DAQ since it only has to comply with the format
-of the raw data file which should be relatively stable
-throughout the data taking period. Payloads running in p3s can be quickly modified
-and adapted to new conditions and requirements during \pd commissioning and
-data taking periods without impacting operation of DAQ and its most immediate
-monioring needs (fulfilled by the OM).
+  The running of p3s jobs is almost entirely independent from the operation of DAQ.
+  The interface between the two consists of notification of the readiness of a potential raw file to be ingested and for p3s jobs to know how to read and unpack it.  This interface, once established, is expected to be relatively stable.
+  Payload jobs run by p3s can be quickly modified
+and adapted to produce new types of results during \pd commissioning and
+data taking periods without impacting operation of DAQ.
 
-\item \textbf{access to data and monitoring software}:
-It is expected that access to DAQ, OM and monitoring data generated in the latter will be
-restricted to a very limited number of people to reduce operational risks 
-(e.g.~it is undesirable to have a hundred users browsing histograms coming out of OM
-or introduce new algorithms into the online monitoring). Being more scalable and 
-decoupled from the core DAQ the p3s will allow to make visual and data products
-more widely accessible to the Collaboration and enable more users to contribute
-to creating and modifying payloads ``in situ'' as the experiment progresses.
+%%%% (bv) I don't really think this is a distinction.  why can't 100 users browse OM results?
+%%%%
+%% \item \textbf{access to data and monitoring software}:
+%% It is expected that access to DAQ, OM and monitoring data generated in the latter will be
+%% restricted to a very limited number of people to reduce operational risks 
+%% (e.g.~it is undesirable to have a hundred users browsing histograms coming out of OM
+%% or introduce new algorithms into the online monitoring). Being more scalable and 
+%% decoupled from the core DAQ the p3s will allow to make visual and data products
+%% more widely accessible to the Collaboration and enable more users to contribute
+%% to creating and modifying payloads ``in situ'' as the experiment progresses.
 
 
 \end{itemize}
@@ -154,56 +170,63 @@ to creating and modifying payloads ``in situ'' as the experiment progresses.
 \subsection{Categories of Jobs in p3s}
 \label{sec:categories}
 
-This is a compressed summary of information presented in \cite{docdb1811}.
-For now we focus only on TPC Data Processing with the Photon Detector Data
-to be considered at a later date. The categories are as follows:
+The exact makeup of the p3s payload jobs is to be determined by Reco,
+DAQ and other groups which have data quality monitoring needss.  It is
+expected these jobs to fall into the following categories which are
+described more fully in \cite{docdb1811}.  They are progressive and,
+for now, focused on TPC data:
 
 \begin{description}
 
-\item[DAQ (no data decompression)] A summary of DAQ-level data  such as summaries of data
- rates  or summaries of any metadata, status codes the provided by the DAQ etc.
-Most of this functionality will exist in OM so this is optional in p3s, with may perhaps
-provide additional level of detail and logging.
+\item[DAQ] category consists of results requiring no data
+  decompression and likely will be produced in OM and by p3s jobs.  It
+  might includes summaries of things like (compressed) fragment sizes,
+  error flags, data rates.
 
-\item[ADC (requires data decompression)] A summary of ADC-level data e.g. mean/RMS
-values at channel level and as a statistics over various groupings and level of detail
-(ASIC, FEMB, RCE, APA etc).
+\item[ADC] results require data decompression but no other substantial
+  CPU and will consist of summary of ADC-level data.  Examples include
+  mean/RMS values over time in various groupings and level of detail
+  (ASIC, FEMB, RCE, APA etc).
 
+\item[FFT] category consists of the application of discrete Fourier
+  transforms (FFT) to ADC-level data primarily to understand any
+  excess noise and its possible evolution.
 
-\item[FFT] A summary of the ADC-level data in frequency space. It requires running a discrete Fourier
-transform (FFT) on channel waveforms. This largely  provides measures of noise and its
-evolution.
+\item[SIG] includes ADC mitigation, removal of any excess noise and
+  the deconvolution of detector response functions in order to
+  understand the signals related to actual activity in the detector.
 
-\item[SIG] A summary of the data \textit{after signal processing}.
-The processing is in  both time domain and in frequency domain (so uses the output of FFT).
-It includes items such as
-\begin{itemize}
-\item ``stuck code'' mitigation
-\item coherent noise removal
-\item noise subtraction and filtering
-\item deconvolution of the response function
-\item calculation of signal correlations for diagnostic purposes
-\end{itemize}
-
-\item[RECO] Results from running some type of reconstruction (perhaps greatly simplified).
-It may, for  example, provide a coarse count of straight muon track candidates.
+\item[RECO] category includes application of any high-CPU algorithms
+  for imaging and reconstructing the topology of activity in the
+  detector and may include high level semantic event classifications.
 
 \end{description}
 
 \subsection{The Scope of Hardware}
-It is anticipated that only a limited amount of new hardware will need to be procured
-for p3s. The hardware base of the system will mainly consist of the compute servers
-which currently belong to the \textit{neut} cluster of the CERN Neutrino Platform
-\cite{neut}
-and its DQM partition named \textit{neutdqm}. Other facilities such as \textit{lxbatch}
-\cite{lxbatch}
-and others may be added if and when they become available since p3s is a pilot-based
-system which facilitates federation of resources, and is batch-system-agnostic.
+P3s itself will require hardware to run its web and database servers
+and to provide enough storage for the final output files as described in
+section~\ref{sec:io}.  It is expected that existing hardware belonging
+to the \textit{neut} cluster of the CERN Neutrino Platform~\cite{neut}
+can provide hosts for these servers.
 
-In addition to compute servers, a small number Web and DB servers will be necessary
-which possess adequate performance characteristics. Storage requirements are being
-scoped out at this point in time.
+The storage required for the output files is not currently know.  It
+depends on the catalog of payload jobs that will be run and the desire
+of the collaboration for the retention of the results.  The largest
+single type of result will be event displays.  They will an amount of
+storage similar to the raw data from which they are produced.  If one
+event display per minute is produced and retained indefinitely some
+few tens of TB will be required.  The remanding class of results will
+require far less storage.
 
+The hardware required to run the payload jobs themselves of course
+depends on the nature of their CPU needs and the fraction of triggers
+they consume.  P3s follows a \textit{pilot}-based paradigm and so is
+able to provide a uniform execution environment to its payload jobs
+over a variety of native hosting environments.  This gives the ability
+to scale across different hosts as needed.  Initial expectation is
+that DQM jobs will be run by p3s on nodes in the \textit{neutdqm}
+partition of \textit{neut} cluster.  Other facilities such as
+\textit{lxbatch} \cite{lxbatch} may be added if needed and as available.
 
 
 \section{Required Capabilities}
@@ -255,7 +278,7 @@ sites and mass storage
 
 \end{itemize} 
 
-\item[Web Access to Data]\ 
+\item[Web Access to Results]\ 
 \begin{itemize}
 
 \item the data produced by p3s will be made available to the users via a Web service
@@ -263,6 +286,17 @@ sites and mass storage
 
 \item for the data which is preserved as data files (as opposed to visual products)
 there will be a catalog accessible via a browser/Web page
+
+\end{itemize} 
+
+\item[Notification of Exceptions]\ 
+\begin{itemize}
+
+\item summary files will be interpreted and checked for fields holding quantities which are to subject to limits defined in p3s.
+
+\item when a quantity is found to be outside of set limits p3s sends notification to registered individuals. 
+
+\item quantity-experts will have ability to modify the list of watched quantities and their limits.
 
 \end{itemize} 
 
@@ -274,7 +308,7 @@ The core of p3s is a Django-based \cite{django} application written in Python. T
 deliverables in the systems category are as follows:
 
 \begin{description}
-\item[p3s server] --- a Web service which supports task management capabilities as per Sec.\,\ref{sec:capabilities}
+\item[p3s server] --- a Web service which supports the capabilities described in Sec.~\ref{sec:capabilities}
 
 \item[user tools] --- such as CLI clients necessary to manipulate the state of the system, submit
 and manage tasks in the manual mode if necessary, and to perform general management and
