@@ -171,7 +171,7 @@ data taking periods without impacting operation of DAQ.
 \label{sec:categories}
 
 The exact makeup of the p3s payload jobs is to be determined by Reco,
-DAQ and other groups which have data quality monitoring needss.  It is
+DAQ and other groups which have data quality monitoring needs.  It is
 expected these jobs to fall into the following categories which are
 described more fully in \cite{docdb1811}.  They are progressive and,
 for now, focused on TPC data:
@@ -203,13 +203,15 @@ for now, focused on TPC data:
 \end{description}
 
 \subsection{The Scope of Hardware}
-P3s itself will require hardware to run its web and database servers
+P3s will require hardware to run its Web and database servers
 and to provide enough storage for the final output files as described in
-section~\ref{sec:io}.  It is expected that existing hardware belonging
-to the \textit{neut} cluster of the CERN Neutrino Platform~\cite{neut}
-can provide hosts for these servers.
+section~\ref{sec:io}.  It is expected that this hardware will be provided
+by the CERN Neutrino Platform either from the pool of the machines
+which beloong to the existing~\cite{neut} cluster, or procured separately
+if performance and scalability tests indicate such necessity.
 
-The storage required for the output files is not currently know.  It
+
+The storage required for the output files is not currently known.  It
 depends on the catalog of payload jobs that will be run and the desire
 of the collaboration for the retention of the results.  The largest
 single type of result will be event displays.  They will an amount of
@@ -222,9 +224,9 @@ The hardware required to run the payload jobs themselves of course
 depends on the nature of their CPU needs and the fraction of triggers
 they consume.  P3s follows a \textit{pilot}-based paradigm and so is
 able to provide a uniform execution environment to its payload jobs
-over a variety of native hosting environments.  This gives the ability
-to scale across different hosts as needed.  Initial expectation is
-that DQM jobs will be run by p3s on nodes in the \textit{neutdqm}
+over a variety of native hosting environments.  This gives p3s the ability
+to scale elastically across different hosts (oor faciltieis) as needed.  Initial expectation
+is that DQM jobs will be run by p3s on nodes in the \textit{neutdqm}
 partition of \textit{neut} cluster.  Other facilities such as
 \textit{lxbatch} \cite{lxbatch} may be added if needed and as available.
 
@@ -377,20 +379,20 @@ MC/Reco jobs in utility mode
 
 Development/engineering
 \begin{itemize}
-\item M.Potekhin (BNL) --- 100\%FTE
-\item B.Viren (BNL) --- 10\%FTE
+\item M.Potekhin (BNL) --- 100\%\,FTE
+\item B.Viren (BNL) --- 10\%\,FTE
 \end{itemize}
 
-\noindent System administration and support
+\noindent System administration and support (working assumption)
 
 \begin{itemize}
-\item N.Benekos (CERN) --- 50\%FTE
-\item G.Savage (FNAL) --- 50\%FTE
+\item N.Benekos (CERN) --- 50\%\,FTE (TBD)
+\item G.Savage (FNAL) --- 50\%\,FTE (TBD)
 \end{itemize}
 
 \subsection{Mat\'eriel}
-To be useful, p3s needs O(100) cores during its operation. In addition,
-a small number of adequately configured machines are needed for
+To be useful, p3s needs O(100) cores during its operation. As noted above,
+an additional small number of adequately configured machines are needed for
 deployment of Web and DB servers to support the p3s function.
 
 It is a working assumption at the time of writing that a significant portion of
