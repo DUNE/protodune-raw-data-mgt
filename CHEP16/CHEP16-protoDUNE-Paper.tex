@@ -62,7 +62,8 @@ will be 20\,Gbps for each experiment.
 
 \section{LArTPC as a Data Source}
 
-DUNE/\pd design has the following characteristics which are common with other recent detectors based on the same technology:
+DUNE/\pd LArTPC design has the following characteristics which are common with
+other recent detectors based on the same technology:
 \begin{itemize}
 \item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
 \item High digitization frequency (essential for precision)
@@ -114,7 +115,7 @@ of this document but it is helpful to note a few details relevant for the topic 
 
 The DAQ has of a few interconnected layers of computers.
 The ``outer layer'' of the system where the data is put together in a format
-suitable for writing into files consists of 10
+suitable for writing into files consists of about 10
  \textit{Event Builders} -- dedicated computers equipped with quad 10Gbps NICs to ensure the necessary
 bandwidth. Interconnectivity is provided by a high-bandwidth switch such as Brocade ICX 7750
 or equivanent. Their function is to assemble complete readout frames from data
@@ -161,18 +162,81 @@ Reliance on EOS is motivated by the experience and architecture of the LHC exper
 as well as the \pd data characteristics presented above in Sec.\,\ref{sec:np04_data_rate}.
 
 The elements in this diagram which contain ``FTS'' in their label correspond to components and
-instances of the \textit{Fermi FTS} system \cite{fts} which transports data between a few endpoints.
-There is more than once instance of FTS in the data transmission chain.
+instances of the \textit{Fermi File Transfer Service} -- FTS for short \cite{fts} -- which transports
+data between a predefined endpoints.
+There is more than once instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
+in the diagram) is responsible for moving the data from the Online Buffer into EOS. The second instance
+-- ``FTS2'' --  copies the data after is has arrived to EOS to tape storage at CERN (the CASTOR
+system~\cite{castor}). It is also tasked with transmitting the data to Fermilab 
+where it is placed
+in a dCache~\cite{dcache} storage cluster. A secondary tape copy is then created at Fermilab
+using the data resident in dCache as the source. Other participating data centers may also
+receive their copies of raw data from this FTS instance.
 
-One instance is re
+In both cases an FTS agent is triggered by arrival of files to a designated
+storage location which is effectively a ``dropbox'', i.e.\,files are picked up
+for transfer asyncronously based on certain criteria (such as the filename pattern etc).
+The Fermi FTS contains functionality which allows for completely automatic operation
+including error handling, transmission retries, monitoring etc.
 
-The EOS system serves as the staging area from which the data gets committed to archival tape storage at
-CERN (CASTOR) and from which it is transmitted to a number of endpoints including principal data
-centers such as FNAL and others. It is also used to provide input to the prompt processing system
-which support the Data Quality Moniotring in \pd.
+A number of protocols are supported by both EOS and FTS inclusing XRootD, gridFTP
+and third-party transfers. Prime candidate for \pd is XRootD which has proven scalability
+and reliability.
+
+In addition to serving as the principal staging area from which the data is copied to
+tape storage and from which it is transmitted to FNAL 
+EOS will also be used to provide input to the prompt processing system
+in order support the Data Quality Moniotring (DQM) in \pd as explained below.
 
 \section{Data Quality Monitoring}
 Data Quality Monitoring (DQM) plays an imporant role in \pd.
+It consists of two parts,  the low latency Online Monitoring (OM)
+system which is engineered as a component of DAQ, and
+the ``prompt processing system''. This is reflected in the diagram
+in Fig.\ref{fig:raw_concept}.
+
+Conceptually, they both serve the same purpose of generating time-critical
+DQM information on a short time scale needed to ascertain the condition
+and performance of both the detector and the DAQ and are complementary to each other. 
+The benchmark turnaround time for ``prompt processing'' jobs 
+is set at 10\,min for reference purposes, with actual numbers depending on
+finalized content of the payload.
+of course there will be several jobs types and execution times will
+vary for many reasons. This time scale fulfills the need to have \textit{actionable}
+DQM information in time for operators to take action and prevent loss
+of useable data and/or valuable beam time.
+\ \\
+\\
+\noindent By having p3s as a separate 
+component in addition to the OM the following issues are adressed:
+\begin{itemize}
+
+\item \textbf{scalability}: DAQ and OM operate in a purpose-built computing environment characterized
+by an extremely high bandwidth and a relatively limited CPU budget, as dictated by the
+primary mission of these systems. Scaling up computational capabilities of DAQ
+is still possible but likely to be prohibitevely expensive due to nature and cost of
+the hardware used in DAQ. The prompt processing system from the very beginning
+was conceptualized as built upon common (and in fact recycled) general purpose hardware
+with ample CPU and somewhat limited network bandwidth. This makes scaling out of
+the system very economical and even allows for inclusion of opportunistic resources
+with very few requirements to be met.
+
+\item \textbf{test of data integrity}: OM will consume data in the form of network streams generated
+by the DAQ specifically for that purpose, i.e.~OM won't operate on actual \textit{files} generated
+by the DAQ. This achieves a degree of simplicity of data handling and very low latency
+in distributing the data to CPU, but also precludes the possibility to ascertain that the data
+in its final form (i.e.~as finalized files on disk prepared for sinking to mass storage) is indeed
+formatted correctly and is otherwise valid in that shape. The p3s whose input is precisely the finished
+files coming out of DAQ serves in that role in addition to others.
+
+\item \textbf{coupling/dependency}: 
+  The running of p3s jobs is almost entirely independent from the operation of DAQ.
+  The interface between the two consists of notification of the readiness of a potential raw file to be ingested and for p3s jobs to know how to read and unpack it.  This interface, once established, is expected to be relatively stable.
+  Payload jobs run by p3s can be quickly modified
+and adapted to produce new types of results during \pd commissioning and
+data taking periods without impacting operation of DAQ.
+
+\end{itemize}
 
 
 \section{The title, authors, addresses and abstract} 
@@ -636,6 +700,17 @@ Using the graphicx package figures can be included using code such as:
 {The Fermilab File Transfer System}\\
 \url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
 
+\bibitem{castor}
+{CASTOR -- CERN Advanced STORage manager}\\
+\url{http://castor.web.cern.ch/}
+
+\bibitem{dcache}
+{dCache.org}\\
+\url{https://www.dcache.org/}
+
+\bibitem{sam}
+{A data handling system for modern and future Fermilab experiments}\\
+\url{http://iopscience.iop.org/1742-6596/513/3/032045}
 
 \end{thebibliography}
 
