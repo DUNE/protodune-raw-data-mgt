@@ -1,6 +1,6 @@
 # Data Management Documents for protoDUNE
 ## Overview
-This repository contains documents for a proposed raw data managment system and a few online components for the protoDUNE single-phase detector (CERN experiment NP04), which is scheduled to take data with CERN SPS beams in late 2018. The dual-phase detector (NP02) employs a somewhat different approach to data management however there are overlaps in the infrastructure which is mentioned in documentation provided here.
+This repository contains documents for a proposed raw data managment system and a few online components for the protoDUNE single-phase detector (CERN experiment NP04), which is scheduled to take data with CERN SPS beams in late 2018. The dual-phase detector (NP02) employs a somewhat different approach to data management however there are overlaps in the infrastructure which is mentioned in some of the documents provided here.
 
 ## Documents in this repository
 ###Data Handling###
@@ -17,10 +17,15 @@ This repository contains documents for a proposed raw data managment system and 
 * *neut-buffer.tex* describes a concrete implementation of a xrootd storage cluster at CERN which is a candidate for the single-phase protoDUNE online buffer. Obsolete dut to design decisions as described above.
 
 ###Workflow###
-* Documents whose names starts with "prompt" are related to the prompt processing system for protoDUNE. These currently include requirements and a design proposal (as an outline).
+* Documents whose names starts with "prompt" are related to the prompt processing system for protoDUNE. These currently include requirements and a design proposal.
+* "p3s plan 2017" contains (as the name suggests) description of work that needs to be completed in 2017 with system components, milestones etc as necessary to be on track for the protoDUNE commissioning.
+
+###Presentations###
+The folder "CHEP16" contains the materials for the paper to be published in the proceedings of the CHEP 2016 conference which concerns data management in protoDUNE.
+
 
 ###Graphic###
-* the folder *"figures"* contains graphics to all of these documents
+* the folder *"figures"* contains graphics to all of these documents, with the exception of the CHEP paper which has its own graphics folder
 
 ## Built PDFs
 
