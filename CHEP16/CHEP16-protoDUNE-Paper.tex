@@ -8,7 +8,7 @@
 %\newcommand{\filesize}{5\,GB\ }
 
 \begin{document}
-\title{Design of the \pd experiment data management infrastructure}
+\title{Design of the \pd raw data management infrastructure}
 
 \author{S Fuess$^1$, R Illingworth$^1$, M Mengel$^1$, A Norman$^1$, M Potekhin$^2$ and B Viren$^2$}
 
@@ -46,18 +46,27 @@ and scheduled to take data in 2018.
 While both apparatuses will share a few common computing infrastructure elements, their
 respective design of DAQ and buffer as well as operations are largely independent.
 The focus of this paper is on the data management for the
-single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification in the medium
-(liquid Argon) and is in essence a very large ionization chamber equipped with a large
-number of readout electrodes (wires), each with its own electronics chain.
+single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification
+in the medium (liquid Argon) and is in essence a very large ionization chamber equipped with
+a large number of readout electrodes (wires), each with its own electronics chain.
 In the DUNE design, the front-end electronics is situated within the cryostat and operates at cryogenic
 temperatures in order to minimize noise (the so-called ``cold electronics design'').
 
 Both NP02 and NP04 will be placed in an extension of the CERN North Area Experimental Hall.
-There will be an enclosure with appropriately scaled power and cooling capacity to house the elements
-of the \pd computing infastructure which need to be close to the detectors.
-Each prototype will be have a dedicated optical fiber network connection to the CERN central storage facilities
-located in the West Area campus of CERN. The nominal bandwidth of these dedicated network connections
-will be 20\,Gbps for each experiment.
+The general layout of the experimental area is shown in Fig.\,\ref{fig:np02np04}.
+There will be enclosures with sufficient power and cooling capacity to house
+the elements of the \pd computing infastructure which need to be close to the detectors.
+They are shown schematically as yellow blocks in the upper-right portion of the diagram.
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[tbh]
+\centering\includegraphics[width=\linewidth]{figures/np02np04.png}
+\caption{\label{fig:np02np04}Layout of the \pd experimental area}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent Each prototype will be have a dedicated optical fiber network connection to
+the CERN central storage facilities located in the West Area campus of CERN. The nominal
+bandwidth of these dedicated network connections will be 20\,Gbps for each experiment.
 
 
 \section{LArTPC as a Data Source}
@@ -145,7 +154,7 @@ Neutrino Platform}\cite{cenf}.
 A small prototype of such system has been tested.
 
 
-\subsection{The logic of the Data Flow}
+\subsection{The Data Flow pattern in \pd}
 %%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[tbh]
 \centering\includegraphics[width=0.85\linewidth]{figures/protoDUNE_data_flow_2017_v1.png}
@@ -155,32 +164,45 @@ A small prototype of such system has been tested.
 
 In the following, we shall consider handling and management of the raw data after it is
 written by the Event Builders to the Online Buffer.  Conceptual diagram of the raw data
-flow in \pd is presented in Fig.\ref{fig:raw_concept} which shows the general logic of data flow
-and also reflects the central role of the EOS system at CERN (the high-performance distributed
-disk storage \cite{eos}) in the raw data management scheme.
+flow in \pd is presented in Fig.\ref{fig:raw_concept} which shows the general pattern of data flow
+and also reflects the central role of the EOS system at CERN \cite{eos} in the raw data management scheme.
 Reliance on EOS is motivated by the experience and architecture of the LHC experiments
 as well as the \pd data characteristics presented above in Sec.\,\ref{sec:np04_data_rate}.
 
 The elements in this diagram which contain ``FTS'' in their label correspond to components and
 instances of the \textit{Fermi File Transfer Service} -- FTS for short \cite{fts} -- which transports
-data between a predefined endpoints.
-There is more than once instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
-in the diagram) is responsible for moving the data from the Online Buffer into EOS. The second instance
--- ``FTS2'' --  copies the data after is has arrived to EOS to tape storage at CERN (the CASTOR
-system~\cite{castor}). It is also tasked with transmitting the data to Fermilab 
-where it is placed
-in a dCache~\cite{dcache} storage cluster. A secondary tape copy is then created at Fermilab
-using the data resident in dCache as the source. Other participating data centers may also
-receive their copies of raw data from this FTS instance.
-
-In both cases an FTS agent is triggered by arrival of files to a designated
-storage location which is expected to be accessible in a POSIX-like  mode.
-It effectively servs as a ``dropbox'', i.e.\,files are picked up
-for transfer asyncronously based on certain criteria (such as the filename pattern etc).
+data between a predefined endpoints. Fermi FTS was designed originally for NOvA experiment
+\cite{nova} DAQ system and has a proven track record of moving over 7.7\,PB of data for NOvA
+and 4.7\,PB of data for MicroBooNE\,\cite{uboone}.
 The Fermi FTS contains functionality which allows for completely automatic operation
 including error handling, transmission retries, monitoring etc.
 
-An important part of the FTS functionality is its interface to and integration with 
+There is more than once instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
+in the diagram) is responsible for moving the data from the Online Buffer into EOS. The second instance
+-- ``FTS2'' --  copies the data after is has arrived to EOS to tape storage at CERN (the CASTOR
+system~\cite{castor}). It is also tasked with transmitting the data to Fermilab  and other peer
+institutions. At FNAL the data are placed in a dCache~\cite{dcache} storage cluster. A secondary
+tape copy is then created at Fermilab using the data resident in dCache as the source.
+Other participating data centers receiving their copies of raw data may function differently
+e.g.\,use other methods of local storage federation.
+
+\subsection{The ``Dropbox'' Logic}
+In both instances an FTS agent is triggered by arrival of files to a designated
+storage location which is expected to be accessible in a POSIX-like  mode.
+It effectively serves as a ``dropbox'', i.e.\,files are selected
+for transfer asyncronously based on certain criteria (such as the filename pattern etc)
+and subjected to following operations:
+\begin{itemize}
+\item Identified
+\item Registered
+\item Scheduled for transmission
+\item Verified
+\item Cleaned up after transfer
+\end{itemize}
+
+
+\subsection{Metadata}
+An important feature of the FTS is its interface to and integration with 
 the \textit{SAM} Metadata system deployed at FNAL which serves the needs of a few
 experiments in both HEP and Intensity Frontier domains. In addition to essential file catalog
 functionality, SAM has extensive storage management
@@ -190,6 +212,15 @@ The most common way
 to associate metadata with a file in SAM is to package it as an auxiliary file in JSON format,
 following certain naming convention. This file is then automatically detected by FTS
 and records in SAM are created in accordance with its content.
+
+Operations related to metadata present certain challenges in the high-volume and high-rate
+environment of the \pd data flow. For example, for the metadata to be useful, it may
+be necessary to extract some of its elements by reading a large fraction or even all of the data file
+written to the buffer. In the very high I/O bandwidth scenario of \pd this puts substantial additional
+load on storage systems. Another example is checksum operations as the checksum is often
+considered a crucial part of the file metadata. If checksums are required from the very beginning
+of the data transfer chain, complete files must be read from the Online Buffer. In addition, handling
+checksums requires a non-negligible amount of CPU.
 
 \subsection{Transfer Protocols}
 A number of protocols are supported by both EOS and FTS inclusing XRootD, gridFTP
@@ -219,14 +250,33 @@ These systems are complementary to each other but operate
 in different enviroment and on a different time scale.
 The benchmark turnaround time for ``prompt processing'' jobs 
 is set roughly at 10\,min, with actual numbers depending on
-finalized content of the payload, while Online Monitoring aims
+finalized content of the payloads. Jobs will be organized and stages
+and subject to prioritization to guarantee timely production of DQM
+visual and data produts. A prototype system is in development at
+the time of writing. The final stages of prompt processing will
+include simplified event reconstruction based on LArSoft framework
+\cite{larsoft}.
+
+Compared to prompt processing, Online Monitoring aims
 to provide response on the scale of seconds an in general under a minute.
 
 The prompt processing system processes only a small fraction of the data
 but can potentially perform more sophisticated calculations since it is
-easier to scale out its CPU capabilities.
+easier to scale out its CPU capabilities. Both OM and prompt processing system
+will be located in the vicinity of the NP04 detector.
 
-
+\section{Summary}
+The single-phase \pd experiment will generate data at a very high rate
+with a few PB of raw data to be recorded in mass storage during the time of
+its operation. To meet the challenges associated with handling these
+data the DUNE Collaboration opted to leverage designs, software and
+components from a few HEP and Intensity Frontier experiments. This includes
+\begin{itemize}
+\item The design of the Online Buffer
+\item The principal data transfer system (Fermi FTS) and the Metadata system (Fermilab SAM)
+\item XRootD storage federation technology
+\item LArSoft framework for Liquid Argon detector simulation and reconstruction
+\end{itemize}
 
 \section*{References}
 \begin{thebibliography}{9}
@@ -250,7 +300,6 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016)\\
 \url{http://home.cern/about/experiments/cern-neutrino-platform}
 
 
-
 \bibitem{eos}
 {The CERN Exabyte Scale Storage}\\
 \url{http://information-technology.web.cern.ch/services/eos-service}
@@ -258,6 +307,14 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016)\\
 \bibitem{fts}
 {The Fermilab File Transfer System}\\
 \url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
+
+\bibitem{nova}
+NOvA Neutrino Experiment\\
+\url{https://www-nova.fnal.gov/}
+
+\bibitem{uboone}
+MicroBooNE Neutrino Experiment\\
+\url{http://www-microboone.fnal.gov/}
 
 \bibitem{castor}
 {CASTOR -- CERN Advanced STORage manager}\\
@@ -270,6 +327,10 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016)\\
 \bibitem{sam}
 {A data handling system for modern and future Fermilab experiments}\\
 \url{http://iopscience.iop.org/1742-6596/513/3/032045}
+
+\bibitem{larsoft}
+{LArSoft Collaboration}\\
+\url{http://larsoft.org//}
 
 \end{thebibliography}
 
