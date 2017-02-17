@@ -43,34 +43,45 @@
 It is important to monitor the data being produced in the Single-Phase
 \pd experiment in a way that allows fast identification and correction
 of any problems.  Monitoring algorithms can require large volumes of
-data or large CPU resources.  Algorithms that require both extremes
-require more hardware than available or can not return results quickly
-enough to be actionable.  This leads to recognizing two opposing ends
-of a spectrum of possible monitoring jobs.  Including also full
-production (FP) processing there are three categories:
+data (high bandwidth) and/or large CPU resources.  Algorithms that require both extremes
+may require more hardware than can be made available or may not return results quickly
+enough to be actionable.
+%This leads to recognizing two opposing ends
+%of a spectrum of possible monitoring jobs.  Including also full
+%production (FP) processing there are three categories:
+Within the spectrum of possibile CPU vs bandwidth strategies there are three categories
+of practical interest:
 
 \begin{description}
-\item[OM] \textit{Online Monitoring} consists of fast algorithms consuming large fractions of raw data and running directly in the special distributed and asynchronous DAQ computing environment.
-\item[PP] \textit{Prompt Processing} consists of relatively long-running algorithms consuming small subsamples of the raw data and running in a conventional computing environment with a special job management system.
-\item[FP] \textit{Full Production} consists any excess noise filtering, signal processing, activity imaging, object formation, pattern recognition and other reconstruction.
+
+\item[OM] \textit{Online Monitoring}: fast algorithms consuming large fractions of raw data and running
+% directly in the special distributed and asynchronous
+within the DAQ computing environment.
+
+\item[PP] \textit{Prompt Processing}: relatively long-running algorithms consuming small subsamples of the raw data and running in a conventional computing environment with a workload management system optimized for promptness.
+
+\item[FP] \textit{Full Production}: any excess noise filtering, signal processing, activity imaging, object formation, pattern recognition and other reconstruction.
+
 \end{description}
 
-These three categories are overlapping in terms of which algorithms
+\noindent These three categories are naturally overlapping in terms of which algorithms
 can or will run in each.  To efficiently use our limited software
-development effort it is important to find ways to write the needed
+development effort it is important to find ways to create the needed
 algorithms in a way that allow their reuse in the three contexts.
 Because the code for all three categories are ultimately based on
 \textit{art} this reuse can be achieved with relatively modest
 effort.\footnote{The authors recommend that algorithm developers
   embrace the new ``tool'' feature provided by the latest version of
-  \textit{art}.}  In particular, this should allow OM and PP groups
+  \textit{art}.}
+
+In particular, this should allow OM and PP groups
 flexibility in terms of easily moving algorithms from one environment
 to another as we better understand our hardware resources and
 monitoring needs.  This balance will likely be struck after we have
-developed and bench marked the monitoring algorithms.  It is expected
+developed and benchmarked the monitoring algorithms.  It is expected
 that these benchmarks will be evaluated and algorithms selected in
 order that each category of jobs satisfies the very rough requirements
-illustrated in table~\ref{tab:contexts}.
+illustrated in Table\,\ref{tab:contexts}.
 
 \begin{table}[h]
   \centering
@@ -86,29 +97,43 @@ illustrated in table~\ref{tab:contexts}.
   \label{tab:contexts}
 \end{table}
 
-
+\noindent
 With the above in mind, this note focuses on the unique parts that
 make up PP.  It also describes ways in which the PP group intends to
 work with the OM and FP groups in order to best make use of our
 limited and shared effort in the collaboration.
 
-The PP effort is centered around developing the \textit{\pd Prompt
-  Processing System} (p3s) and it is the main deliverable.  At its
-heart, the p3s is a special job management system which provides
+\section{The Scope of Prompt Processing}
+
+Prompt Processing can be conceptualized as consisting of (a) payload
+jobs necessary to fulfill its function, and (b) the infrastructure that
+makes execution of these jobs possible in an optimal manner.
+It is important to ensure portability and
+interoperability of software created in the OM, PP and FP domains,
+especially since they are bound to use functionally similar or identical
+units of software. It is expected therefore that writing resusable payload
+jobs will be \textit{a collaborative effort} involving members of the DRA
+and other groups, and their  scope is discussed in Sec.~\ref{sec:categories}.
+
+The part of responsibility
+of the Prompt Processing group that is ``internal'' to it is the
+development of
+%The PP effort is centered around developing
+the \textit{\pd Prompt   Processing System} (p3s) and it is the group's
+main deliverable.  The core of 
+p3s is a specialized job management system which provides
 latency assurances for job completion using a fixed amount of
 computing resources at the expense of limiting the data coverage.
 This is opposite from traditional job management systems that
-emphasize processing 100\% of all input data but do not limit the
-duration of that processing.  The scope of p3s is describe further in
-Sec.~\ref{sec:p3sscope}.
+emphasize processing 100\% of all input data and effectively do not limit the
+duration of that processing. The Prompt Processing System also includes
+an array of User Interface and data visualization tools.
+The scope of p3s is described further in Sec.~\ref{sec:p3sscope}.
+%While the primary focus of the PP group is to provide p3s, the
+%\textit{payload} jobs that it runs are of great importance as they
+%provide the actual data quality monitoring (DQM).
 
-While the primary focus of the PP group is to provide p3s, the
-\textit{payload} jobs that it runs are of great importance as they
-provide the actual data quality monitoring (DQM).  The scope that the
-PP group assumes related to development of payload jobs is discussed
-in Sec.~\ref{sec:categories}.
-
-Guidance on requirements for hardware are given in
+Finally, guidance on hardware requirements are given in
 Sec.~\ref{sec:hardware} followed by a timeline and milestones in
 Sec.~\ref{sec:timeline}, a summary of resources in
 Sec.~\ref{sec:resources} and ending with a risk assessment in
@@ -119,9 +144,11 @@ Sec.~\ref{sec:risk}.
 \section{p3s}
 \label{sec:p3sscope}
 The \textit{\pd Prompt Processing System} (p3s) is primarily a
-platform for management of automated processing of data streams which
-gives guarantees of latency of results, if not coverage nor
-throughput.  It is an infrastructure element and does not, as a
+platform for automated processing of data streams which
+aims to  guarantee an agreed upon latency of producing results,
+as opposed to data coverage or
+throughput typical of a common Workload Management System.
+It is an infrastructure element and does not, as a
 deliverable, include the actual software for its computational
 payloads (which are discussed in Sec.~\ref{sec:categories}).
 
@@ -166,28 +193,26 @@ initial raw data files from one or both of the two possible sources:
 \end{itemize}
 The Online Buffer, if accessed at all, would only be used as a source
 of raw data files.  
-
-The p3s is aware of the input and output files for each job by their
-URL (\texttt{root://} or other scheme).  Ultimately, each job is
-instructed by p3s, guided by its configuration, what the URLs for
-every input file as well as every output file expected.  Any output
-file may be used as an input file of a subsequent job.  These
-intermediate files connect jobs into an acyclic, directed graph (DAG).
-
-It is work noting that for URLs schemes with a server that allows it,
-directly streaming files or even portions of files is allowed.  In the
-case of XRootD this can greatly limit the amount of data that must be
+% mxp
+% too technical for this document and redundant vis a vis next section
+%The p3s is aware of the input and output files for each job by their
+%URL (\texttt{root://} or other scheme).  Ultimately, each job is
+%instructed by p3s, guided by its configuration, what the URLs for
+%every input file as well as every output file expected.  Any output
+%file may be used as an input file of a subsequent job.  These
+%intermediate files connect jobs into an acyclic, directed graph (DAG).
+Data streaming capability inherent in XRootD for many use cases
+can greatly limit the amount of data that must be
 transferred in the case where only a single trigger or even a subset
 of fragments of one trigger are needed from a raw data file to satisfy
 a given payload job.  Jobs which do not have the capability or
-inclination to stream must nevertheless provide a way to stage files
+requirement to stream data must nevertheless provide a way to stage files
 in to and out from local storage.  This is expected to be accomplished
 by a script which can likely be shared by a variety of core payload
 jobs.
 
-The p3s will check for successful job completion and the production of
-all expected output files.  Driven by its configured rules, p3s will
-purge certain files that made up DAG edges.
+The p3s will perform basics checks for successful job completion
+and existence of expected output files and purge intermediate data.
 As needed, some portion of the files produced by p3s jobs will be
 archived to mass storage and made available for distribution to the
 collaboration.
@@ -280,17 +305,17 @@ there will be a catalog accessible via a browser/Web page
 \item[Notification of Exceptions]\ 
 \begin{itemize}
 
-\item summary files will be interpreted and checked for fields holding quantities which are to subject to limits defined in p3s.
+\item summary files will be interpreted and checked for fields holding metrics which are subject to limits defined in p3s.
 
-\item when a quantity is found to be outside of set limits p3s sends notification to registered individuals. 
+\item when a calculated metric is outside of the limits a notification is sent to registered individuals. 
 
-\item quantity-experts will have ability to modify the list of watched quantities and their limits.
+\item domain experts will have ability to modify the list of watched quantities and their limits.
 
 \end{itemize} 
 
 \end{description}
 
-\subsection{Components and Deliverables}
+\subsection{p3s Components and Deliverables}
 
 The core of p3s is a Django-based \cite{django} application written in Python. The
 deliverables in the systems category are as follows:
@@ -325,18 +350,21 @@ deliverables in the systems category are as follows:
 \section{Payload Jobs}
 \label{sec:categories}
 
-The algorithmic content of the jobs that p3s will run spans a large
-range of expertise.  Some jobs will consist of algorithms which may
-start out being developed by the OM group but must be moved to PP due
-to CPU constraints (and if PP's relative lack of data throughput can
-provide enough useful statistics).  On the other end of the spectrum
-are jobs which are composed of algorithms that will also run as part
-of the \textit{full production} (FP) processing run (and rerun)
-offline.
+The algorithms to be used in the p3s payload jobs span a wide
+range of expertise in a few domains.  Some jobs will consist of algorithms
+originated in the OM group but may have to be moved to PP due
+to CPU constraints..
+% (and if PP's relative lack of data throughput can provide enough useful statistics).
+On the other end of the spectrum
+are jobs based on algorithms that will run as a part
+of the \textit{full production} (FP) processing which if fully in the
+offline domain.
 
-Because of this broad required expertise the PP group can not commit
-to providing all payload jobs.  It will however facilitate other
-collaborators to develop them.  In particular the group will closely
+Because of the considerable breadth of the required expertise the
+PP group should not commit to writing the code for all payload jobs. 
+It will however facilitate the work of other
+collaborators and ensure development of optimal interfaces
+to data and applications.  In particular the group will closely
 coordinate with OM and FP groups to identify individuals that can
 develop the algorithms.  It will also assist in the development to
 help it progress in ways that exploit the benefits of \textit{art} and
