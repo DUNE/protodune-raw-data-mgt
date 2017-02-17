@@ -3,7 +3,7 @@
 \usepackage{url}
 \usepackage{xspace}
 
-
+\newcommand{\Omit}[1]{}
 \newcommand{\pd}{protoDUNE\xspace}
 %\newcommand{\filesize}{5\,GB\ }
 
@@ -18,31 +18,53 @@
 \ead{potekhin@bnl.gov}
 
 \begin{abstract}
-The Deep Underground Neutrino Experiment (DUNE) will employ a uniquely large 40kt Liquid Argon
-Time Projection Chamber (LArTPC) as the main component of its Far Detector.
-In order to validate this design and characterize the detector performance an
+The Deep Underground Neutrino Experiment (DUNE) will employ a set of Liquid Argon
+Time Projection Chambers (LArTPC) with a total mass of 40~kt as the
+main components a Far Detector.
+In order to validate this technology designs and characterize the
+detector performance at full scale, an
 ambitious experimental program (called ``\pd'') has been
-initiated which includes a beam test of large-scale prototypes of single-phase and dual-phase LArTPC
-at CERN. The rate and the volume of raw data to be collected during the projected 2-month
-test  are substantial and on par with the LHC experiments in LHC Run 1.
-The protoDUNE experiment will require careful design of the DAQ, data handling and
-data quality monitoring systems. There are also substantial requirements for data distribution
-to a number of DUNE computing sites. We present our approach to solving these problems by
+initiated which includes a test of the large-scale prototypes for the
+single-phase and dual-phase LArTPC technologies, which will run in a beam
+at CERN. The total raw data volume
+that is slated to be collected during the scheduled 3-month beam run
+estimated to be in excess of 2.5~PB for each detector.  This data
+volume will require that \Omit[placing
+test  are substantial and on par with the LHC experiments in LHC Run 1.]
+the protoDUNE experiment carefully design the DAQ, data handling and
+data quality monitoring systems to be capable of dealing with
+challenges inherent with peta-scale data management while
+simultaneously fulfilling the requirements of disseminating the data to
+a world wide collaboration and DUNE associated computing sites. \Omit[There are also substantial requirements for data distribution
+to a number of DUNE computing sites.] We present our approach to solving these problems by
 leveraging the design, expertise and components created for the LHC and Intensity Frontier
-experiments. 
+experiments into a unified architecture that is capable of meeting the
+needs of \pd. 
 \end{abstract}
 
 \section{Introduction}
 The \pd program will help validate various DUNE technology aspects before proceeding with
 the construction of the large-scale principal DUNE detectors at the Sanford Underground Research Facility \cite{cdrVol1, cdrVol4}.
-The program is designed for measurements with a test beam provided by a dedicated target and beamline system
-at the CERN SPS accelerator complex. It has the potential to be an important platform for realistic
-Liquid Argon Time Projection Chamber (LArTPC) detector characterization (e.g. PID, shower response, etc.)
-utilizing controlled conditions of a test-beam experimental setup. The program includes two
-large LArTPC prototypes based on two different technologies --- single-phase and dual-phase TPCs.
+The program is designed to make a series of measurements on the
+interaction of charge particles in the liquid argon medium.  These
+measures will be performed in a test beam provided by a new dedicated
+target station and beamline transport system at the CERN SPS
+accelerator complex.  This ``neutrino platform'' facility has the
+potential to be an important resource for the characterization of the DUNE/protoDUNE
+Liquid Argon Time Projection Chamber (LArTPC) detectors and for
+providing realistic electromagnetic and hadronic shower response
+functions for different particles interacting in these detectors. \Omit[  characterization (e.g. PID, shower response, etc.)
+utilizing controlled conditions of a test-beam experimental setup.]
+The experimental program includes two separate
+large LArTPC prototypes one based on a ``single-phase'' (liquid) technology and
+one based on a ``dual-phase'' (liquid/gaseous) TPC readout technology,
+with CERN experiment designations \textbf{NP04} and \textbf{NP02}
+respectively.  Both detectors are scheduled to be deployed at CERN in
+2017, with beam data taking in 2018.
+\Omit[based on two different technologies --- single-phase and dual-phase TPCs.
 The dual-phase prototype was given the official designation as a CERN experiment \textbf{NP02},
 while the single-phase was designated as \textbf{NP04}. Both are to be deployed at CERN in 2017
-and scheduled to take data in 2018.
+and scheduled to take data in 2018.]
 
 While both apparatuses will share a few common computing infrastructure elements, their
 respective design of DAQ and buffer as well as operations are largely independent.
