@@ -99,7 +99,16 @@ facilities located in the West Area campus of CERN.
 
 \section{LArTPC as a Data Source}
 
-DUNE/\pd LArTPC design has the following characteristics which are common with
+DUNE/\pd LArTPC design has a fine spatial resolution due to the high
+channel count and spatial granularity, wire pitch and geometry, of the readout
+planes.  The readout design also takes advantage the relatively slow
+drift velocity of ions in the Argon and the 2~MHz digitization clock
+to achieve similarly fine spatial and temporal resolution long the
+drift axis of the detector, corresponding to the 5~ms drift time across
+the active volume.  These characteristics are typical of
+similar modern TPC detectors.
+
+\Omit[  has the following characteristics which are common with
 other recent detectors based on the same technology:
 \begin{itemize}
 \item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
@@ -107,13 +116,27 @@ other recent detectors based on the same technology:
 \item Considerable duration of the readout window (a few ms), which is due to the relatively
 low drift velocity of ionization electrons in Liquid Argon, of the order of mm/$\mu$s.
 \end{itemize}
+]
 
-\noindent All these factors result in a considerable amount of data collected per single event readout.
-A DUNE/\pd event may be compared to a stack of thousands of digital  snapshots of the signal
-collected from the electrodes.  As detailed in Sec.\,\ref{sec:np04_data_rate} below,
-instantaneous and average data rates in the data transmission chain are expected to be substantial, 
+\noindent These factors do however, in the absence of zero
+suppression, result in a large data volume needing to be readout and
+processed for a single event (drift) trigger. for a
+single considerable amount of data collected per single event readout.
+A DUNE/\pd readout event may be compared to sequential stack of a thousand of digital
+images of the signals collected from the electrodes. 
+The instantaneous triggered data rate and the data rates averaged over
+the beam's spill and duty factors are expected to be primarily limited
+by the network bandwidth available within the DAQ infrastructure and
+the I/O bandwidth available for recording the data.  Within these
+limits the NP04 experiment is expected to accumulate 2.5~PB of physics beam
+data during 3 months of running.  The total data volume accumulated by
+the experiment is expected to be larger when data from
+detector commissioning prior to the beam run, and cosmic ray data from
+after the beam running are included. 
+\Omit[for recording the data and average data rates in the data transmission chain are expected to be substantial, 
 and the total amount of data to be produced by NP04 will be of the order of a few
-petabytes (especially if one includes commissioning runs with cosmic rays).
+petabytes (especially if one includes commissioning runs with cosmic
+rays). ] These rates are detailed in Sec.\,\ref{sec:np04_data_rate}.
 
 A photon detector integrated into the TPC will also record data but its rate and volume are
 expected to be quite small compared to the TPC data so it won't be addressed here.
