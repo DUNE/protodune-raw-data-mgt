@@ -23,8 +23,9 @@ Time Projection Chamber (LArTPC) as the main component of its Far Detector.
 In order to validate this design and characterize the detector performance an
 ambitious experimental program (called ``\pd'') has been
 initiated which includes a beam test of large-scale prototypes of single-phase and dual-phase LArTPC
-at CERN. The amount of data to be collected in this test is substantial and on par with the LHC experiments
-in LHC Run 1. The protoDUNE experiment will require careful design of the DAQ, data handling and
+at CERN. The rate and the volume of raw data to be collected during the projected 2-month
+test  are substantial and on par with the LHC experiments in LHC Run 1.
+The protoDUNE experiment will require careful design of the DAQ, data handling and
 data quality monitoring systems. There are also substantial requirements for data distribution
 to a number of DUNE computing sites. We present our approach to solving these problems by
 leveraging the design, expertise and components created for the LHC and Intensity Frontier
@@ -75,7 +76,7 @@ DUNE/\pd LArTPC design has the following characteristics which are common with
 other recent detectors based on the same technology:
 \begin{itemize}
 \item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
-\item High digitization frequency (essential for precision)
+\item Digitization frequency in the 2\,MHz range (essential for precision)
 \item Considerable duration of the readout window (a few ms), which is due to the relatively
 low drift velocity of ionization electrons in Liquid Argon, of the order of mm/$\mu$s.
 \end{itemize}
@@ -104,13 +105,13 @@ The following nominal parameters define the expected data rates and volume in NP
 \item Trigger rate: 100\,Hz
 \item SPS spill time: 4.8\,s
 \item SPS cycle: 16.8\,s
-\item Compression: $\times$2
+\item Compression: $\times$4
 \end{itemize}
 \noindent This results in the following nominal data characteristics:
 \begin{itemize}
 \item Instantaneous rate (in DAQ): 11.5\,GB/s
 \item Average rate (including ingestion into mass storage): 3.3\,GB/s
-\item Total data volume during the projected run period: 1.2\,PB (commisioning not included)
+\item Total data to be captured: 6\,PB
 \item Buffer to store 3 days worth of data: 850\,TB
 
 \end{itemize}
@@ -122,10 +123,10 @@ The following nominal parameters define the expected data rates and volume in NP
 Details of the DAQ design and Online Monitoring in \pd are outside of the scope
 of this document but it is helpful to note a few details relevant for the topic at hand.
 
-The DAQ has of a few interconnected layers of computers.
+The DAQ has of a few interconnected layers of processes running on dedicated computers.
 The ``outer layer'' of the system where the data is put together in a format
-suitable for writing into files consists of about 10
- \textit{Event Builders} -- dedicated computers equipped with quad 10Gbps NICs to ensure the necessary
+suitable for writing into files consists of  \textit{Event Builders}. The Event Builders
+are hosted on a few machines equipped with quad 10Gbps NICs to ensure the necessary
 bandwidth. Interconnectivity is provided by a high-bandwidth switch such as Brocade ICX 7750
 or equivanent. Their function is to assemble complete readout frames from data
 fragments obtained from the inner layer of DAQ, the \textit{Board Readers}.
@@ -155,9 +156,10 @@ A small prototype of such system has been tested.
 
 
 \subsection{The Data Flow pattern in \pd}
+\label{sec:flow}
 %%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[tbh]
-\centering\includegraphics[width=0.85\linewidth]{figures/protoDUNE_data_flow_2017_v1.png}
+\centering\includegraphics[width=0.85\linewidth]{figures/protoDUNE_data_flow_2017_v2.png}
 \caption{\label{fig:raw_concept}Conceptual diagram of the flow of raw data in \pd}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,13 +206,13 @@ and subjected to following operations:
 \subsection{Metadata}
 An important feature of the FTS is its interface to and integration with 
 the \textit{SAM} Metadata system deployed at FNAL which serves the needs of a few
-experiments in both HEP and Intensity Frontier domains. In addition to essential file catalog
+experiments in both High Energy Physics and Intensity Frontier domains. In addition to essential file catalog
 functionality, SAM has extensive storage management
 capabilities covering both disk (e.g.\,dCache) and tape (e.g.\,FNAL Enstore) types of storage.
 % Working in tandem, FTS and SAM allow
 The most common way
 to associate metadata with a file in SAM is to package it as an auxiliary file in JSON format,
-following certain naming convention. This file is then automatically detected by FTS
+following a certain naming convention. This file is then automatically detected by FTS
 and records in SAM are created in accordance with its content.
 
 Operations related to metadata present certain challenges in the high-volume and high-rate
@@ -222,6 +224,11 @@ considered a crucial part of the file metadata. If checksums are required from t
 of the data transfer chain, complete files must be read from the Online Buffer. In addition, handling
 checksums requires a non-negligible amount of CPU.
 
+Current plan is to utilize the checksum calculattion capabilities provided by XRootD
+during both legs of the transfer: it is first calculated by the ``FTS1'' instance
+(see \ref{sec:flow}) and added as a part of the metadata. It is then used in further transfers
+by ``FTS2'' to CASTOR and dCache.
+
 \subsection{Transfer Protocols}
 A number of protocols are supported by both EOS and FTS inclusing XRootD, gridFTP
 and third-party transfers. Prime candidate for \pd is XRootD which has proven scalability
@@ -229,7 +236,8 @@ and reliability.
 
 In addition to serving as the principal staging area from which the data is copied to
 tape storage at CERN and from which it is transmitted to FNAL, 
-EOS will also be used to provide trasparent access to data to the prompt processing system
+EOS will also be used to provide transparent access to data to the
+\pd prompt processing system 
 in order support the Data Quality Moniotring (DQM) in \pd as explained in Sec.\,\ref{sec:dqm}.
 Its XRootD interface makes it a particularly attractive option.
 
@@ -247,23 +255,24 @@ system which is engineered as a component of DAQ, and
 the ``prompt processing system''. This is reflected in the diagram
 in Fig.\ref{fig:raw_concept}.
 These systems are complementary to each other but operate
-in different enviroment and on a different time scale.
+in different enviroments and on a different time scale.
 The benchmark turnaround time for ``prompt processing'' jobs 
 is set roughly at 10\,min, with actual numbers depending on
 finalized content of the payloads. Jobs will be organized and stages
 and subject to prioritization to guarantee timely production of DQM
-visual and data produts. A prototype system is in development at
+visual and data products. A prototype system has been developed at
 the time of writing. The final stages of prompt processing will
 include simplified event reconstruction based on LArSoft framework
 \cite{larsoft}.
 
 Compared to prompt processing, Online Monitoring aims
-to provide response on the scale of seconds an in general under a minute.
-
+to provide response on the scale of seconds and in general under a minute.
 The prompt processing system processes only a small fraction of the data
 but can potentially perform more sophisticated calculations since it is
 easier to scale out its CPU capabilities. Both OM and prompt processing system
-will be located in the vicinity of the NP04 detector.
+will be located in the vicinity of the NP04 detector. It may be necessary to
+scale out parts of prompt processing to the CERN central batch facility
+so the system is designed to support this mode of operation as well.
 
 \section{Summary}
 The single-phase \pd experiment will generate data at a very high rate
