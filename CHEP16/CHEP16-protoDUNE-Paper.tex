@@ -66,31 +66,36 @@ The dual-phase prototype was given the official designation as a CERN experiment
 while the single-phase was designated as \textbf{NP04}. Both are to be deployed at CERN in 2017
 and scheduled to take data in 2018.]
 
-While both apparatuses will share a few common computing infrastructure elements, their
-respective design of DAQ and buffer as well as operations are largely independent.
+The two detector apparatuses, when deployed, will share parts of their
+computing infrastructure.  Their data acquisition (DAQ) systems and
+corresponding data buffers will operate in an independant manner. 
 The focus of this paper is on the data management for the
 single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification
-in the medium (liquid Argon) and is in essence a very large ionization chamber equipped with
+in the liquid Argon medium and is in essence a large single volume
+ionization/drift chamber.  The drift volume is equipped with
 a large number of readout electrodes (wires), each with its own electronics chain.
-In the DUNE design, the front-end electronics is situated within the cryostat and operates at cryogenic
-temperatures in order to minimize noise (the so-called ``cold electronics design'').
+In this ``cold electronics design'' employed by \textbf{NP04},  the front-end electronics is situated within the cryostat and operates at cryogenic
+temperatures in order to minimize noise.
 
-Both NP02 and NP04 will be placed in an extension of the CERN North Area Experimental Hall.
+Both NP02 and NP04 detectors will be placed in an extension of the CERN North Area Experimental Hall.
 The general layout of the experimental area is shown in Fig.\,\ref{fig:np02np04}.
-There will be enclosures with sufficient power and cooling capacity to house
-the elements of the \pd computing infastructure which need to be close to the detectors.
-They are shown schematically as yellow blocks in the upper-right portion of the diagram.
+Within these areas there will be enclosures with sufficient power and cooling capacity to house
+the elements of the \pd DAQ readout and computing infrastructure which
+needs to be in close proximity to the physical detectors.
+These enclosures are shown schematically as yellow blocks in the
+upper-right portion of Fig.\,\ref{fig:np02np04}. From these counting
+houses, each prototype detector will be have a dedicated 20 Gb/s
+network connection over optical fiber to the CERN central storage
+facilities located in the West Area campus of CERN.  
+
 %%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[tbh]
-\centering\includegraphics[width=\linewidth]{figures/np02np04.png}
-\caption{\label{fig:np02np04}Layout of the \pd experimental area}
+\begin{figure}[tb]
+\centering\includegraphics[width=0.8\textwidth]{figures/np02np04.png}
+\caption{\label{fig:np02np04}Diagram of the layout of the CERN north area with
+  staging of the protoDUNE dual phase detector (center) and single
+  phase detector (right).}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%
-
-\noindent Each prototype will be have a dedicated optical fiber network connection to
-the CERN central storage facilities located in the West Area campus of CERN. The nominal
-bandwidth of these dedicated network connections will be 20\,Gbps for each experiment.
-
 
 \section{LArTPC as a Data Source}
 
