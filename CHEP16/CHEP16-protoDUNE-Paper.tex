@@ -1,5 +1,6 @@
 \documentclass[a4paper]{jpconf}
 \usepackage{graphicx}
+\usepackage{tabularx}
 \usepackage{url}
 \usepackage{xspace}
 
@@ -29,14 +30,11 @@ single-phase and dual-phase LArTPC technologies, which will run in a beam
 at CERN. The total raw data volume
 that is slated to be collected during the scheduled 3-month beam run
 estimated to be in excess of 2.5~PB for each detector.  This data
-volume will require that \Omit[placing
-test  are substantial and on par with the LHC experiments in LHC Run 1.]
-the protoDUNE experiment carefully design the DAQ, data handling and
+volume will require that the protoDUNE experiment carefully design the DAQ, data handling and
 data quality monitoring systems to be capable of dealing with
 challenges inherent with peta-scale data management while
 simultaneously fulfilling the requirements of disseminating the data to
-a world wide collaboration and DUNE associated computing sites. \Omit[There are also substantial requirements for data distribution
-to a number of DUNE computing sites.] We present our approach to solving these problems by
+a world wide collaboration and DUNE associated computing sites. We present our approach to solving these problems by
 leveraging the design, expertise and components created for the LHC and Intensity Frontier
 experiments into a unified architecture that is capable of meeting the
 needs of \pd. 
@@ -53,18 +51,13 @@ accelerator complex.  This ``neutrino platform'' facility has the
 potential to be an important resource for the characterization of the DUNE/protoDUNE
 Liquid Argon Time Projection Chamber (LArTPC) detectors and for
 providing realistic electromagnetic and hadronic shower response
-functions for different particles interacting in these detectors. \Omit[  characterization (e.g. PID, shower response, etc.)
-utilizing controlled conditions of a test-beam experimental setup.]
+functions for different particles interacting in these detectors. 
 The experimental program includes two separate
 large LArTPC prototypes one based on a ``single-phase'' (liquid) technology and
 one based on a ``dual-phase'' (liquid/gaseous) TPC readout technology,
 with CERN experiment designations \textbf{NP04} and \textbf{NP02}
 respectively.  Both detectors are scheduled to be deployed at CERN in
 2017, with beam data taking in 2018.
-\Omit[based on two different technologies --- single-phase and dual-phase TPCs.
-The dual-phase prototype was given the official designation as a CERN experiment \textbf{NP02},
-while the single-phase was designated as \textbf{NP04}. Both are to be deployed at CERN in 2017
-and scheduled to take data in 2018.]
 
 The two detector apparatuses, when deployed, will share parts of their
 computing infrastructure.  Their data acquisition (DAQ) systems and
@@ -108,16 +101,6 @@ drift axis of the detector, corresponding to the 5~ms drift time across
 the active volume.  These characteristics are typical of
 similar modern TPC detectors.
 
-\Omit[  has the following characteristics which are common with
-other recent detectors based on the same technology:
-\begin{itemize}
-\item High spatial granularity of readout (e.g. the electrode pattern), and the resulting high channel count
-\item Digitization frequency in the 2\,MHz range (essential for precision)
-\item Considerable duration of the readout window (a few ms), which is due to the relatively
-low drift velocity of ionization electrons in Liquid Argon, of the order of mm/$\mu$s.
-\end{itemize}
-]
-
 \noindent These factors do however, in the absence of zero
 suppression, result in a large data volume needing to be readout and
 processed for a single event (drift) trigger. for a
@@ -127,44 +110,61 @@ images of the signals collected from the electrodes.
 The instantaneous triggered data rate and the data rates averaged over
 the beam's spill and duty factors are expected to be primarily limited
 by the network bandwidth available within the DAQ infrastructure and
-the I/O bandwidth available for recording the data.  Within these
-limits the NP04 experiment is expected to accumulate 2.5~PB of physics beam
+the I/O bandwidth available for recording the data.  Lossless data
+reduction/compression (e.g. Huffman encoding)
+techniques are applied to the data within the DAQ readout chain and
+are projected to result in a factor of 4x reduction to the raw data.
+Based on these projections, the NP04 experiment is expected to accumulate 2.5~PB of physics beam
 data during 3 months of running.  The total data volume accumulated by
 the experiment is expected to be larger when data from
 detector commissioning prior to the beam run, and cosmic ray data from
-after the beam running are included. 
-\Omit[for recording the data and average data rates in the data transmission chain are expected to be substantial, 
-and the total amount of data to be produced by NP04 will be of the order of a few
-petabytes (especially if one includes commissioning runs with cosmic
-rays). ] These rates are detailed in Sec.\,\ref{sec:np04_data_rate}.
+after the beam running are included.   These rates are detailed in Sec.\,\ref{table:np04_data_rate}.
 
-A photon detector integrated into the TPC will also record data but its rate and volume are
-expected to be quite small compared to the TPC data so it won't be addressed here.
+% \section{The NP04 Data Characteristics}
+% \label{sec:np04_data_rate}
+% The following nominal parameters define the expected data rates and volume in NP04:
+% \begin{itemize}
+% \item TPC channel count: 15,360
+% \item Digitization frequency: 2MHz
+% \item Readout window: 5\,ms
+% \item Trigger rate: 100\,Hz
+% \item SPS spill time: 4.8\,s
+% \item SPS cycle: 16.8\,s
+% \item Compression: $\times$4
+% \end{itemize}
+% \noindent This results in the following nominal data characteristics:
+% \begin{itemize}
+% \item Instantaneous rate (in DAQ): 11.5\,GB/s
+% \item Average rate (including ingestion into mass storage): 3.3\,GB/s
+% \item Total data to be captured: 6\,PB
+% \item Buffer to store 3 days worth of data: 850\,TB
+% \end{itemize}
 
-There are data reduction (compression) techniques that are applicable to \pd raw data in order to reduce its size. 
-Only the lossless algorithms will be applied during the compression of the NP04 raw data
-(e.g. Huffman algorithm and others).
-
-\section{The NP04 Data Characteristics}
-\label{sec:np04_data_rate}
-The following nominal parameters define the expected data rates and volume in NP04:
-\begin{itemize}
-\item TPC channel count: 15,360
-\item Digitization frequency: 2MHz
-\item Readout window: 5\,ms
-\item Trigger rate: 100\,Hz
-\item SPS spill time: 4.8\,s
-\item SPS cycle: 16.8\,s
-\item Compression: $\times$4
-\end{itemize}
-\noindent This results in the following nominal data characteristics:
-\begin{itemize}
-\item Instantaneous rate (in DAQ): 11.5\,GB/s
-\item Average rate (including ingestion into mass storage): 3.3\,GB/s
-\item Total data to be captured: 6\,PB
-\item Buffer to store 3 days worth of data: 850\,TB
-
-\end{itemize}
+\begin{table}
+\begin{center}
+\caption[GPS Detector Locations]{\label{table:np04_data_rate}
+  Detector, beam, DAQ and data rate parameters for the single phase
+  \pd experiment (NP04).}
+\begin{tabularx}{0.75\textwidth}{ X  >{\setlength{\hsize}{0.8\hsize}}r}
+\hline
+Detector Parameter & Target \\
+\hline
+TPC channel count & 15,360 \\
+Digitization frequency & 2~MHz \\
+Readout window & 5~ms \\
+SPS spill time& 4.8~s\\
+SPS cycle& 22.5~s\\
+Trigger rate (target minimum/maximum) & 25-100~Hz \\
+Single readout size (per trigger) & 230.4~MB \\
+Target compression factor& $\times$4 \\
+Instantaneous data rate (in-spill) & 1440 MB/s \\
+Average data rate & 576~MB/s \\
+Total data recorded (beam + cosmic) & 2.5\,PB\\
+Buffer to store 3 days worth of data & 300\,TB\\
+\hline
+\end{tabularx}
+\end{center}
+\end{table}
 
 
 \section{Raw Data Flow in \pd}
