@@ -34,7 +34,7 @@ volume will require that the protoDUNE experiment carefully design the DAQ, data
 data quality monitoring systems to be capable of dealing with
 challenges inherent with peta-scale data management while
 simultaneously fulfilling the requirements of disseminating the data to
-a world wide collaboration and DUNE associated computing sites. We present our approach to solving these problems by
+a worldwide collaboration and DUNE associated computing sites. We present our approach to solving these problems by
 leveraging the design, expertise and components created for the LHC and Intensity Frontier
 experiments into a unified architecture that is capable of meeting the
 needs of \pd. 
@@ -97,14 +97,15 @@ channel count and spatial granularity, wire pitch and geometry, of the readout
 planes.  The readout design also takes advantage the relatively slow
 drift velocity of ions in the Argon and the 2~MHz digitization clock
 to achieve similarly fine spatial and temporal resolution long the
-drift axis of the detector, corresponding to the 5~ms drift time across
-the active volume.  These characteristics are typical of
+drift axis of the detector. The readout window is  set to 5\,ms 
+which is driven by the electron drift time across
+the active volume (which is slightly less).  These characteristics are typical of
 similar modern TPC detectors.
 
-\noindent These factors do however, in the absence of zero
-suppression, result in a large data volume needing to be readout and
-processed for a single event (drift) trigger. for a
-single considerable amount of data collected per single event readout.
+In the absence of zero suppression these factors do however
+result in a large data volume that needs to be readout and
+processed for a single readout.
+%single considerable amount of data collected per single event readout (trigger).
 A DUNE/\pd readout event may be compared to sequential stack of a thousand of digital
 images of the signals collected from the electrodes. 
 The instantaneous triggered data rate and the data rates averaged over
@@ -118,7 +119,7 @@ Based on these projections, the NP04 experiment is expected to accumulate 2.5~PB
 data during 3 months of running.  The total data volume accumulated by
 the experiment is expected to be larger when data from
 detector commissioning prior to the beam run, and cosmic ray data from
-after the beam running are included.   These rates are detailed in Sec.\,\ref{table:np04_data_rate}.
+after the beam running are included.   These rates are detailed in Table.\,\ref{table:np04_data_rate}.
 
 % \section{The NP04 Data Characteristics}
 % \label{sec:np04_data_rate}
@@ -145,6 +146,7 @@ after the beam running are included.   These rates are detailed in Sec.\,\ref{ta
 \caption[GPS Detector Locations]{\label{table:np04_data_rate}
   Detector, beam, DAQ and data rate parameters for the single phase
   \pd experiment (NP04).}
+\ \\
 \begin{tabularx}{0.75\textwidth}{ X  >{\setlength{\hsize}{0.8\hsize}}r}
 \hline
 Detector Parameter & Target \\
@@ -202,7 +204,7 @@ and have enough headroom for robust operation.
 A backup (auxiliary) option is to implement the buffer as a a XRootD \cite{xrootd} cluster
 that may be deployed on existing general purpose hardware provided by the \textit{CERN
 Neutrino Platform}\cite{cenf}.
-A small prototype of such system has been tested.
+A prototype of such system has been tested.
 
 
 \subsection{The Data Flow pattern in \pd}
