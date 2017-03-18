@@ -30,7 +30,7 @@
 
 \begin{abstract}
   \noindent The purpose of this document is to inform the leadership
-  of the Single-Phase \pd experiment (NA04) about the scope,
+  of the Single-Phase \pd experiment (NP04) about the scope,
   deliverables, schedules, interfaces and other crucial
   characteristics of the prompt processing (PP).
 \end{abstract}
@@ -414,9 +414,20 @@ Sec.\,\ref{sec:capabilities}.
 It will be extremely desirable for \pd during the data taking
 period to validate the trigger logic and other
 parameters related to the data coming from the Beam Instrumentation
-(BI) systems and its associated computing infrastructure, both provided
-by CERN. Because of the delay of data delivery inherent in the design and operation of
-the BI computing it cannot be optimally processed by the OM software,
+(BI) systems and their computing infrastructure elements.
+These data will not be fed into the DAQ system of the NP04
+experiment so they will be captured separately and 
+will have to be merged/integrated in a separate production
+step.
+
+There will be several BI data streams such as coming from TOF, Cherenkov
+and fiber trackers. Some of these data will be ``bundled''  in packets
+ correponding to the SPS cycle and will be available as a database
+entry for each cycle. The interface will be provided
+by CERN.
+
+Because of the delay  inherent in the flow of BI data as described above
+it cannot be optimally processed by the OM software,
 while full processing is not agile enough for the turnaround time required
 in DQM. For these reasons PP offers a unique opportunity to accomplish
 this part of DQM. Jobs in this category will obtain the BI data within
@@ -468,26 +479,30 @@ Critical milestones are marked by bullets.
 
 \begin{description}
 
-\item[March'17: p3s dev server] --- a continuously running instance of p3s deployed on the DQM cluster,
-utilizing the ``Django development server'' and \textit{sqlite} database back-end. LArSoft payloads as
-test case. Visual and data products served from the same server.
+\item[Feb'17: initial prototype] --- a working instance of p3s having most of
+required functionality, utilizing the ``Django development server'' and \textit{sqlite}
+database back-end.
 
-\item[April'17: XRootD] --- a continuously running XRootD service deployed on the DQM cluster with
-fully functional interface to EOS and ongoing test transfers.
+\item[Mar'17: Apache/PostgreSQL] --- a continuously running instance of
+p3s deployed on Apache with PostgreSQL back-end, in a test setup at BNL.
+Resolution of concurrency issues.
 
-\item[June'17: full chain] --- an instance of p3s running on dev server/sqlite with automated
-generation of workflows
+\item[Apr'17: initial CERN deployment] --- p3s deployed on the DQM (\textit{neutdqm}) cluster.
+
+\item[May'17: XRootD] --- XRootD service on the DQM cluster with
+a functioning interface to EOS.
+
+\item[Jun'17: payload integration] --- art/LArSoft payloads confugured to run on p3s; system
+ automated data driven generation and management of workflows
 \begin{itemize}
 \item DAQ vertical slice readiness
 \end{itemize}
 
-\item[July'17: Web Service for Visual and Data Products] --- an instance of a Web server optimized
+\item[Jul'17: Visual and Data Products] --- Web server optimized
 for delivery of visual and data products produced by p3s.
 
-\item[August'17] --- p3s migration to Apache and PostgreSQL. Integration testing with the
-DAQ Online Buffer.
 
-\item[September'17] --- p3s/DAQ integration testing
+\item[Sep'17: p3s/DAQ integration testing] --- 
 \begin{itemize}
 \item Full DAQ test readiness
 \end{itemize}
@@ -554,13 +569,19 @@ Technologies used in p3s are not new, they are mature and tested in the field, w
 overall implementation risk. The remaining risk factors are
 \begin{itemize}
 
-\item insufficient allocation of hardware to p3s jobs can scale down
+\item Integration of the Beam Instrumentation Data. The amount
+of development work necessary to access these data is not well
+understood. Optimal design of the merging process (e.g. to avoid
+doubling the data volume while writing out the merged data)
+can be a challenge.
+
+\item Insufficient allocation of hardware to p3s jobs can reduce
   the amount of data processed or the capability of the allowed
   algorithms to such an extent that the fraction of triggers or the
   types of features in the data which can be checked leads to a
   failure to identify problems in the detector.
 
-\item lack of coordination and identification of individuals to
+\item Lack of coordination and identification of individuals to
   develop the payload jobs which have sufficient coverage and
   performance may likewise lead to failure to identify problems in the
   detector.
