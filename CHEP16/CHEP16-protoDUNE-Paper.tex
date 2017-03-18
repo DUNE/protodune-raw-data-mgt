@@ -19,10 +19,10 @@
 \ead{potekhin@bnl.gov}
 
 \begin{abstract}
-The Deep Underground Neutrino Experiment (DUNE) will employ a set of Liquid Argon
-Time Projection Chambers (LArTPC) with a total mass of 40~kt as the
-main components a Far Detector.
-In order to validate this technology designs and characterize the
+The Deep Underground Neutrino Experiment (DUNE) will employ a set of
+Liquid Argon Time Projection Chambers (LArTPC) with a total mass of 40\,kt
+as the main components of its Far Detector.
+In order to validate this technology and characterize the
 detector performance at full scale, an
 ambitious experimental program (called ``\pd'') has been
 initiated which includes a test of the large-scale prototypes for the
@@ -44,7 +44,7 @@ needs of \pd.
 The \pd program will help validate various DUNE technology aspects before proceeding with
 the construction of the large-scale principal DUNE detectors at the Sanford Underground Research Facility \cite{cdrVol1, cdrVol4}.
 The program is designed to make a series of measurements on the
-interaction of charge particles in the liquid argon medium.  These
+interaction of charged particles in the Liquid Argon medium.  These
 measures will be performed in a test beam provided by a new dedicated
 target station and beamline transport system at the CERN SPS
 accelerator complex.  This ``neutrino platform'' facility has the
@@ -64,7 +64,7 @@ computing infrastructure.  Their data acquisition (DAQ) systems and
 corresponding data buffers will operate in an independant manner. 
 The focus of this paper is on the data management for the
 single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification
-in the liquid Argon medium and is in essence a large single volume
+in the Liquid Argon medium and is in essence a large single volume
 ionization/drift chamber.  The drift volume is equipped with
 a large number of readout electrodes (wires), each with its own electronics chain.
 In this ``cold electronics design'' employed by \textbf{NP04},  the front-end electronics is situated within the cryostat and operates at cryogenic
@@ -152,15 +152,15 @@ after the beam running are included.   These rates are detailed in Table.\,\ref{
 Detector Parameter & Target \\
 \hline
 TPC channel count & 15,360 \\
-Digitization frequency & 2~MHz \\
-Readout window & 5~ms \\
-SPS spill time& 4.8~s\\
-SPS cycle& 22.5~s\\
-Trigger rate (target minimum/maximum) & 25-100~Hz \\
-Single readout size (per trigger) & 230.4~MB \\
+Digitization frequency & 2\,MHz \\
+Readout window & 5\,ms \\
+SPS spill time& 4.8\,s\\
+SPS cycle& 22.5\,s\\
+Trigger rate (target minimum/maximum) & 25--100\,Hz \\
+Single readout size (per trigger) & 230.4\,MB \\
 Target compression factor& $\times$4 \\
-Instantaneous data rate (in-spill) & 1440 MB/s \\
-Average data rate & 576~MB/s \\
+Instantaneous data rate (in-spill) & 1440\,MB/s \\
+Average data rate & 576\,MB/s \\
 Total data recorded (beam + cosmic) & 2.5\,PB\\
 Buffer to store 3 days worth of data & 300\,TB\\
 \hline
@@ -178,9 +178,8 @@ of this document but it is helpful to note a few details relevant for the topic 
 The DAQ has of a few interconnected layers of processes running on dedicated computers.
 The ``outer layer'' of the system where the data is put together in a format
 suitable for writing into files consists of  \textit{Event Builders}. The Event Builders
-are hosted on a few machines equipped with quad 10Gbps NICs to ensure the necessary
-bandwidth. Interconnectivity is provided by a high-bandwidth switch such as Brocade ICX 7750
-or equivanent. Their function is to assemble complete readout frames from data
+are hosted on a few machines equipped with quad 10\,Gbps NICs and connected to a high-bandwidth switch.
+Their function is to assemble complete readout frames from data
 fragments obtained from the inner layer of DAQ, the \textit{Board Readers}.
 
 The Event Builders create the necessary file-level header information and write the
@@ -276,7 +275,7 @@ considered a crucial part of the file metadata. If checksums are required from t
 of the data transfer chain, complete files must be read from the Online Buffer. In addition, handling
 checksums requires a non-negligible amount of CPU.
 
-Current plan is to utilize the checksum calculattion capabilities provided by XRootD
+Current plan is to utilize the checksum calculation capabilities provided by XRootD
 during both legs of the transfer: it is first calculated by the ``FTS1'' instance
 (see \ref{sec:flow}) and added as a part of the metadata. It is then used in further transfers
 by ``FTS2'' to CASTOR and dCache.
@@ -342,19 +341,18 @@ components from a few HEP and Intensity Frontier experiments. This includes
 \section*{References}
 \begin{thebibliography}{9}
 
-\bibitem{cdrVol1} DUNE CDR Vol 1 -- The LBNF and DUNE Projects\\
-\url{http://arxiv.org/abs/1601.05471}
+\bibitem{cdrVol1} DUNE CDR Vol 1 -- The LBNF and DUNE Projects.~e-Print: arXiv:1601.05471 
+%\url{http://arxiv.org/abs/1601.05471}
 
-\bibitem{cdrVol4} DUNE CDR Vol 4 -- The DUNE Detectors at LBNF\\
-\url{http://arxiv.org/abs/1601.02984}
+\bibitem{cdrVol4} DUNE CDR Vol 4 -- The DUNE Detectors at LBNF.~e-Print: arXiv:1601.02984
+%\url{http://arxiv.org/abs/1601.02984}
 
 \bibitem{np04} 
-Yearly report on ProtoDUNE Single Phase NP04 (2016)\\
-\url{https://cds.cern.ch/record/2144868}
+Yearly report on ProtoDUNE Single Phase NP04 (2016), \textit{CERN-SPSC-2016-018}
+%\url{https://cds.cern.ch/record/2144868}
 
 \bibitem{xrootd}
-{XRootD}\\
-\url{http://www.xrootd.org}
+{XRootD software framework:}~\url{http://www.xrootd.org}
 
 \bibitem{cenf}
 {CERN Neutrino Platform}\\
@@ -366,31 +364,33 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016)\\
 \url{http://information-technology.web.cern.ch/services/eos-service}
 
 \bibitem{fts}
-{The Fermilab File Transfer System}\\
-\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
+Norman A 2014 \textit{The Fermilab File Transfer System}.~e-Print: FNAL CD-DocDB-5412
+%\url{http://cd-docdb.fnal.gov/cgi-%bin/RetrieveFile?docid=5412&filename=datamanagement-
+%changeprocedures.pdf&version=1}
 
 \bibitem{nova}
-NOvA Neutrino Experiment\\
+NOvA Neutrino Experiment:~
 \url{https://www-nova.fnal.gov/}
 
 \bibitem{uboone}
-MicroBooNE Neutrino Experiment\\
+The MicroBooNE Experiment:~
 \url{http://www-microboone.fnal.gov/}
 
 \bibitem{castor}
-{CASTOR -- CERN Advanced STORage manager}\\
+{CASTOR -- CERN Advanced STORage manager}:~
 \url{http://castor.web.cern.ch/}
 
 \bibitem{dcache}
-{dCache.org}\\
+{dCache, a distributed storage solution:}~
 \url{https://www.dcache.org/}
 
 \bibitem{sam}
-{A data handling system for modern and future Fermilab experiments}\\
-\url{http://iopscience.iop.org/1742-6596/513/3/032045}
+R A Illingworth 2014 \textit{J. Phys.: Conf. Series} 513 032045
+%{A data handling system for modern and future Fermilab experiments}\\
+%\url{http://iopscience.iop.org/1742-6596/513/3/032045}
 
 \bibitem{larsoft}
-{LArSoft Collaboration}\\
+{LArSoft Collaboration}:~
 \url{http://larsoft.org//}
 
 \end{thebibliography}
