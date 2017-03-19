@@ -28,7 +28,7 @@ ambitious experimental program (called ``\pd'') has been
 initiated which includes a test of the large-scale prototypes for the
 single-phase and dual-phase LArTPC technologies, which will run in a beam
 at CERN. The total raw data volume
-that is slated to be collected during the scheduled 3-month beam run
+that is slated to be collected during the scheduled 3-month beam run is
 estimated to be in excess of 2.5~PB for each detector.  This data
 volume will require that the protoDUNE experiment carefully design the DAQ, data handling and
 data quality monitoring systems to be capable of dealing with
@@ -53,7 +53,7 @@ Liquid Argon Time Projection Chamber (LArTPC) detectors and for
 providing realistic electromagnetic and hadronic shower response
 functions for different particles interacting in these detectors. 
 The experimental program includes two separate
-large LArTPC prototypes one based on a ``single-phase'' (liquid) technology and
+large LArTPC prototypes, one based on a ``single-phase'' (liquid) technology and
 one based on a ``dual-phase'' (liquid/gaseous) TPC readout technology,
 with CERN experiment designations \textbf{NP04} and \textbf{NP02}
 respectively.  Both detectors are scheduled to be deployed at CERN in
@@ -61,7 +61,7 @@ respectively.  Both detectors are scheduled to be deployed at CERN in
 
 The two detector apparatuses, when deployed, will share parts of their
 computing infrastructure.  Their data acquisition (DAQ) systems and
-corresponding data buffers will operate in an independant manner. 
+corresponding data buffers will operate in an independent manner. 
 The focus of this paper is on the data management for the
 single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification
 in the Liquid Argon medium and is in essence a large single volume
@@ -95,15 +95,15 @@ facilities located in the West Area campus of CERN.
 DUNE/\pd LArTPC design has a fine spatial resolution due to the high
 channel count and spatial granularity, wire pitch and geometry, of the readout
 planes.  The readout design also takes advantage the relatively slow
-drift velocity of ions in the Argon and the 2~MHz digitization clock
-to achieve similarly fine spatial and temporal resolution long the
+drift velocity of ions in the Argon and the 2\,MHz digitization clock
+to achieve similarly fine spatial and temporal resolution along the
 drift axis of the detector. The readout window is  set to 5\,ms 
 which is driven by the electron drift time across
 the active volume (which is slightly less).  These characteristics are typical of
 similar modern TPC detectors.
 
 In the absence of zero suppression these factors do however
-result in a large data volume that needs to be readout and
+result in a large data volume that needs to be read out and
 processed for a single readout.
 %single considerable amount of data collected per single event readout (trigger).
 A DUNE/\pd readout event may be compared to sequential stack of a thousand of digital
@@ -175,7 +175,7 @@ Buffer to store 3 days worth of data & 300\,TB\\
 Details of the DAQ design and Online Monitoring in \pd are outside of the scope
 of this document but it is helpful to note a few details relevant for the topic at hand.
 
-The DAQ has of a few interconnected layers of processes running on dedicated computers.
+The DAQ has a few interconnected layers of processes running on dedicated computers.
 The ``outer layer'' of the system where the data is put together in a format
 suitable for writing into files consists of  \textit{Event Builders}. The Event Builders
 are hosted on a few machines equipped with quad 10\,Gbps NICs and connected to a high-bandwidth switch.
@@ -185,19 +185,20 @@ fragments obtained from the inner layer of DAQ, the \textit{Board Readers}.
 The Event Builders create the necessary file-level header information and write the
 resulting data  to the \textit{Online Buffer} which is attached to the \pd DAQ. 
 The design of this buffer is inspired by a system sucessfully employed in ATLAS experiment
-and is based on a COTS storage hardware from DELL which features a high degree of redundnacy.
-It is structured as 3 identical high-capacity storage system, i.e.~scales vertically. Each system contains
+and is based on COTS storage hardware from DELL which features a high degree of redundnacy.
+It is structured as three identical high-capacity storage systems, i.e.\,scales vertically.
+Each system contains
 \begin{itemize}
 
 \item Two front-end nodes (DELL R620 or similar)
 \item Storage Controller (DELL MD3420 or similar)
 \item Four expansion shelves (DELL MD1220 or similar)
-\item A total of $\sim$120 HDDs
+\item A total of $\sim$120\,HDDs
 \end{itemize}
 
 \noindent In addition to redundancy, the high HDD count is the main factor which allows
-to sink \pd data to the disk at the high rate according to the experiment plan (Sec.\,\ref{sec:np04_data_rate})
-and have enough headroom for robust operation.
+to commit \pd data to the disk at the high rate according to the experiment plan
+(Sec.\,\ref{sec:np04_data_rate}) and ensure robust operation.
 
 
 A backup (auxiliary) option is to implement the buffer as a a XRootD \cite{xrootd} cluster
@@ -215,24 +216,24 @@ A prototype of such system has been tested.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-In the following, we shall consider handling and management of the raw data after it is
-written by the Event Builders to the Online Buffer.  Conceptual diagram of the raw data
+\noindent In the following, we shall consider handling and management of the raw data after it is
+written by the Event Builders to the Online Buffer.  A conceptual diagram of the raw data
 flow in \pd is presented in Fig.\ref{fig:raw_concept} which shows the general pattern of data flow
 and also reflects the central role of the EOS system at CERN \cite{eos} in the raw data management scheme.
 Reliance on EOS is motivated by the experience and architecture of the LHC experiments
 as well as the \pd data characteristics presented above in Sec.\,\ref{sec:np04_data_rate}.
 
 The elements in this diagram which contain ``FTS'' in their label correspond to components and
-instances of the \textit{Fermi File Transfer Service} -- FTS for short \cite{fts} -- which transports
-data between a predefined endpoints. Fermi FTS was designed originally for NOvA experiment
+instances of the \textit{Fermi File Transfer Service} -- FTS for short \cite{sam,fts} -- which transports
+data between predefined endpoints. Fermi FTS was designed originally for the NOvA experiment
 \cite{nova} DAQ system and has a proven track record of moving over 7.7\,PB of data for NOvA
 and 4.7\,PB of data for MicroBooNE\,\cite{uboone}.
 The Fermi FTS contains functionality which allows for completely automatic operation
 including error handling, transmission retries, monitoring etc.
 
-There is more than once instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
+There is more than one instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
 in the diagram) is responsible for moving the data from the Online Buffer into EOS. The second instance
--- ``FTS2'' --  copies the data after is has arrived to EOS to tape storage at CERN (the CASTOR
+-- ``FTS2'' --  copies the data after it has arrived to EOS to tape storage at CERN (the CASTOR
 system~\cite{castor}). It is also tasked with transmitting the data to Fermilab  and other peer
 institutions. At FNAL the data are placed in a dCache~\cite{dcache} storage cluster. A secondary
 tape copy is then created at Fermilab using the data resident in dCache as the source.
@@ -257,7 +258,8 @@ and subjected to following operations:
 \subsection{Metadata}
 An important feature of the FTS is its interface to and integration with 
 the \textit{SAM} Metadata system deployed at FNAL which serves the needs of a few
-experiments in both High Energy Physics and Intensity Frontier domains. In addition to essential file catalog
+experiments in both Energy Frontier and Intensity Frontier domains.
+In addition to essential file catalog
 functionality, SAM has extensive storage management
 capabilities covering both disk (e.g.\,dCache) and tape (e.g.\,FNAL Enstore) types of storage.
 % Working in tandem, FTS and SAM allow
@@ -275,7 +277,7 @@ considered a crucial part of the file metadata. If checksums are required from t
 of the data transfer chain, complete files must be read from the Online Buffer. In addition, handling
 checksums requires a non-negligible amount of CPU.
 
-Current plan is to utilize the checksum calculation capabilities provided by XRootD
+The current plan is to utilize the checksum calculation capabilities provided by XRootD
 during both legs of the transfer: it is first calculated by the ``FTS1'' instance
 (see \ref{sec:flow}) and added as a part of the metadata. It is then used in further transfers
 by ``FTS2'' to CASTOR and dCache.
@@ -294,7 +296,7 @@ Its XRootD interface makes it a particularly attractive option.
 
 \section{Data Quality Monitoring}
 \label{sec:dqm}
-Data Quality Monitoring (DQM) plays an imporant role in \pd.
+Data Quality Monitoring (DQM) plays an important role in \pd.
 Its goal is to generate time-critical information on a short time
 scale needed to ascertain the condition
 and performance of both the detector and the DAQ,
@@ -309,7 +311,7 @@ These systems are complementary to each other but operate
 in different enviroments and on a different time scale.
 The benchmark turnaround time for ``prompt processing'' jobs 
 is set roughly at 10\,min, with actual numbers depending on
-finalized content of the payloads. Jobs will be organized and stages
+finalized content of the payloads. Jobs will be organized in stages
 and subject to prioritization to guarantee timely production of DQM
 visual and data products. A prototype system has been developed at
 the time of writing. The final stages of prompt processing will
@@ -338,6 +340,10 @@ components from a few HEP and Intensity Frontier experiments. This includes
 \item LArSoft framework for Liquid Argon detector simulation and reconstruction
 \end{itemize}
 
+\section*{Acknowledgments}
+The Fermi National Accelerator Laboratory is operated by Fermi Research Alliance, LLC
+under Contract No. De-AC02-07CH11359 with the United States Department of Energy.
+
 \section*{References}
 \begin{thebibliography}{9}
 
@@ -363,10 +369,16 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016), \textit{CERN-SPSC-2016-018}
 {The CERN Exabyte Scale Storage}\\
 \url{http://information-technology.web.cern.ch/services/eos-service}
 
+
+\bibitem{sam}
+R A Illingworth 2014 \textit{J. Phys.: Conf. Series} 513 032045
+%{A data handling system for modern and future Fermilab experiments}\\
+%\url{http://iopscience.iop.org/1742-6596/513/3/032045}
+
 \bibitem{fts}
 Norman A 2014 \textit{The Fermilab File Transfer System}.~e-Print: FNAL CD-DocDB-5412
-%\url{http://cd-docdb.fnal.gov/cgi-%bin/RetrieveFile?docid=5412&filename=datamanagement-
-%changeprocedures.pdf&version=1}
+%%\url{http://cd-docdb.fnal.gov/cgi-%bin/RetrieveFile?docid=5412&filename=datamanagement-
+%%changeprocedures.pdf&version=1}
 
 \bibitem{nova}
 NOvA Neutrino Experiment:~
@@ -383,11 +395,6 @@ The MicroBooNE Experiment:~
 \bibitem{dcache}
 {dCache, a distributed storage solution:}~
 \url{https://www.dcache.org/}
-
-\bibitem{sam}
-R A Illingworth 2014 \textit{J. Phys.: Conf. Series} 513 032045
-%{A data handling system for modern and future Fermilab experiments}\\
-%\url{http://iopscience.iop.org/1742-6596/513/3/032045}
 
 \bibitem{larsoft}
 {LArSoft Collaboration}:~
