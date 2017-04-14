@@ -32,7 +32,8 @@
   \noindent The purpose of this document is to inform the leadership
   of the Single-Phase \pd experiment (NP04) about the scope,
   deliverables, schedules, interfaces and other crucial
-  characteristics of the prompt processing (PP).
+  characteristics of the Data Quality Monitoring (DQM) workflows which will be
+  run within the ProtoDUNE Prompt Processing System (p3s).
 \end{abstract}
 
 \tableofcontents
@@ -58,7 +59,8 @@ of practical interest:
 % directly in the special distributed and asynchronous
 within the DAQ computing environment.
 
-\item[PP] \textit{Prompt Processing}: relatively long-running algorithms consuming small subsamples of the raw data and running in a conventional computing environment with a workload management system optimized for promptness.
+\item[DQM] \textit{Data Quality Monitoring/Prompt Processing}: relatively long-running algorithms consuming
+small subsamples of the raw data and running in a conventional computing environment with a workload management system optimized for promptness.
 
 \item[FP] \textit{Full Production}: any excess noise filtering, signal processing, activity imaging, object formation, pattern recognition and other reconstruction.
 
@@ -74,7 +76,7 @@ effort.\footnote{The authors recommend that algorithm developers
   embrace the new ``tool'' feature provided by the latest version of
   \textit{art}.}
 
-In particular, this should allow OM and PP groups
+In particular, this should allow OM and DQM groups
 flexibility in terms of easily moving algorithms from one environment
 to another as we better understand our hardware resources and
 monitoring needs.  This balance will likely be struck after we have
@@ -90,37 +92,32 @@ illustrated in Table\,\ref{tab:contexts}.
     & processed &  CPU & latency \\
     \hline
     OM: & $\sim 10$\% & tens & 1 min \\
-    PP: & $\sim 1$\% & hundreds & 10 min \\
+    DQM: & $\sim 1$\% & hundreds & 10\,min -- 1\,hr \\
     FP: & 100\% & thousands & months \\
   \end{tabular}
-  \caption{Qualitative comparison and rough expectations for coverage, resources and performance of online monitoring (OM), prompt processing (PP) and full production (FP) categories of jobs.}
+  \caption{Qualitative comparison and rough expectations for coverage, resources and performance of online monitoring (OM), Data Quality Monitoring (DQM) and full production (FP) categories of jobs.}
   \label{tab:contexts}
 \end{table}
 
 \noindent
-With the above in mind, this note focuses on the unique parts that
-make up PP.  It also describes ways in which the PP group intends to
-work with the OM and FP groups in order to best make use of our
+With the above in mind, this note focuses on theDQM processing.  It also describes ways in which the
+DQM group intends to work with the OM and FP groups in order to best leverage our
 limited and shared effort in the collaboration.
 
-\section{The Scope of Prompt Processing}
+\section{The Scope of DQM}
 
-Prompt Processing can be conceptualized as consisting of (a) payload
+DQM/Prompt Processing can be conceptualized as consisting of (a) payload
 jobs necessary to fulfill its function, and (b) the infrastructure that
 makes execution of these jobs possible in an optimal manner.
 It is important to ensure portability and
-interoperability of software created in the OM, PP and FP domains,
+interoperability of software created in the OM, DQM and FP domains,
 especially since they are bound to use functionally similar or identical
 units of software. It is expected therefore that writing resusable payload
 jobs will be \textit{a collaborative effort} involving members of the DRA
 and other groups, and their  scope is discussed in Sec.~\ref{sec:categories}.
 
-The part of responsibility
-of the Prompt Processing group that is ``internal'' to it is the
-development of
-%The PP effort is centered around developing
-the \textit{\pd Prompt   Processing System} (p3s) and it is the group's
-main deliverable.  The core of 
+The principal deliverable of the DQM group is the development, deployment and operation
+of the \textit{\pd Prompt   Processing System} (p3s) as the primary DQM vehicle. The core of 
 p3s is a specialized job management system which provides
 latency assurances for job completion using a fixed amount of
 computing resources at the expense of limiting the data coverage.
@@ -129,9 +126,6 @@ emphasize processing 100\% of all input data and effectively do not limit the
 duration of that processing. The Prompt Processing System also includes
 an array of User Interface and data visualization tools.
 The scope of p3s is described further in Sec.~\ref{sec:p3sscope}.
-%While the primary focus of the PP group is to provide p3s, the
-%\textit{payload} jobs that it runs are of great importance as they
-%provide the actual data quality monitoring (DQM).
 
 Finally, guidance on hardware requirements are given in
 Sec.~\ref{sec:hardware} followed by a timeline and milestones in
@@ -152,12 +146,12 @@ It is an infrastructure element and does not, as a
 deliverable, include the actual software for its computational
 payloads (which are discussed in Sec.~\ref{sec:categories}).
 
-A related but separate part of the PP deliverable is the p3s
+A related but separate compnent  is the DQM
 \textit{visualization system}.  This system is intended to display
 graphical (eg, histograms, plots, event displays) and other summary
-results produced by the payload jobs run by p3s.  This portion of the
-system is still conceptual and there is hope that it can be realized
-using the same system needed for presenting OM results.  The remainder
+results produced by the payload jobs run by p3s.  This portion of DQM
+is still conceptual and possibilities are being explored of it being realized
+using a similar system to be implemented by the OM group.  The remainder
 of this section will make reference to the visualization system but is
 focused on the job management system.
 
@@ -236,8 +230,8 @@ following way
 \end{description}
 
 \noindent As mentioned above, the hope is that the visualization needs
-of the OM and PP results can be satisfied by a single system.  The PP
-group will work with OM and others to achieve that.
+of the OM and DQM results can be satisfied by a single system.
+% The DQM group will work with OM and others to achieve that.
 
 
 \subsection{Required Capabilities}
@@ -353,16 +347,14 @@ deliverables in the systems category are as follows:
 \subsection{The Role of DQM Stakeholders}
 The algorithms to be used in the p3s payload jobs span a wide
 range of expertise in a few domains.  Some jobs will consist of algorithms
-originated in the OM group but may have to be moved to PP due
-to CPU constraints..
-% (and if PP's relative lack of data throughput can provide enough useful statistics).
-On the other end of the spectrum
+originated in the OM group but may have to be moved to DQM due
+to CPU constraints. On the other end of the spectrum
 are jobs based on algorithms that will run as a part
 of the \textit{full production} (FP) processing which if fully in the
 offline domain.
 
 Because of the considerable breadth of the required expertise the
-PP group should not commit to writing the code for all payload jobs. 
+DQM group should not commit to writing the code for all payload jobs. 
 It will however facilitate the work of other
 collaborators and ensure development of optimal interfaces
 to data and applications.  In particular the group will closely
@@ -373,8 +365,8 @@ realize the flexibility described above.
 
 In the end, the exact makeup of the p3s payload jobs that will run
 must be determined by the detector hardware and the final DAQ
-architecture, and by joint decision of OM, PP, DRA groups and
-any other DQM stakeholders.  However they are
+architecture, and by joint decision of OM, DQM, DRA groups and
+other \pd  stakeholders.  However they are
 developed, it is any given job will implement one or more of the
 following stages which are described more fully in \cite{docdb1811}.
 The output of each stage is logically an input to the next although,
@@ -420,19 +412,32 @@ experiment so they will be captured separately and
 will have to be merged/integrated in a separate production
 step.
 
-There will be several BI data streams such as coming from TOF, Cherenkov
-and fiber trackers. Some of these data will be ``bundled''  in packets
- correponding to the SPS cycle and will be available as a database
-entry for each cycle. The interface will be provided
-by CERN.
+There will be several BI data streams in protoDUNE such as coming from TOF, Cherenkov
+and fiber trackers, which are to be stored to the general beam instrumentation
+database developed and operated by CERN. These data
+will be available at the end of each SPS cycle as time series.
+% Some of these data will be ``bundled''  in packets
+% correponding to the SPS cycle
+While the back-end database in this system is Oracle RAC,
+its interface is quite defferent from a typical RDMS due
+to specific requirements for such database and its considerable scale
+and data rate. Current interfaces
+are implemented in Java and working assumption is that
+the protoDUNE Beam Instrumentation Group will create
+a PostgreSQL database server in which the BI data will be
+captured via aforementioned interface and held for further processing.
+It appears important to obtain assistance from CERN experts to
+optimally design this ``bridge'' between these databases.
 
 Because of the delay  inherent in the flow of BI data as described above
 it cannot be optimally processed by the OM software,
-while full processing is not agile enough for the turnaround time required
-in DQM. For these reasons PP offers a unique opportunity to accomplish
-this part of DQM. Jobs in this category will obtain the BI data within
-minutes of it being produced and match it to the TPC and other
-\pd subsystems.
+while full processing is not agile enough for suffiently short turnaround time (i.e.~to provide
+actionable information).
+For these reasons DQM offers a unique opportunity to perform
+trigger validation and other checks which involve the BI data.
+Jobs in this category will obtain the BI data within
+minutes of it being produced and perform computations matching it to the TPC and other
+\pd subsystems within an hour.
 
 \subsection{Other Processing}
 There will be other \pd components that may require DQM such as the photon detection
@@ -527,36 +532,36 @@ MC/Reco jobs in utility mode
 
 Development/engineering
 \begin{itemize}
-\item M.Potekhin (BNL) --- 100\%\,FTE
-\item B.Viren (BNL) --- 10\%\,FTE
+\item M.Potekhin (BNL), lead developer --- 100\%\,FTE
+\item B.Viren (BNL), design consultant --- 10\%\,FTE
 \end{itemize}
 
 \noindent System administration and support (working assumption)
 
 \begin{itemize}
-\item N.Benekos (CERN) --- 50\%\,FTE (TBD)
-\item G.Savage (FNAL) --- 50\%\,FTE (TBD)
+\item M.Potekhin (BNL) --- deployment and general maintenance
+\item Modest contributions to the p3s support and maintenance are tentatively anticipated from N.Benekos (CERN) and G.Savage (FNAL)
+however the actual effort level is subject to discussion with all parties involved.
 \end{itemize}
 
 \noindent The amount of effort needed for development of payload jobs
-is not considered in scope but see above sections for discussion of
-how the PP group will contribute and assist.
+is not considered in scope but see above sections for a discussion of
+how the DQM group will contribute and assist.
 
 \subsection{Mat\'eriel}
 
-A rough guess is that at a minimum p3s payload jobs will require O(100) cores
-during its operation.  This is an elastic requirement.  More available
+A rough guess is that at a minimum the DQM payload jobs running on p3s will require O(100)
+cores during its operation.  This is an elastic requirement.  More available
 cores will allow more intensive processing over a larger percentage of
 the raw data while restricting the available hardware can be met by a
-scaling back.  This scaling is automatically achieved by p3s.
-
-An small number of adequately configured machines are needed for
+scaling back.  This scaling is automatically achieved by p3s. Separately,
+a small number of adequately speced and configured machines are needed for
 deployment of Web and DB servers to support the p3s function.  
 
 It is a working assumption at the time of writing that a significant
 portion of the \textit{neut} cluster \cite{neut} will be assigned for
 p3s use as \pd ramps up its operations in 2017 and into 2018.  However
-and in any case the PP group relies on \pd management to assist in
+and in any case the DQM group relies on \pd management to assist in
 finding suitable computing resources, especially in securing a guaranteed
 resource allocation on \textit{lxbatch} if the Beam Instrumentation
 processing is to run on that facility.
@@ -587,7 +592,7 @@ can be a challenge.
   detector.
 
 
-\item PP relies on the DAQ group to release updates to the ``data
+\item DQM relies on the DAQ group to release updates to the ``data
   access library'' needed for unpacking raw data in a manner prompt
   enough so that p3s payload jobs can adapt, be rebuilt and deployed.
   Failures in this chain can lead to periods of time where detector
@@ -595,14 +600,14 @@ can be a challenge.
   produced.
 
 \item If the small subsamples of the initial raw data is ingested from
-  EOS then PP results depend on the successful and prompt transfer of
+  EOS then DQM results depend on the successful and prompt transfer of
   raw data files from the Online Buffer to EOS by F-FTS.  Any delay or
-  outage will translate to late or missing PP results.
+  outage will translate to late or missing DQM results.
 
-\item If initial and ongoing expert system administration support is
-  not identified for the computers running payload jobs and the
-  servers running p3s web service and database then deployment of PP
-  may be delayed or unreliable.
+\item If initial and ongoing sysadmin support is
+  not allocated for the p3s worker nodes and the
+  p3s web and database servers then the system deployment
+  may be delayed and/or unreliable.
 
 \end{itemize}
 
