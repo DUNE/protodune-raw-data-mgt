@@ -24,6 +24,10 @@ mentioned in some of the documents provided here.
 * Documents whose names starts with "prompt" are related to the prompt processing system for protoDUNE. These currently include requirements and a design proposal.
 * "p3s plan 2017" contains (as the name suggests) description of work that needs to be completed in 2017 with system components, milestones etc as necessary to be on track for the protoDUNE commissioning.
 
+
+## Data Challenges
+ProtoDUNE Data Challenges require considerable planning and coordination. The document protoDUNE-data-challenge.tex contains draft documentation for this effort.
+
 ## Presentations
 
 The folder "CHEP16" contains the materials for the paper to be published in the proceedings of the CHEP 2016 conference which concerns data management in protoDUNE.
