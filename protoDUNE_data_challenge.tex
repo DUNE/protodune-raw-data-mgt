@@ -82,7 +82,7 @@ retrieval based on Metadata and can also be used for orchestration of production
 
 \item \textbf{Data Quality Monitoring} (DQM) which is tasked with running algorithms with turnaround time short enough to provide
 actionable results (under and hour) but which won't fit into the computational footprint of the Online Monitoring (a part of DAQ).
-To support DQM, the ProtoDUNE Prompt Processing System (p3s) has been created and will run any type of DQM workload
+To support DQM, the ProtoDUNE Prompt Processing System (\textbf{p3s}) has been created and will run any type of DQM workload
 as requested by the working groups.
 
 \item \textbf{Calibration and Production}. While it is not expected that these components will be finalized for at least the first Data
@@ -99,6 +99,15 @@ software) it is important to put in place, document and optimize its interfaces 
 databases, Metadata, software and data provenance controls etc.
 
 \end{itemize}
+\noindent Relationship between the infrastructure and other components listed above is schematically illustrated in
+Fig.\ref{fig:dc1}.
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=1.0\textwidth]{figures/data_challenge_1.pdf}
+  \caption{Schematics of data flow and  processing in \pd data challenges.}
+  \label{fig:dc1}
+\end{figure}
 
 \section{Timeline and Milestones}
 \label{sec:timeline}
