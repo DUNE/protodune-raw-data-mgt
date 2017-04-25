@@ -1,9 +1,13 @@
 # Data Management Documents for protoDUNE
 ## Overview
-This repository contains documents for a proposed raw data managment system and a few online components for the protoDUNE single-phase detector (CERN experiment NP04), which is scheduled to take data with CERN SPS beams in late 2018. The dual-phase detector (NP02) employs a somewhat different approach to data management however there are overlaps in the infrastructure which is mentioned in some of the documents provided here.
+This repository contains documents for a proposed raw data managment system and a few online
+components for the protoDUNE single-phase detector (CERN experiment NP04), which is scheduled
+to take data with CERN SPS beams in late 2018. The dual-phase detector (NP02) employs a somewhat
+different approach to data management however there are overlaps in the infrastructure which is
+mentioned in some of the documents provided here.
 
 ## Data Handling
-* *protoDUNE-DMS-design.tex is the MAIN document*. It describes a specific design of the data management system based on deployment and reuse of F-FTS, which is a data management system supported by FNAL.
+* Archive/protoDUNE-DMS-design.tex is a description of a specific design of the data management system based on deployment and reuse of F-FTS, which is a data management system supported by FNAL.
 
 * Archive/*pdrdm.tex* is an initial note evaluating basic design requirements.
 
