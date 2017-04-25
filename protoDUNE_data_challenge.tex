@@ -9,7 +9,7 @@
 \usepackage{xspace}
 \usepackage{amssymb}
 
-%\usepackage[firstpage]{draftwatermark}
+\usepackage[firstpage]{draftwatermark}
 
 
 \bibliographystyle{unsrt}
@@ -17,465 +17,88 @@
 \newcommand{\fixme}[1]{\textbf{FIXME: #1}}    
 \newcommand{\pd}{protoDUNE\xspace}
 
-\title{Planning of the \pd Prompt Processing System}
+\title{A proposal for the Single-Phase \pd (NP04) data challenges in 2017-2018}
 \date{\today}
-\author{M.Potekhin, B. Viren}
+\author{R.Pordes, M.Potekhin, D. Stefan, R.Sulej}
 
 \begin{document}
-%\SetWatermarkText{DRAFT}
-%\SetWatermarkLightness{0.9}
-%\SetWatermarkScale{3}
+\SetWatermarkText{DRAFT}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{3}
 
 \maketitle
 
 \begin{abstract}
-  \noindent The purpose of this document is to inform the leadership
-  of the Single-Phase \pd experiment (NP04) about the scope,
-  deliverables, schedules, interfaces and other crucial
-  characteristics of the Data Quality Monitoring (DQM) workflows which will be
-  run within the ProtoDUNE Prompt Processing System (p3s).
+\noindent There are two main factors that compell the \pd collaborators to take necessary mesaures
+to ensure 100\% readiness of the whole \pd software and computing complex during most of the
+commissioning period and throughout data taking in 2018. First, due to the short run schedule the beam
+time is precious and spending any significant amout of time on debugging will make fulfillment of
+the run plan impossible. Second, the Collaboration will need to process and analyze the NP04 data
+on a reasonably short time scale (months rather than years) in order to maximize benefits of the
+prototype effort for the DUNE R\&D work and CDR cycle, so efficient resource management and
+throughput of \pd processing will be of essence right at the beginning of data taking. For these
+reasons, and given the \pd schedule,  we propose to conduct two Data Challenges in order to identify
+and address potential issues before they can impact the experiment.
+
+
+
 \end{abstract}
 
 \tableofcontents
 
 \pagebreak
 
-\section{Overview}
-It is important to monitor the data being produced in the Single-Phase
-\pd experiment in a way that allows fast identification and correction
-of any problems.  Monitoring algorithms can require large volumes of
-data (high bandwidth) and/or large CPU resources.  Algorithms that require both extremes
-may require more hardware than can be made available or may not return results quickly
-enough to be actionable.
-%This leads to recognizing two opposing ends
-%of a spectrum of possible monitoring jobs.  Including also full
-%production (FP) processing there are three categories:
-Within the spectrum of possibile CPU vs bandwidth strategies there are three categories
-of practical interest:
+\section{About this document}
+%The Single-Phase \pd experiment (NP04) is characterized by substantial data rates
+%and volume, as well as by inherent complexity of its data handlng and processing scheme due
+%to properties of its main detector (the Liquid Argon TPC), readout electronics and other factors.
+%Initial estimates indicate considerable CPU and storage requirements for production and analysis.
+%In order to ensure readiness of the protoDUNE computing infrastructure for data taking
+%in 2018, it will be necessary to conduct Data Challenges which are meant to validate
+%individual infrastructure and software components, interfaces  as well as the status of overall
+%system integration.
+The goal of this document is to provide concise information about the proposed \pd Data Challenges
+to the infividual working groups in order to coordinate effort and come to a consensus as to the scope,
+plans and schedule of the proposed Data Challenges. It does not contain detailed descriptions
+and/or designs of the \pd computing
+infrastructure elements and the reader is reffered to existing documentation where
+needed, with references provided in the text.
 
-\begin{description}
-
-\item[OM] \textit{Online Monitoring}: fast algorithms consuming large fractions of raw data and running
-% directly in the special distributed and asynchronous
-within the DAQ computing environment.
-
-\item[DQM] \textit{Data Quality Monitoring/Prompt Processing}: relatively long-running algorithms consuming
-small subsamples of the raw data and running in a conventional computing environment with a workload management system optimized for promptness.
-
-\item[FP] \textit{Full Production}: any excess noise filtering, signal processing, activity imaging, object formation, pattern recognition and other reconstruction.
-
-\end{description}
-
-\noindent These three categories are naturally overlapping in terms of which algorithms
-can or will run in each.  To efficiently use our limited software
-development effort it is important to find ways to create the needed
-algorithms in a way that allow their reuse in the three contexts.
-Because the code for all three categories are ultimately based on
-\textit{art} this reuse can be achieved with relatively modest
-effort.\footnote{The authors recommend that algorithm developers
-  embrace the new ``tool'' feature provided by the latest version of
-  \textit{art}.}
-
-In particular, this should allow OM and DQM groups
-flexibility in terms of easily moving algorithms from one environment
-to another as we better understand our hardware resources and
-monitoring needs.  This balance will likely be struck after we have
-developed and benchmarked the monitoring algorithms.  It is expected
-that these benchmarks will be evaluated and algorithms selected in
-order that each category of jobs satisfies the very rough requirements
-illustrated in Table\,\ref{tab:contexts}.
-
-\begin{table}[h]
-  \centering
-  \begin{tabular}[h]{r|ccc}
-    & triggers & avail & result \\
-    & processed &  CPU & latency \\
-    \hline
-    OM: & $\sim 10$\% & tens & 1 min \\
-    DQM: & $\sim 1$\% & hundreds & 10\,min -- 1\,hr \\
-    FP: & 100\% & thousands & months \\
-  \end{tabular}
-  \caption{Qualitative comparison and rough expectations for coverage, resources and performance of online monitoring (OM), Data Quality Monitoring (DQM) and full production (FP) categories of jobs.}
-  \label{tab:contexts}
-\end{table}
-
-\noindent
-With the above in mind, this note focuses on theDQM processing.  It also describes ways in which the
-DQM group intends to work with the OM and FP groups in order to best leverage our
-limited and shared effort in the collaboration.
-
-\section{The Scope of DQM}
-
-DQM/Prompt Processing can be conceptualized as consisting of (a) payload
-jobs necessary to fulfill its function, and (b) the infrastructure that
-makes execution of these jobs possible in an optimal manner.
-It is important to ensure portability and
-interoperability of software created in the OM, DQM and FP domains,
-especially since they are bound to use functionally similar or identical
-units of software. It is expected therefore that writing resusable payload
-jobs will be \textit{a collaborative effort} involving members of the DRA
-and other groups, and their  scope is discussed in Sec.~\ref{sec:categories}.
-
-The principal deliverable of the DQM group is the development, deployment and operation
-of the \textit{\pd Prompt   Processing System} (p3s) as the primary DQM vehicle. The core of 
-p3s is a specialized job management system which provides
-latency assurances for job completion using a fixed amount of
-computing resources at the expense of limiting the data coverage.
-This is opposite from traditional job management systems that
-emphasize processing 100\% of all input data and effectively do not limit the
-duration of that processing. The Prompt Processing System also includes
-an array of User Interface and data visualization tools.
-The scope of p3s is described further in Sec.~\ref{sec:p3sscope}.
-
-Finally, guidance on hardware requirements are given in
-Sec.~\ref{sec:hardware} followed by a timeline and milestones in
-Sec.~\ref{sec:timeline}, a summary of resources in
-Sec.~\ref{sec:resources} and ending with a risk assessment in
-Sec.~\ref{sec:risk}.
-
-
-
-\section{p3s}
-\label{sec:p3sscope}
-The \textit{\pd Prompt Processing System} (p3s) is primarily a
-platform for automated processing of data streams which
-aims to  guarantee an agreed upon latency of producing results,
-as opposed to data coverage or
-throughput typical of a common Workload Management System.
-It is an infrastructure element and does not, as a
-deliverable, include the actual software for its computational
-payloads (which are discussed in Sec.~\ref{sec:categories}).
-
-A related but separate compnent  is the DQM
-\textit{visualization system}.  This system is intended to display
-graphical (eg, histograms, plots, event displays) and other summary
-results produced by the payload jobs run by p3s.  This portion of DQM
-is still conceptual and possibilities are being explored of it being realized
-using a similar system to be implemented by the OM group.  The remainder
-of this section will make reference to the visualization system but is
-focused on the job management system.
-
-
-\subsection{Input, Intermediate and Output Files}
-\label{sec:io}
-
-From the point of view of raw data flow, the boundary between online
-and offline scope is the Online Buffer which is a storage system
-attached to DAQ computers.  It exists primarily to assure continued
-DAQ operation in the event of an outage of the link to the CERN
-network.  The ``\pd/SP Data Scenarios'' spreadsheet~\cite{docdb1086}
-describes expected running conditions and provides estimates of data
-volumes and rates relevant to this boundary.
-
-All raw files written by the DAQ to the buffer will be transferred to
-CERN EOS using the Fermilab file transfer system (F-FTS)
-\cite{docdb1212,fts}.  F-FTS takes responsibility for purging any and
-all files it is given and can do so in a configurable manner.
-
-The p3s payload jobs are expected to ingest a small percentage
-($\lesssim$1\%) of raw data files.  This number is a very rough guess
-based on expected CPU requirements of the algorithms, amount of
-available CPU and amount of data to provide meaningful feedback about
-the data quality.
-
-All files consumed and produced by p3s jobs are assumed to be served
-via XRootD~\cite{xrootd}.  This allows flexibility in ingesting the
-initial raw data files from one or both of the two possible sources:
+\section{The Scope of the Data Challanges}
+Information regarding the \pd (NP04) computing is summarized in the \pd-SP Technical Design Report\cite{docdb1794}.
+The following components can be identified as relevant in the context of Data Challanges:
 \begin{itemize}
-\item the Online Buffer
-\item CERN EOS~\cite{eos}
+\item The DAQ \textbf{Online Buffer} which stores raw data assembled by the Event Builders, as files on disk. The internals
+of the DAQ system itself are not within the scope.
+
+\item The \textbf{Raw Data Handling System}\cite{docdb1212}  which performs data transfers between a few endpoints
+at CERN and FNAL starting with the Online Buffer and which is also tasked with proper accounting and handling of Metadata
+by interacting with the SAM system at FNAL (see next item). The Data Handling System will inteface the disk-based mass storage
+at CERN and FNAL (i.e.\,EOS and dCache) as well as tape systems (CASTOR and Enstore). We anticipate using the \textit{Fermi
+File Transfer System}\cite{fts} for most of this functionality.
+
+\item The \textbf{Metadata}  -- SAM system at FNAL which comprises the functionality of the file catalog, data storage and
+retrieval based on Metadata and can also be used for orchestration of production workflows.
+
+\item \textbf{Data Quality Monitoring} (DQM) which is tasked with running algorithms with turnaround time short enough to provide
+actionable results (under and hour) but which won't fit into the computational footprint of the Online Monitoring (a part of DAQ).
+To support DQM, the ProtoDUNE Prompt Processing System (p3s) has been created and will run any type of DQM workload
+as requested by the working groups.
+
+\item \textbf{Calibration and Production}. While it is not expected that these components will be finalized for at least the first Data
+Challenge it is important to have a firm grasp of the required interfaces, data flow patterns and other crucial aspects of
+the \pd Production Systems. Having functional prototypes in place is therefore crucial on the time scale of the Data Challenges.
+An important component of the overall production chain is the \textit{Data Reduction} step along the lines described
+in \cite{docdb2089}. In one shape or another it is likely to be included in the production software and will in fact constitute
+one of the more CPU-intensive components. Understanding the interfaces and practical implications of this component would
+be a useful part of the Data Challenge.
+
+\item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\, while there is no expectation
+for the final design and implementation of the analysis chain to exist (especially that it's by nature the most dynamic part of all
+software) it is important to put in place, document and optimize its interfaces with various components of infrastructure e.g.\,calibration
+databases, Metadata, software and data provenance controls etc.
+
 \end{itemize}
-The Online Buffer, if accessed at all, would only be used as a source
-of raw data files.  
-% mxp
-% too technical for this document and redundant vis a vis next section
-%The p3s is aware of the input and output files for each job by their
-%URL (\texttt{root://} or other scheme).  Ultimately, each job is
-%instructed by p3s, guided by its configuration, what the URLs for
-%every input file as well as every output file expected.  Any output
-%file may be used as an input file of a subsequent job.  These
-%intermediate files connect jobs into an acyclic, directed graph (DAG).
-Data streaming capability inherent in XRootD for many use cases
-can greatly limit the amount of data that must be
-transferred in the case where only a single trigger or even a subset
-of fragments of one trigger are needed from a raw data file to satisfy
-a given payload job.  Jobs which do not have the capability or
-requirement to stream data must nevertheless provide a way to stage files
-in to and out from local storage.  This is expected to be accomplished
-by a script which can likely be shared by a variety of core payload
-jobs.
-
-The p3s will perform basics checks for successful job completion
-and existence of expected output files and purge intermediate data.
-As needed, some portion of the files produced by p3s jobs will be
-archived to mass storage and made available for distribution to the
-collaboration.
-
-Final output files produced by these jobs are also presented to end
-users by the p3s \textit{visualization system} in a number of ways as
-described below.  The final output files can be categorized in the
-following way
-
-\begin{description}
-\item[graphics] files in PNG or SVG format representing histograms, plots, event displays, etc.
-\item[summary] files in JSON format provides ancillary information for graphics files including captions or other information that may be directly rendered by a user interface.
-\item[reference] files which should be retained for browsing by the user and which may include logs or intermediate results. 
-\end{description}
-
-\noindent The two end-user interfaces that p3s will provide are:
-
-\begin{description}
-\item[web pages] a web server which allows browsing of all results, and include features such as refreshing of specific time critical results
-\item[notifications] a system that interprets \textit{summary} files to provide alarm notification via email, mobile push, or other means.
-\end{description}
-
-\noindent As mentioned above, the hope is that the visualization needs
-of the OM and DQM results can be satisfied by a single system.
-% The DQM group will work with OM and others to achieve that.
-
-
-\subsection{Required Capabilities}
-\label{sec:capabilities}
-
-The p3s must have capabilties to support categories of processing outlined
-in Sec.\,\ref{sec:categories}. The term ``task'' is used here to designate a set
-of related jobs, for a example a processing chain where each job consumes
-data produced by its predecessor. Jobs can be used to add a wide range
-of functionalty to the system, e.g.~copy a fraction of data to mass storage
-if necessary or produce a set of PNG files based on intermediate ROOT files,
-or perhaps generate an alarm if a certain metric falls out of prescribed range.
-
-The p3s supports description of tasks as DAGs and also supports task templates
-for ease of operation. The first job in the chain reads data from
-the Online Buffer or EOS. In the limiting case, a task may contain just one payload
-job; there is no set limit on the number of jobs in the DAG or its topology.
-Submission of individual \textit{ad hoc} jobs by users is also supported.
-
-\begin{description}
-\item[Job and Task Management]\ 
-\begin{itemize}
-
-\item automatic generation of tasks upon arrival of fresh data to the buffer
-
-\item distribution of jobs to processing resources assigned to p3s
-
-\item management of tasks i.e.~orchestration of execution of jobs within
-a task according to the dependencies between jobs
-
-\item prioritization of tasks and jobs (during assignmenet to processing slots)
- including automated dynamic changes of priorities in order to ensure completion
-of critical tasks
-
-\end{itemize} 
-
-\item[User and System interfaces]\ 
-\begin{itemize}
-
-\item full remote control of the system by operators via appropriate interfaces
-
-\item interface to the Online Buffer and EOS in order to access the input data
-
-\item interface to F-FTS necessary to move a portion of p3s output to external
-sites and mass storage
-
-\item Web interface for task monitoring and debugging of p3s
-
-
-\end{itemize} 
-
-\item[Web Access to Results]\ 
-\begin{itemize}
-
-\item the data produced by p3s will be made available to the users via a Web service
-(e.g. a Web page populated with plots selected according to user-specified criteria)
-
-\item for the data which is preserved as data files (as opposed to visual products)
-there will be a catalog accessible via a browser/Web page
-
-\item this item should be shared with OM. 
-
-\end{itemize} 
-
-\item[Notification of Exceptions]\ 
-\begin{itemize}
-
-\item summary files will be interpreted and checked for fields holding metrics which are subject to limits defined in p3s.
-
-\item when a calculated metric is outside of the limits a notification is sent to registered individuals. 
-
-\item domain experts will have ability to modify the list of watched quantities and their limits.
-
-\end{itemize} 
-
-\end{description}
-
-\subsection{p3s Components and Deliverables}
-
-The core of p3s is a Django-based \cite{django} application written in Python. The
-deliverables in the systems category are as follows:
-
-\begin{description}
-\item[p3s server] --- a web service which supports the capabilities
-  described in Sec.~\ref{sec:capabilities}
-
-\item[user tools] --- such as CLI clients necessary to manipulate the
-  state of the system, submit and manage tasks in the manual mode if
-  necessary, and to perform general management and maintenance of the
-  system.
-
-\item[visualization] --- a web application, ideally shared with OM,
-  which presents graphical and other summary results that were
-  produced by p3s payload jobs available to end users.
-
-%%% (bv) Do we really need to list this?
-% \item[data network access] --- a XRootD-based service continuously
-%   running on the DQM cluster and communicating with small-footprint
-%   XRootD service running on the Online Buffer, and also EOS.
-
-\item[Web and DB] --- the (software) servers needed as a platform to
-  support the items listed above. These can be based on a variety of
-  products and offer a degree of interoperability.
-
-\end{description}
-
-
-
-
-\section{Payload Jobs}
-\label{sec:categories}
-
-\subsection{The Role of DQM Stakeholders}
-The algorithms to be used in the p3s payload jobs span a wide
-range of expertise in a few domains.  Some jobs will consist of algorithms
-originated in the OM group but may have to be moved to DQM due
-to CPU constraints. On the other end of the spectrum
-are jobs based on algorithms that will run as a part
-of the \textit{full production} (FP) processing which if fully in the
-offline domain.
-
-Because of the considerable breadth of the required expertise the
-DQM group should not commit to writing the code for all payload jobs. 
-It will however facilitate the work of other
-collaborators and ensure development of optimal interfaces
-to data and applications.  In particular the group will closely
-coordinate with OM and FP groups to identify individuals that can
-develop the algorithms.  It will also assist in the development to
-help it progress in ways that exploit the benefits of \textit{art} and
-realize the flexibility described above.
-
-In the end, the exact makeup of the p3s payload jobs that will run
-must be determined by the detector hardware and the final DAQ
-architecture, and by joint decision of OM, DQM, DRA groups and
-other \pd  stakeholders.  However they are
-developed, it is any given job will implement one or more of the
-following stages which are described more fully in \cite{docdb1811}.
-The output of each stage is logically an input to the next although,
-due to p3s, there is the potential for parallelization of stages. This is
-addressed by the required capabilities of p3s as outlined in
-Sec.\,\ref{sec:capabilities}.
-
-\subsection{TPC Processing Categories}
-%The list below focuses on TPC data. The processing categories include
-\begin{description}
-
-\item[DAQ] category consists of results requiring no data
-  decompression and likely will be produced in OM and by p3s jobs.  It
-  might includes summaries of things like (compressed) fragment sizes,
-  error flags, data rates.
-
-\item[ADC] results require data decompression but no other substantial
-  CPU and will consist of summary of ADC-level data.  Examples include
-  mean/RMS values over time in various groupings and level of detail
-  (ASIC, FEMB, RCE, APA etc).
-
-\item[FFT] category consists of the application of discrete Fourier
-  transforms (FFT) to ADC-level data primarily to understand any
-  excess noise and its possible evolution.
-
-\item[SIG] includes ADC mitigation, removal of any excess noise and
-  the deconvolution of detector response functions in order to
-  understand the signals related to actual activity in the detector.
-
-\item[RECO] category includes application of any high-CPU algorithms
-  for imaging and reconstructing the topology of activity in the
-  detector and may include high level semantic event classifications.
-
-\end{description}
-
-\subsection{Beam Instrumentation}
-It will be extremely desirable for \pd during the data taking
-period to validate the trigger logic and other
-parameters related to the data coming from the Beam Instrumentation
-(BI) systems and their computing infrastructure elements.
-These data will not be fed into the DAQ system of the NP04
-experiment so they will be captured separately and 
-will have to be merged/integrated in a separate production
-step.
-
-There will be several BI data streams in protoDUNE such as coming from TOF, Cherenkov
-and fiber trackers, which are to be stored to the general beam instrumentation
-database developed and operated by CERN. These data
-will be available at the end of each SPS cycle as time series.
-% Some of these data will be ``bundled''  in packets
-% correponding to the SPS cycle
-While the back-end database in this system is Oracle RAC,
-its interface is quite defferent from a typical RDMS due
-to specific requirements for such database and its considerable scale
-and data rate. Current interfaces
-are implemented in Java and working assumption is that
-the protoDUNE Beam Instrumentation Group will create
-a PostgreSQL database server in which the BI data will be
-captured via aforementioned interface and held for further processing.
-It appears important to obtain assistance from CERN experts to
-optimally design this ``bridge'' between these databases.
-
-Because of the delay  inherent in the flow of BI data as described above
-it cannot be optimally processed by the OM software,
-while full processing is not agile enough for suffiently short turnaround time (i.e.~to provide
-actionable information).
-For these reasons DQM offers a unique opportunity to perform
-trigger validation and other checks which involve the BI data.
-Jobs in this category will obtain the BI data within
-minutes of it being produced and perform computations matching it to the TPC and other
-\pd subsystems within an hour.
-
-\subsection{Other Processing}
-There will be other \pd components that may require DQM such as the photon detection
-and cosmic ray subsystems. Understanding the scope of required processing is expected
-to come from their respective workgroups.
-
-\section{Hardware}
-\label{sec:hardware}
-The p3s itself will require hardware to run its Web and database
-servers and to provide enough storage for intermediate and final
-output files as described in section~\ref{sec:io}.  It is expected
-that this hardware will be provided by the CERN Neutrino Platform
-either from the pool of the machines which beloong to the
-existing~\cite{neut} cluster, or procured separately if performance
-and scalability tests indicate such necessity.
-
-
-The storage required for the output files is not currently known.  It
-depends on the catalog of payload jobs that will be run and the desire
-of the collaboration for the retention of the results.  The largest
-single type of result will be event displays.  They will an amount of
-storage similar to the raw data from which they are produced.  If one
-event display per minute is produced and retained indefinitely some
-few tens of TB will be required.  The remanding class of results will
-require far less storage.
-
-The hardware required to run the payload jobs themselves of course
-depends on the nature of their CPU needs and the fraction of triggers
-they consume.  P3s follows a \textit{pilot}-based paradigm and so is
-able to provide a uniform execution environment to its payload jobs
-over a variety of native hosting environments.  This gives p3s the ability
-to scale elastically across different hosts (or facilties) as needed.  Initial expectation
-is that DQM jobs will be run by p3s on nodes in the \textit{neutdqm}
-partition of \textit{neut} cluster. However it appears more optimal
-to run jobs in the Beam Instrumentation category on the
-\textit{lxbatch} \cite{lxbatch} facility because of its proximity to
-the CERN Central Services which include EOS and the database
-providing this type of data.
 
 \section{Timeline and Milestones}
 \label{sec:timeline}
@@ -614,10 +237,9 @@ can be a challenge.
 \clearpage
 \begin{thebibliography}{1}
 
-\bibitem{docdb1086}
-{DUNE DocDB 1086: \textit{ protoDUNE/SP data scenarios with full stream (spreadsheet)}}\\
-\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1086}
-
+\bibitem{docdb1794}
+{DUNE DocDB 1794: \textit{ProtoDUNE-SP Technical Design Report }}\\
+\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1794}
 
 
 
@@ -628,6 +250,12 @@ can be a challenge.
 \bibitem{fts}
 {The Fermilab File Transfer System}\\
 \url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=5412&filename=datamanagement-changeprocedures.pdf&version=1}
+
+
+
+\bibitem{docdb2089}
+{Proposed Initial Data Reduction for protoDUNE/SP}\\
+\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=2089&filename=datamanagement-changeprocedures.pdf&version=1}
 
 
 \bibitem{xrootd}
@@ -657,6 +285,13 @@ can be a challenge.
 \bibitem{django}
 {Django}\\
 \url{https://docs.djangoproject.com/en/1.10/}
+
+
+\bibitem{docdb1086}
+{DUNE DocDB 1086: \textit{ protoDUNE/SP data scenarios with full stream (spreadsheet)}}\\
+\url{http://docs.dunescience.org:8080/cgi-bin/ShowDocument?docid=1086}
+
+
 
 
 \end{thebibliography}
