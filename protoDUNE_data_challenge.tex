@@ -17,7 +17,7 @@
 \newcommand{\fixme}[1]{\textbf{FIXME: #1}}    
 \newcommand{\pd}{protoDUNE\xspace}
 
-\title{A proposal for the Single-Phase \pd (NP04) data challenges in 2017-2018}
+\title{A Proposal for the Single-Phase \pd (NP04) Data Challenges in 2017-2018}
 \date{\today}
 \author{R.Pordes, M.Potekhin, D. Stefan, R.Sulej}
 
@@ -152,22 +152,93 @@ FNAL and facilities at CERN.
 
 \item  \textbf{Calibration and Production}. This includes running prototypes and mockups of this software utilizing the FNAL POMS.
 
+\item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
+components of the production system(s). There are no strict requirements to functionality and performance of the analysis
+software at this stage.
+
 \end{itemize}
+\noindent The work-up period must be completed no later than September 2017. It is expected that Data Reduction, Production, DQM
+and othe components will have substantial overlaps and/or commonalities, which must be exploited from the point of view of software
+sharing and reuse. One of the goals of the work-up period is to identify such items.
 
+\subsection{Timeline, Reporting and Documentation}
+Because of the significant CERN involvement in \pd computing, and to facilitate communication with the CERN IT management
+it appears optimal to document the working plans and progress of Data Challenges on the CERN TWiki pages provided by
+CENF. More detailed technical documentation regarding components and systems will be managed on DUNE DocDB as before.
 
-\subsection{Timeline}
 The work-up as described above should be completed by September 2017, and reports for each component provided
-to the \pd leadership and the \pd-CENR liaison representative.
+to the \pd leadership and the \pd-CERN computing liaison representative. DC1 will take place in October 2017.
+DC2 will be conducted in February 2018. Each Data Challenge will result in a concise report which will be made available
+to the Collaboration and follow-up shall be organized as needed.
 
 \subsection{DC1 Scenario}
 
 \begin{itemize}
 
-\item 
+\item Simulated raw data is deposited into the Online Bufer by the specially created test agent.
+
+\item The data is detected by F-FTS1 and transmitted to EOS.
+
+\item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files
+are registered.
+
+\item Mock-up Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+
+\item Automated process initiates DQM streams in p3s. In DC1, full-blown processing on CERN Tier-0\,\cite{lxbatch}
+will not be required and at a minimum the operation of p3s will be validated on the Neutrino Platform cluster\,\cite{neut}.
+
+\item Production team at FNAL submits production jobs using the newly arrived data as input.
 
 \end{itemize}
 
 
+\subsection{DC2 Scenario}
+
+\begin{itemize}
+
+\item DAQ sends raw data (such as pulser or dummy trigger data) to the Online Bufer.
+
+\item The data is detected by F-FTS1 and transmitted to EOS.
+
+\item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files
+are registered.
+
+\item Realistic Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+
+\item Automated process initiates DQM streams in p3s using  CERN Tier-0. At a minimum, ADC and noise spectra (FFT) are produced
+and delivered to the user by a Web service.
+
+\item Production team at FNAL submits production jobs using the newly arrived data as input.
+
+\item Analysis chain is activated.
+
+\end{itemize}
+
+
+\section{Personnel and Responsibilities}
+
+\begin{itemize}
+
+\item Online Buffer and the test agent -- DAQ team
+
+\item Beam Instrumentation Interface -- Beam Instrumentation Group, DB coordinator: J.Paley
+
+\item F-FTS -- FNAL team (lead: A.Norman)
+
+\item p3s -- prompt processing team (lead: M.Potekhin)
+
+\item DQM and production payloads -- DRA team (co-leads: D.Stefan, R.Sulej)
+
+\item Integration consultant -- B.Viren
+
+\item Metadata and SAM -- FNAL SCD (T.Junk, S.Fuess)
+
+\item Analysis -- TBD
+
+\item Coordination -- R.Pordes
+
+
+\end{itemize}
 
 \clearpage
 \begin{thebibliography}{1}
@@ -210,16 +281,15 @@ to the \pd leadership and the \pd-CENR liaison representative.
 \url{https://cdcvs.fnal.gov/redmine/projects/prod_mgmt_db}
 
 
+\bibitem{lxbatch}
+{The CERN batch computing service}\\
+\url{http://information-technology.web.cern.ch/services/batch}
 
 
 
 \bibitem{neut}
 {Neutrino Computing Cluster at CERN}\\
 \url{https://twiki.cern.ch/twiki/bin/view/CENF/NeutrinoClusterCERN}
-
-\bibitem{lxbatch}
-{The CERN batch computing service}\\
-\url{http://information-technology.web.cern.ch/services/batch}
 
 
 
