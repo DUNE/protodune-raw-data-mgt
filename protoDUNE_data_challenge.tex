@@ -17,7 +17,7 @@
 \newcommand{\fixme}[1]{\textbf{FIXME: #1}}    
 \newcommand{\pd}{protoDUNE\xspace}
 
-\title{A Proposal for the Single-Phase \pd (NP04) Data Challenges in 2017-2018}
+\title{A Proposal for the Single-Phase \pd Experiment Data Challenges in 2017-2018}
 \date{\today}
 \author{R.Pordes, M.Potekhin, D. Stefan, R.Sulej}
 
@@ -29,16 +29,15 @@
 \maketitle
 
 \begin{abstract}
-\noindent There are two main factors that make it necessary to ensure 100\% readiness of the
+
+
+\noindent It is important to ensure 100\% readiness of the
 end-to-end \pd software and computing complex during the detector commissioning period and
-throughout data taking in 2018. First, due to the short run schedule spending any significant amout
-of time on debugging will make fulfillment of
-the run plan impossible. Second, the Collaboration will need to process and analyze the NP04 data
-on a reasonably short time scale (months rather than years) in order to maximize benefits of the
-prototype effort for the DUNE R\&D work and CDR cycle, so efficient resource management and
-throughput of \pd processing will be of essence right at the beginning of data taking. For these
-reasons, and given the \pd schedule,  we propose to conduct two Data Challenges in order to identify
+throughout data taking in 2018. We propose to conduct two Data Challenges in order to identify
 and address potential issues before they can impact the experiment.
+% The first Data Challenge is
+%meant to define and test various interfaces and modes of data transfer and processing, without
+%the software being finalized. The
 
 
 
@@ -49,14 +48,17 @@ and address potential issues before they can impact the experiment.
 \pagebreak
 
 \section{About this document}
-%The Single-Phase \pd experiment (NP04) is characterized by substantial data rates
-%and volume, as well as by inherent complexity of its data handlng and processing scheme due
-%to properties of its main detector (the Liquid Argon TPC), readout electronics and other factors.
-%Initial estimates indicate considerable CPU and storage requirements for production and analysis.
-%In order to ensure readiness of the protoDUNE computing infrastructure for data taking
-%in 2018, it will be necessary to conduct Data Challenges which are meant to validate
-%individual infrastructure and software components, interfaces  as well as the status of overall
-%system integration.
+%There are two main factors that make it necessary to ensure 100\% readiness of the
+%end-to-end \pd software and computing complex during the detector commissioning period and
+%throughout data taking in 2018. First, due to the short run schedule spending any significant amout
+%of time on debugging will make fulfillment of
+%the run plan impossible. Second, the Collaboration will need to process and analyze the NP04 data
+%on a reasonably short time scale (months rather than years) in order to maximize benefits of the
+%prototype effort for the DUNE R\&D work and CDR cycle, so efficient resource management and
+%throughput of \pd processing will be of essence right at the beginning of data taking. For these
+%reasons, and given the \pd schedule,  we propose to conduct two Data Challenges in order to identify
+%and address potential issues before they can impact the experiment.
+
 The goal of this document is to provide concise information about the proposed \pd Data Challenges
 to the infividual working groups in order to coordinate effort and come to a consensus as to the scope,
 plans and schedule of the proposed Data Challenges. It does not contain detailed descriptions
@@ -67,7 +69,7 @@ needed, with references provided in the text.
 \section{The Scope of the Data Challenges}
 Information regarding the \pd (NP04) computing is summarized in the \pd-SP Technical Design Report\cite{docdb1794}.
 The following components (including infrastructure, middleware and software) can be identified as relevant in the context
-of Data Challenges (which will be also referred to as ``DC'' in this document):
+of Data Challenges (which will be also referred to as \textit{``DC''} in this document):
 \begin{itemize}
 \item The DAQ \textbf{Online Buffer} which stores raw data assembled by the Event Builders, as files on disk. The internals
 of the DAQ system itself are not within the scope.
@@ -95,12 +97,12 @@ DQM workload as formulated and programmed by the working groups.
 \item \textbf{Calibration and Production Software}. While it is not expected that these components will be finalized
 (and some even exist) for at least the first Data
 Challenge it is important to have a firm grasp of the required interfaces, data flow patterns and other crucial aspects of
-the \pd Production Systems. Having functional prototypes or at least mockups  in place is therefore crucial on the time
+the \pd Production Systems. Having prototypes in place is therefore crucial on the time
 scale of the Data Challenges.
 An important component of the overall production chain is the \textit{Data Reduction} step along the lines described
-in \cite{docdb2089}. In one shape or another it is likely to be included in the production software and will in fact constitute
-one of the more CPU-intensive components. Understanding the interfaces and practical implications of this component would
-be a useful part of the Data Challenge.
+in \cite{docdb2089}. It combines a few signal-processing procedures (cf. digital filtering and noise reduction), and it will be
+necessary in any version or architecture of the production software.
+Understanding the interfaces and practical implications of this component would be a useful part of the Data Challenge.
 
 \item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\, while there is no expectation
 for the final design and implementation of the analysis chain to exist (especially that it is by nature the most dynamic and
@@ -137,20 +139,21 @@ must undergo end-to-end functional testing including registration in SAM and sin
 agent will be created which simulates creation of the raw data files by DAQ, which are written to the Online Buffer and picked up
 by the F-FTS for transmission.
 
-\item \textbf{Beam Instrumentation Interface}. At a minimum, mockup schemas for \pd beam detectors must be created in
+\item \textbf{Beam Instrumentation Interface}. At a minimum, prototype schemas for \pd beam detectors must be created in
 the CERN Beam Instrumentation Database, and populated with dummy data. An extraction process must be put in place which
-``captures'' these data and commits it either to a database managed by \pd or as files on disk (EOS). A prototype or a mockup
-of the merging process must be put in place.
+``captures'' these data and commits it either to a database managed by \pd or as files on disk (EOS). A prototype
+of the merging process must be put in place. This will also require data access libraries to be utilized in the production process.
 
 \item  \textbf{DQM/p3s}. The prompt processing system must be tested and validated to run with the primary data
 staging area being in EOS. The issues of deployment, updating and maintenance of LArSoft and other requisite software
 must be resolved.
 
-\item  \textbf{Data Reduction Software}. In one shape or another, data reduction will form a distinct stage in the production chain
-in \pd. A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
+\item  \textbf{Data Reduction Software}.
+% In one shape or another, data reduction will form a distinct stage in the production chain  in \pd.
+A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
 FNAL and facilities at CERN.
 
-\item  \textbf{Calibration and Production}. This includes running prototypes and mockups of this software utilizing the FNAL POMS.
+\item  \textbf{Calibration and Production}. This includes running prototypes of this software utilizing the FNAL POMS.
 
 \item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
 components of the production system(s). There are no strict requirements to functionality and performance of the analysis
@@ -175,14 +178,15 @@ to the Collaboration and follow-up shall be organized as needed.
 
 \begin{itemize}
 
-\item Simulated raw data is deposited into the Online Bufer by the specially created test agent.
+\item Simulated raw data is deposited into the Online Bufer by a specially created test agent.
 
 \item The data is detected by F-FTS1 and transmitted to EOS.
 
 \item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files
 are registered.
 
-\item Mock-up Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+\item Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+These data do not need to be real at this poin, as the purpose of this step is to test interfaces and protocols.
 
 \item Automated process initiates DQM streams in p3s. In DC1, full-blown processing on CERN Tier-0\,\cite{lxbatch}
 will not be required and at a minimum the operation of p3s will be validated on the Neutrino Platform cluster\,\cite{neut}.
