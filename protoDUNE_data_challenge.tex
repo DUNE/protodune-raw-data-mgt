@@ -19,7 +19,7 @@
 
 \title{A Proposal for the Single-Phase \pd Experiment Data Challenges in 2017-2018}
 \date{\today}
-\author{R.Pordes, M.Potekhin, D. Stefan, R.Sulej}
+\author{R.Pordes, M.Potekhin, R.Sulej}
 
 \begin{document}
 \SetWatermarkText{DRAFT}
@@ -60,10 +60,10 @@ and address potential issues before they can impact the experiment.
 %and address potential issues before they can impact the experiment.
 
 The goal of this document is to provide concise information about the proposed \pd Data Challenges
-to the infividual working groups in order to coordinate effort and come to a consensus as to the scope,
-plans and schedule of the proposed Data Challenges. It does not contain detailed descriptions
+to the individual working groups in order to coordinate effort and come to a consensus as to the scope,
+plans and schedule of the proposed Data Challenges. \textit{It does not contain detailed descriptions
 and/or designs of the \pd computing
-infrastructure elements and the reader is reffered to existing documentation where
+infrastructure elements} and the reader is reffered to existing documentation where
 needed, with references provided in the text.
 
 \section{The Scope of the Data Challenges}
@@ -78,13 +78,14 @@ of the DAQ system itself are not within the scope.
 handled by the \pd DAQ (whose primary task is to capture data from the TPC and the Photon Detector), and is instead
 transmitted to the Beam Instrumentation Database at CERN. It is not available immediately for each triggered event,
 and is instead available in batches after each spill cycle of the SPS. Interfacing this system is a task that needs
-to be addressed for \pd to be able to validate its beam trigger system.
+to be addressed for \pd to be able to include these data in its offline processing in an optimal manner.
+%validate its beam trigger system.
 
 \item The \textbf{Raw Data Management System}\cite{docdb1212}  which performs data transfers between a few endpoints
 at CERN and FNAL starting with the Online Buffer and which is also tasked with proper accounting and handling of Metadata
 by interacting with the SAM system at FNAL (see next item). The Data Handling System will inteface the disk-based mass storage
 at CERN and FNAL (i.e.\,EOS\cite{eos} and dCache) as well as tape systems (CASTOR and Enstore respectively).
-We anticipate using the \textit{Fermi File Transfer System}, also abbreviated as F-FTS\cite{fts} for most of this functionality.
+We anticipate using the \textit{Fermi File Transfer System} (also abbreviated as F-FTS\cite{fts}) for most of this functionality.
 
 \item The \textbf{Metadata}  -- SAM system at FNAL which comprises the functionality of the file catalog, data storage and
 retrieval based on Metadata and can also be used for orchestration of production workflows.
@@ -95,21 +96,20 @@ To support DQM, the ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docd
 DQM workload as formulated and programmed by the working groups.
 
 \item \textbf{Calibration and Production Software}. While it is not expected that these components will be finalized
-(and some even exist) for at least the first Data
-Challenge it is important to have a firm grasp of the required interfaces, data flow patterns and other crucial aspects of
-the \pd Production Systems. Having prototypes in place is therefore crucial on the time
-scale of the Data Challenges.
+(and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
+data flow patterns and other crucial aspects of the \pd Production Systems. Having prototypes in place is therefore crucial
+on the time scale of the Data Challenges.
 An important component of the overall production chain is the \textit{Data Reduction} step along the lines described
 in \cite{docdb2089}. It combines a few signal-processing procedures (cf. digital filtering and noise reduction), and it will be
 necessary in any version or architecture of the production software.
 Understanding the interfaces and practical implications of this component would be a useful part of the Data Challenge.
 
-\item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\, while there is no expectation
-for the final design and implementation of the analysis chain to exist (especially that it is by nature the most dynamic and
-fluid part of all software) it is important to put in place, document and optimize its interfaces with various components
+\item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\,while there is no expectation
+for the final design and implementation of the analysis chain to exist early in the experiment (especially that it is by nature the most
+dynamic and fluid part of all software) it is important to put in place, document and optimize its interfaces with various components
 of infrastructure e.g.\,calibration databases, Metadata, software and data provenance controls etc.
 
-\item \textbf{Production Operations Management Service (POMS)}. This service \cite{poms} manages and automates jobs
+\item \textbf{Production Operations Management Service (POMS)}. This FNAL-based service \cite{poms} manages and automates jobs
 submission on distributed resources on the Grid. It will be the primary platform for \pd on which to run production and analysis.
 
 
@@ -141,7 +141,7 @@ by the F-FTS for transmission.
 
 \item \textbf{Beam Instrumentation Interface}. At a minimum, prototype schemas for \pd beam detectors must be created in
 the CERN Beam Instrumentation Database, and populated with dummy data. An extraction process must be put in place which
-``captures'' these data and commits it either to a database managed by \pd or as files on disk (EOS). A prototype
+``captures'' these data and commits it either to a database managed by \pd and/or as files on disk (EOS). A prototype
 of the merging process must be put in place. This will also require data access libraries to be utilized in the production process.
 
 \item  \textbf{DQM/p3s}. The prompt processing system must be tested and validated to run with the primary data
@@ -153,7 +153,11 @@ must be resolved.
 A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
 FNAL and facilities at CERN.
 
-\item  \textbf{Calibration and Production}. This includes running prototypes of this software utilizing the FNAL POMS.
+\item  \textbf{Calibration and Production Software}. Prototypes of this software need to be put in place. They will
+include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
+merging and processing.
+
+\item  \textbf{Production Management and Support}. This includes running prototypes of this software utilizing the FNAL POMS.
 
 \item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
 components of the production system(s). There are no strict requirements to functionality and performance of the analysis
@@ -186,12 +190,13 @@ to the Collaboration and follow-up shall be organized as needed.
 are registered.
 
 \item Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
-These data do not need to be real at this poin, as the purpose of this step is to test interfaces and protocols.
+These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
 
 \item Automated process initiates DQM streams in p3s. In DC1, full-blown processing on CERN Tier-0\,\cite{lxbatch}
 will not be required and at a minimum the operation of p3s will be validated on the Neutrino Platform cluster\,\cite{neut}.
 
-\item Production team at FNAL submits production jobs using the newly arrived data as input.
+\item Production team at FNAL submits production jobs using the newly arrived data as input. This includes prototype interfaces
+to software components of the LArTPC, Photon Detector and Beam Instrumentation systems.
 
 \end{itemize}
 
@@ -200,7 +205,7 @@ will not be required and at a minimum the operation of p3s will be validated on 
 
 \begin{itemize}
 
-\item DAQ sends raw data (such as pulser or dummy trigger data) to the Online Bufer.
+\item DAQ sends raw data (such as pulser or simulated trigger data) to the Online Bufer.
 
 \item The data is detected by F-FTS1 and transmitted to EOS.
 
@@ -212,7 +217,8 @@ are registered.
 \item Automated process initiates DQM streams in p3s using  CERN Tier-0. At a minimum, ADC and noise spectra (FFT) are produced
 and delivered to the user by a Web service.
 
-\item Production team at FNAL submits production jobs using the newly arrived data as input.
+\item Production team at FNAL submits production jobs using the newly arrived data as input. Interfaces between software components,
+data etc as well as actual functionaltiy are close to final.
 
 \item Analysis chain is activated.
 
@@ -233,9 +239,14 @@ and delivered to the user by a Web service.
 
 \item DQM and production payloads -- DRA team (co-leads: D.Stefan, R.Sulej)
 
+\item Calibrations -- M.Mooney
+
 \item Integration consultant -- B.Viren
 
 \item Metadata and SAM -- FNAL SCD (T.Junk, S.Fuess)
+
+
+\item Production support at CERN and FNAL -- TBD
 
 \item Analysis -- TBD
 
