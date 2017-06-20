@@ -203,7 +203,8 @@ to commit \pd data to the disk at the high rate according to the experiment plan
 
 A backup (auxiliary) option is to implement the buffer as a a XRootD \cite{xrootd} cluster
 that may be deployed on existing general purpose hardware provided by the \textit{CERN
-Neutrino Platform}\cite{cenf}.
+Neutrino Platform} orgranization.
+% \cite{cenf}
 A prototype of such system has been tested.
 
 
@@ -219,7 +220,7 @@ A prototype of such system has been tested.
 \noindent In the following, we shall consider handling and management of the raw data after it is
 written by the Event Builders to the Online Buffer.  A conceptual diagram of the raw data
 flow in \pd is presented in Fig.\ref{fig:raw_concept} which shows the general pattern of data flow
-and also reflects the central role of the EOS system at CERN \cite{eos} in the raw data management scheme.
+and also reflects the central role of the EOS system at CERN \cite{castoreos} in the raw data management scheme.
 Reliance on EOS is motivated by the experience and architecture of the LHC experiments
 as well as the \pd data characteristics presented above in Sec.\,\ref{sec:np04_data_rate}.
 
@@ -234,7 +235,7 @@ including error handling, transmission retries, monitoring etc.
 There is more than one instance of FTS in the \pd data transmission chain. One instance (labeled ``FTS1''
 in the diagram) is responsible for moving the data from the Online Buffer into EOS. The second instance
 -- ``FTS2'' --  copies the data after it has arrived to EOS to tape storage at CERN (the CASTOR
-system~\cite{castor}). It is also tasked with transmitting the data to Fermilab  and other peer
+system~\cite{castoreos}). It is also tasked with transmitting the data to Fermilab  and other peer
 institutions. At FNAL the data are placed in a dCache~\cite{dcache} storage cluster. A secondary
 tape copy is then created at Fermilab using the data resident in dCache as the source.
 Other participating data centers receiving their copies of raw data may function differently
@@ -362,20 +363,27 @@ Yearly report on ProtoDUNE Single Phase NP04 (2016), \textit{CERN-SPSC-2016-018}
 %\url{https://cds.cern.ch/record/2144868}
 
 \bibitem{xrootd}
-{XRootD software framework:}~\url{http://www.xrootd.org}
+L Bauerdick et al. ``Using Xrootd to Federate Regional Storage.'' \textit{Journal of Physics: Conference Series.} Vol.\textbf{396}. IOP Publishing, 2012.
+%{XRootD software framework:}~\url{http://www.xrootd.org}
 
-\bibitem{cenf}
-{CERN Neutrino Platform}\\
-\url{http://home.cern/about/experiments/cern-neutrino-platform}
+%\bibitem{cenf}
+%{CERN Neutrino Platform}\\
+%\url{http://home.cern/about/experiments/cern-neutrino-platform}
 
 
-\bibitem{eos}
-{The CERN Exabyte Scale Storage}\\
-\url{http://information-technology.web.cern.ch/services/eos-service}
+\bibitem{castoreos}
+ L Mascetti et al. ``Disk storage at CERN.'' \textit{Journal of Physics: Conference Series.} Vol.\textbf{664}. IOP Publishing, 2015.
+%{CASTOR -- CERN Advanced STORage manager}:~
+%\url{http://castor.web.cern.ch/}
+
+%\bibitem{eos}
+%{The CERN Exabyte Scale Storage}\\
+%\url{http://information-technology.web.cern.ch/services/eos-service}
 
 
 \bibitem{sam}
-R A Illingworth 2014 \textit{J. Phys.: Conf. Series} 513 032045
+R A Illingworth ``A data handling system for modern and future Fermilab experiments.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{513}. IOP Publishing, 2014.
+
 %{A data handling system for modern and future Fermilab experiments}\\
 %\url{http://iopscience.iop.org/1742-6596/513/3/032045}
 
@@ -385,20 +393,22 @@ Norman A 2014 \textit{The Fermilab File Transfer System}.~e-Print: FNAL CD-DocDB
 %%changeprocedures.pdf&version=1}
 
 \bibitem{nova}
-NOvA Neutrino Experiment:~
-\url{https://www-nova.fnal.gov/}
+R Plunkett et al.  ``Status of the NOvA Experiment.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{120}. IOP Publishing, 2008.
+
+
+% NOvA Neutrino Experiment:~
+% \url{https://www-nova.fnal.gov/}
 
 \bibitem{uboone}
-The MicroBooNE Experiment:~
-\url{http://www-microboone.fnal.gov/}
+B Jones et al.  ``The Status of the MicroBooNE Experiment.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{408}. IOP Publishing, 2013.
 
-\bibitem{castor}
-{CASTOR -- CERN Advanced STORage manager}:~
-\url{http://castor.web.cern.ch/}
+%The MicroBooNE Experiment:~
+% \url{http://www-microboone.fnal.gov/}
 
 \bibitem{dcache}
-{dCache, a distributed storage solution:}~
-\url{https://www.dcache.org/}
+A Millar et al.  ``dCache, agile adoption of storage technology.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{396}. IOP Publishing, 2012.
+% {dCache, a distributed storage solution:}~
+% \url{https://www.dcache.org/}
 
 \bibitem{larsoft}
 {LArSoft Collaboration}:~
