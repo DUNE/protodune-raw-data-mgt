@@ -63,7 +63,9 @@ The two detector apparatuses, when deployed, will share parts of their
 computing infrastructure.  Their data acquisition (DAQ) systems and
 corresponding data buffers will operate in an independent manner. 
 The focus of this paper is on the data management for the
-single-phase LArTPC (NP04)\,\cite{np04}. This detector  functions without amplification
+single-phase LArTPC (NP04).
+%\,\cite{np04}.
+This detector  functions without amplification
 in the Liquid Argon medium and is in essence a large single volume
 ionization/drift chamber.  The drift volume is equipped with
 a large number of readout electrodes (wires), each with its own electronics chain.
@@ -318,7 +320,8 @@ and subject to prioritization to guarantee timely production of DQM
 visual and data products. A prototype system has been developed at
 the time of writing. The final stages of prompt processing will
 include simplified event reconstruction based on LArSoft framework
-\cite{larsoft}.
+developed at FNAL.
+%\cite{larsoft}.
 
 Compared to prompt processing, Online Monitoring aims
 to provide response on the scale of seconds and in general under a minute.
@@ -352,18 +355,23 @@ under contract No.\,DE-SC0012704 with the United States Department of Energy.
 \section*{References}
 \begin{thebibliography}{9}
 
-\bibitem{cdrVol1} DUNE CDR Vol 1 -- The LBNF and DUNE Projects.~e-Print: arXiv:1601.05471 
+\bibitem{cdrVol1}
+R Acciarri et al.
+``Long-Baseline Neutrino Facility (LBNF) and Deep Underground Neutrino Experiment (DUNE) Conceptual Design Report Volume 1: The LBNF and DUNE Projects''.\\ e-Print: arXiv:\textbf{1601.05471}
+ %DUNE CDR Vol 1 -- The LBNF and DUNE Projects.~e-Print: arXiv:1601.05471
 %\url{http://arxiv.org/abs/1601.05471}
 
-\bibitem{cdrVol4} DUNE CDR Vol 4 -- The DUNE Detectors at LBNF.~e-Print: arXiv:1601.02984
+\bibitem{cdrVol4}
+R Acciarri et al.
+``Long-Baseline Neutrino Facility (LBNF) and Deep Underground Neutrino Experiment (DUNE) Conceptual Design Report, Volume 4 The DUNE Detectors at LBNF''.\\~e-Print: arXiv:\textbf{1601.02984}
 %\url{http://arxiv.org/abs/1601.02984}
 
-\bibitem{np04} 
-Yearly report on ProtoDUNE Single Phase NP04 (2016), \textit{CERN-SPSC-2016-018}
+%\bibitem{np04} 
+% Yearly report on ProtoDUNE Single Phase NP04 (2016), \textit{CERN-SPSC-2016-018}
 %\url{https://cds.cern.ch/record/2144868}
 
 \bibitem{xrootd}
-L Bauerdick et al. ``Using Xrootd to Federate Regional Storage.'' \textit{Journal of Physics: Conference Series.} Vol.\textbf{396}. IOP Publishing, 2012.
+L Bauerdick et al. ``Using Xrootd to Federate Regional Storage.'' \textit{J. Phys.: Conf. Series.} Vol.\textbf{396}. IOP Publishing, 2012.
 %{XRootD software framework:}~\url{http://www.xrootd.org}
 
 %\bibitem{cenf}
@@ -372,7 +380,7 @@ L Bauerdick et al. ``Using Xrootd to Federate Regional Storage.'' \textit{Journa
 
 
 \bibitem{castoreos}
- L Mascetti et al. ``Disk storage at CERN.'' \textit{Journal of Physics: Conference Series.} Vol.\textbf{664}. IOP Publishing, 2015.
+ L Mascetti et al. ``Disk storage at CERN.'' \textit{J. Phys.: Conf. Series.} Vol.\textbf{664}. IOP Publishing, 2015.
 %{CASTOR -- CERN Advanced STORage manager}:~
 %\url{http://castor.web.cern.ch/}
 
@@ -382,7 +390,7 @@ L Bauerdick et al. ``Using Xrootd to Federate Regional Storage.'' \textit{Journa
 
 
 \bibitem{sam}
-R A Illingworth ``A data handling system for modern and future Fermilab experiments.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{513}. IOP Publishing, 2014.
+R A Illingworth ``A data handling system for modern and future Fermilab experiments.''  \textit{J. Phys.: Conf. Series.} Vol.\textbf{513}. IOP Publishing, 2014.
 
 %{A data handling system for modern and future Fermilab experiments}\\
 %\url{http://iopscience.iop.org/1742-6596/513/3/032045}
@@ -393,26 +401,26 @@ Norman A 2014 \textit{The Fermilab File Transfer System}.~e-Print: FNAL CD-DocDB
 %%changeprocedures.pdf&version=1}
 
 \bibitem{nova}
-R Plunkett et al.  ``Status of the NOvA Experiment.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{120}. IOP Publishing, 2008.
+R Plunkett et al.  ``Status of the NOvA Experiment.''  \textit{J. Phys.: Conf. Series.} Vol.\textbf{120}. IOP Publishing, 2008.
 
 
 % NOvA Neutrino Experiment:~
 % \url{https://www-nova.fnal.gov/}
 
 \bibitem{uboone}
-B Jones et al.  ``The Status of the MicroBooNE Experiment.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{408}. IOP Publishing, 2013.
+B Jones et al.  ``The Status of the MicroBooNE Experiment.''  \textit{J. Phys.: Conf. Series.} Vol.\textbf{408}. IOP Publishing, 2013.
 
 %The MicroBooNE Experiment:~
 % \url{http://www-microboone.fnal.gov/}
 
 \bibitem{dcache}
-A Millar et al.  ``dCache, agile adoption of storage technology.''  \textit{Journal of Physics: Conference Series.} Vol.\textbf{396}. IOP Publishing, 2012.
+A Millar et al.  ``dCache, agile adoption of storage technology.''  \textit{J. Phys.: Conf. Series.} Vol.\textbf{396}. IOP Publishing, 2012.
 % {dCache, a distributed storage solution:}~
 % \url{https://www.dcache.org/}
 
-\bibitem{larsoft}
-{LArSoft Collaboration}:~
-\url{http://larsoft.org//}
+%\bibitem{larsoft}
+%{LArSoft Collaboration}:~
+%\url{http://larsoft.org//}
 
 \end{thebibliography}
 
