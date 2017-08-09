@@ -1,0 +1,23 @@
+digraph integration {
+
+	DAQ[shape="box"];
+	BeamInst[shape="box"];
+	DCS[shape=box];
+	shifter[shape=circle];
+
+DCS->FNAL_DB;
+DAQ->buffer->FTS;
+FTS->EOS[label="raw data"];
+EOS->DQM_p3s->DQM_payloads->EOS->DQM_web->shifter;
+FTS->CASTOR;
+FTS->FNAL_store->offline->data_reduction->reconstruction;
+BeamInst->JCOP_DB->JCOP_web->shifter;
+JCOP_DB->FNAL_DB->offline;
+JCOP_DB->DQM_payloads[label="?"];
+FNAL_DB->DQM_payloads[label="?"];
+offline->gen_calib_const->FNAL_DB->calibrate->offline
+
+
+label="Data Challenge Dependencies.\nCaveat: strawman, some parts may be nonsense."
+
+}

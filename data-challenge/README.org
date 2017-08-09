@@ -1,0 +1,9 @@
+#+TITLE: Data Challenge Documents
+
+* What's here
+
+This directory contains some documents or figures related to the first
+protoDUNE data challenge.
+
+- integration.dot :: attempts to contain a conceptual dependency/data
+     flow graph showing all the parts
