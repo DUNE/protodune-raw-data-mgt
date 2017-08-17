@@ -1,23 +1,42 @@
 digraph integration {
-
-	DAQ[shape="box"];
-	BeamInst[shape="box"];
-	DCS[shape=box];
-	shifter[shape=circle];
-
-DCS->FNAL_DB;
-DAQ->buffer->FTS;
-FTS->EOS[label="raw data"];
-EOS->DQM_p3s->DQM_payloads->EOS->DQM_web->shifter;
-FTS->CASTOR;
-FTS->FNAL_store->offline->data_reduction->reconstruction;
-BeamInst->JCOP_DB->JCOP_web->shifter;
-JCOP_DB->FNAL_DB->offline;
-JCOP_DB->DQM_payloads[label="?"];
-FNAL_DB->DQM_payloads[label="?"];
-offline->gen_calib_const->FNAL_DB->calibrate->offline
-
-
-label="Data Challenge Dependencies.\nCaveat: strawman, some parts may be nonsense."
-
+    label="Data Challenge Dependencies V0.1.\nCaveat: strawman, some parts may be nonsense.";
+    edge [comment="Wildcard node added automatic in EG."];
+    node [comment="Wildcard node added automatic in EG."];
+    TPC_CRT_DAQ [shape="box"];
+    Beam_Instrumentation_DAQ [shape="box"];
+    Slow_Control_System [shape=box];
+    Monitors [shape="circle"];
+    Slow_Control_System -> CERN_JCOP_Database;
+    JCOP_DCS_Database -> CERN_DCS_DB;
+    CERN_DCS_DB -> FNAL_DCS_DB;
+    TPC_CRT_DAQ -> DAQ_buffer;
+    TPC_CRT_DAQ -> Monitors;
+    DAQ_buffer -> FTS_Lite;
+    FTS_Lite -> FTS_web;
+    FTS_Lite -> EOS  [label="raw data"];
+    EOS -> DQM_p3s;
+    DQM_p3s -> DQM_payloads;
+    DQM_payloads -> EOS;
+    EOS -> DQM_web;
+    EOS -> Monitors;
+    DQM_web -> Monitors;
+    EOS -> CASTOR;
+    EOS -> FTS;
+    FTS -> FTS_web;
+    FTS -> FNAL_store_Enstore_DCache;
+    FNAL_store_Enstore_DCache -> offline;
+    offline -> data_reduction;
+    data_reduction -> reconstruction;
+    Beam_Instrumentation_DAQ -> JCOP_DB;
+    JCOP_DB -> JCOP_web;
+    JCOP_web -> Monitors;
+    JCOP_DB -> FNAL_DB;
+    FNAL_DB -> offline;
+    JCOP_DB -> DQM_payloads  [label="?"];
+    FNAL_DB -> DQM_payloads  [label="?"];
+    offline -> gen_calib_const;
+    offline -> Monitors;
+    gen_calib_const -> FNAL_DB;
+    FNAL_DB -> calibrate;
+    calibrate -> offline;
 }
