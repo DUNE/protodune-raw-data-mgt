@@ -9,8 +9,6 @@
 \usepackage{xspace}
 \usepackage{amssymb}
 
-\usepackage[firstpage]{draftwatermark}
-
 
 \bibliographystyle{unsrt}
 
@@ -22,24 +20,29 @@
 \author{R.Pordes, M.Potekhin, R.Sulej}
 
 \begin{document}
-\SetWatermarkText{DRAFT}
-\SetWatermarkLightness{0.9}
-\SetWatermarkScale{3}
+
 
 \maketitle
 
 \begin{abstract}
 
 
+
 \noindent It is important to ensure 100\% readiness of the
 end-to-end \pd software and computing complex during the detector commissioning period and
-throughout data taking in 2018. We propose to conduct two Data Challenges in order to identify
-and address potential issues before they can impact the experiment.
-% The first Data Challenge is
-%meant to define and test various interfaces and modes of data transfer and processing, without
-%the software being finalized. The
+throughout data taking in 2018. We propose to conduct two Data Challenges (DCs) in order to identify
+and address potential issues before they can impact the experiment. 
+\par
+The Data Challenges will be done with the
+understanding that the software is not in the final state for beam running. 
+\par
+DCs will include defining and  testing interfaces, measuring rates and reliability of data transfers and job execution, understanding the set of processing workflows, and publishing the results of monitoring the infrastructure as well as the physics outputs.
 
 
+Version 1: May 2017 - Initial definition of components of the data challenges
+\par
+
+Version 2: In progress. Will be used to initially define and agree on the components of DC1. 
 
 \end{abstract}
 
@@ -83,7 +86,7 @@ to be addressed for \pd to be able to include these data in its offline processi
 
 % Adding Online Monitoring based on talking to Christos/Flavio and as a test for writing to the git repository
 % Ruth, July 31st 2017
-\item The \textbf{Online Monitoring System} which provides control room monitoring and display of detector parameters. 
+\item The \textbf{Slow Control and Online Monitoring System} which provide control, monitoring and display of the data acquisition readout and detector parameters. 
 
 \item The \textbf{Raw Data Management System}\cite{docdb1212}  which performs data transfers between a few endpoints
 at CERN and FNAL starting with the Online Buffer and which is also tasked with proper accounting and handling of Metadata
@@ -137,6 +140,8 @@ scope of Data Challenges presented here.
 Before any end-to-end data challenge can be meaningul, all individual components and interfaces must undergo
 their own functional testing. The following non-inclusive list illustrates the scope of the pre-DC activity:
 \begin{itemize}
+
+\item \textbf{Slow Control and Online Monitoring}
 
 \item \textbf{Data Transfer and SAM interaction}.  Both F-FTS1 and F-FTS2 components as schematically depicted in Fig.\,\ref{fig:dc1}
 must undergo end-to-end functional testing including registration in SAM and sinking data to tape storage both at CERN and FNAL. A test
@@ -231,6 +236,8 @@ data etc as well as actual functionaltiy are close to final.
 
 \section{Personnel and Responsibilities}
 
+\color{red} This list is currently being revised. \color{black}
+
 \begin{itemize}
 
 \item Online Buffer and the test agent -- DAQ team
@@ -292,8 +299,7 @@ data etc as well as actual functionaltiy are close to final.
 
 \bibitem{docdb2089}
 {Proposed Initial Data Reduction for protoDUNE/SP}\\
-\url{http://cd-docdb.fnal.gov/cgi-bin/RetrieveFile?docid=2089&filename=datamanagement-changeprocedures.pdf&version=1}
-
+\url{http://docs.dunescience.org/cgi-bin/RetrieveFile?docid=2089}
 
 \bibitem{poms}
 {Production Operations Management Service (POMS)}\\
