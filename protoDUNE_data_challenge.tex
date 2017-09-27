@@ -42,7 +42,7 @@ DCs will include defining and  testing interfaces, measuring rates and reliabili
 Version 1: May 2017 - Initial definition of components of the data challenges
 \par
 
-Version 2: In progress. Will be used to initially define and agree on the components of DC1. 
+Version 2: In progress. Will be used to initially define and agree on the components of DC1. Add some consistent numbering/naming of the steps to be done. Add information on files used/needed.
 
 \end{abstract}
 
@@ -71,9 +71,11 @@ needed, with references provided in the text.
 
 \section{The Scope of the Data Challenges}
 Information regarding the \pd (NP04) computing is summarized in the \pd-SP Technical Design Report\cite{docdb1794}.
+
+\subsection{Components}
 The following components (including infrastructure, middleware and software) can be identified as relevant in the context
 of Data Challenges (which will be also referred to as \textit{``DC''} in this document):
-\begin{itemize}
+\begin{enumerate}
 \item The DAQ \textbf{Online Buffer} which stores raw data assembled by the Event Builders, as files on disk. The internals
 of the DAQ system itself are not within the scope.
 
@@ -88,13 +90,13 @@ to be addressed for \pd to be able to include these data in its offline processi
 % Ruth, July 31st 2017
 \item The \textbf{Slow Control and Online Monitoring System} which provide control, monitoring and display of the data acquisition readout and detector parameters. 
 
-\item The \textbf{Raw Data Management System}\cite{docdb1212}  which performs data transfers between a few endpoints
-at CERN and FNAL starting with the Online Buffer and which is also tasked with proper accounting and handling of Metadata
-by interacting with the SAM system at FNAL (see next item). The Data Handling System will inteface the disk-based mass storage
+\item The \textbf{Data Management System}\cite{docdb1212}  which performs data transfers between a few endpoints
+at CERN and FNAL starting with the Online Buffer, including output from DQM,  and which is also tasked with proper accounting and handling of the file catalog and other metadata
+by interacting with the SAM system at FNAL (see next item). The Data Management/Handling System will also interface the disk-based mass storage
 at CERN and FNAL (i.e.\,EOS\cite{eos} and dCache) as well as tape systems (CASTOR and Enstore respectively).
-We anticipate using the \textit{Fermi File Transfer System} (also abbreviated as F-FTS\cite{fts}) for most of this functionality.
+We anticipate using the \textit{Fermi File Transfer System} (also abbreviated as F-FTS\cite{fts}).
 
-\item The \textbf{Metadata}  -- SAM system at FNAL which comprises the functionality of the file catalog, data storage and
+\item The \textbf{File Catalog (Metadata)}  -- SAM system at FNAL which comprises the functionality of the file catalog, data storage and
 retrieval based on Metadata and can also be used for orchestration of production workflows.
 
 \item \textbf{Data Quality Monitoring} (DQM) which is tasked with running algorithms with turnaround time short enough to provide
@@ -102,9 +104,12 @@ actionable results (under and hour) but which won't fit into the computational f
 To support DQM, the ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s} has been created and will run any type of\
 DQM workload as formulated and programmed by the working groups.
 
-\item \textbf{Calibration and Production Software}. While it is not expected that these components will be finalized
+\item \textbf{Calibration} While it is not expected that these components will be finalized
 (and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
-data flow patterns and other crucial aspects of the \pd Production Systems. Having prototypes in place is therefore crucial
+data flow patterns and other crucial aspects of the \pd Calibration software.
+ \item \textbf{Reconstruction}. While it is not expected that these components will be finalized
+(and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
+data flow patterns and other crucial aspects of the \pd Reconstruction Systems. Having prototypes in place is therefore crucial
 on the time scale of the Data Challenges.
 An important component of the overall production chain is the \textit{Data Reduction} step along the lines described
 in \cite{docdb2089}. It combines a few signal-processing procedures (cf. digital filtering and noise reduction), and it will be
@@ -116,12 +121,12 @@ for the final design and implementation of the analysis chain to exist early in 
 dynamic and fluid part of all software) it is important to put in place, document and optimize its interfaces with various components
 of infrastructure e.g.\,calibration databases, Metadata, software and data provenance controls etc.
 
-\item \textbf{Production Operations Management Service (POMS)}. This FNAL-based service \cite{poms} manages and automates jobs
+\item \textbf{Production Operations Management System (based on POMS)}. This FNAL-based service includes using the DUNE service portal, production workflows executed by POMS \cite{poms}, including the management and automation of  jobs
 submission on distributed resources on the Grid. It will be the primary platform for \pd on which to run production and analysis.
 
 
-\end{itemize}
-\noindent Relationship between the various infrastructure and other components listed above is schematically illustrated in
+\end{enumerate}
+\noindent The relationship between the various infrastructure and other components listed above is schematically illustrated in
 Fig.\ref{fig:dc1}. This diagram relflects the fact that transmission of \pd data is a multistage process and in particular there
 will be separate instances of F-FTS transferring the data from the Online Buffer to mass storage at CERN, and then from
 CERN to FNAL and elsewhere.
@@ -135,10 +140,40 @@ CERN to FNAL and elsewhere.
 \noindent Data and production streams which belong to \pd Monte Carlo simulation domain are not included in the
 scope of Data Challenges presented here.
 
-\section{Plans for Data Challenges}
+
+
+\subsection{Files and Interfaces: ** Incomplete/Wrong  - For Discussion **}
+
+
+The information here will be built up as needed and known. In general it will be pointers to existing documentation  internal to the appropriate components. 
+\renewcommand{\theenumi}{\alph{enumi}}
+\begin{enumerate}
+\item Beam Instrumentation Database Interface - data format and name of code module and description of the database attributes and internface.
+\item Calibration data  -  data format and name of code module and description of the database attributes and interface for calibration information.
+\item DQM output files - information about files output from DQM, their location, type and internal format.
+\item Input data file - any directory and file naming conventions and details as well as scripts that use this information
+\item Input data format - internal format of an input data file
+\item POMS configuration files - means of access to and editing of POMS requests.
+\item Reduced data format - location of reduced data files (if any) and description of their internal format
+\item SAM metadata files  - what SAM metadata files are needed and their description.
+\item Slow Control data format - data format and name of code module and description of the database attributes and interface for slow control information.
+\end{enumerate}
+\renewcommand{\theenumi}{\alph{arabic}}
+
+An ongoing diagram of the workflows and their dependencies is shown in Figure 2: Schematic of Dependencies. It is another aim of the data challenges to check that terminology, and it's presentation, is consistent across components - work to be done!
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=1.0\textwidth]{data-challenge/integration}
+  \caption{Schematic of Dependencies}
+  \label{fig:dependencies}
+\end{figure}
+
+
+
 \subsection{Work-up to the Data Challenges}
-Before any end-to-end data challenge can be meaningul, all individual components and interfaces must undergo
-their own functional testing. The following non-inclusive list illustrates the scope of the pre-DC activity:
+Before any end-to-end data challenge can be meaningful, all individual components and interfaces must undergo
+their own functional testing. The scope of the pre-DC activity will include most of the components above and an understanding of what files, file and data formats, and interfaces are going to be used. An initial list is given below and will be modified as things are better understood.
 \begin{itemize}
 
 \item \textbf{Slow Control and Online Monitoring}
@@ -162,7 +197,11 @@ must be resolved.
 A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
 FNAL and facilities at CERN.
 
-\item  \textbf{Calibration and Production Software}. Prototypes of this software need to be put in place. They will
+\item  \textbf{Calibration}
+Prototypes of this software need to be put in place. They will
+include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
+merging and processing.
+\item \textbf{Production Software} Prototypes of this software need to be put in place. They will
 include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
 merging and processing.
 
@@ -173,33 +212,39 @@ components of the production system(s). There are no strict requirements to func
 software at this stage.
 
 \end{itemize}
-\noindent The work-up period must be completed no later than September 2017. It is expected that Data Reduction, Production, DQM
-and othe components will have substantial overlaps and/or commonalities, which must be exploited from the point of view of software
-sharing and reuse. One of the goals of the work-up period is to identify such items.
+\noindent  One of the goals of the work-up period is to identify components that overlap and where software can be shared and reused. 
 
-\subsection{Timeline, Reporting and Documentation}
-Because of the significant CERN involvement in \pd computing, and to facilitate communication with the CERN IT management
-it appears optimal to document the working plans and progress of Data Challenges on the CERN TWiki pages provided by
-CENF. More detailed technical documentation regarding components and systems will be managed on DUNE DocDB as before.
+\subsection{Collaboration Tools, Reporting and Documentation}
+We are using a mail list (DUNE-proto-sp-dc), DUNE SLACK channel (pd-sp-datachallenges) for planning and technical details.  Documentation to be retained will be submitted to the DUNE DocDB. Results/summary of the data challenge for the will be posted to the DUNE wiki.
 
-The work-up as described above should be completed by September 2017, and reports for each component provided
-to the \pd leadership and the \pd-CERN computing liaison representative. DC1 will take place in October 2017.
-DC2 will be conducted in February 2018. Each Data Challenge will result in a concise report which will be made available
-to the Collaboration and follow-up shall be organized as needed.
+\clearpage
 
-\subsection{DC1 Scenario}
+\section{Data Challenge 1}
+
+Data Challenge 1 (DC1) is taking place the week of November 6th. It is currently not sure when/how the Cold Box Test schedule for initial data taking overlaps with this week.  It is important for the Data Challenge not to perturb the needs for the Cold Box Test. 
 
 \begin{itemize}
 
-\item Simulated raw data is deposited into the Online Bufer by a specially created test agent.
+\item Provide Input Data: 
+\begin{itemize}
+\item Simulated raw data files will be deposited into a Test/Simulated Online Buffer by a specially created test agent.
+\item  Initially this will be on a CERN OpenStack VM for testing of functionality but not performance. 
+\item A script will be written to deposit or cycle through several files. 
+\end{itemize}
+\item SAM Metadata is created for the files either by hand or through a script
 
-\item The data is detected by F-FTS1 and transmitted to EOS.
+\item The data files are automatically detected by F-FTS-Lite and transmitted to EOS.
 
-\item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files
-are registered.
+\item The input data files are transferred to storage at Fermilab and CERN and declared to the file catalog.
+\begin{itemize}
+\item F-FTS initiates data transfer to dCache and Enstore at FNAL. 
+\item F-FTS initiated data transfer to Castor
+\item Files are updated in SAM
+\end{itemize}
 
 \item Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
 These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
+
 
 \item Automated process initiates DQM streams in p3s. In DC1, full-blown processing on CERN Tier-0\,\cite{lxbatch}
 will not be required and at a minimum the operation of p3s will be validated on the Neutrino Platform cluster\,\cite{neut}.
@@ -209,64 +254,43 @@ to software components of the LArTPC, Photon Detector and Beam Instrumentation s
 
 \end{itemize}
 
-
-\subsection{DC2 Scenario}
-
-\begin{itemize}
-
-\item DAQ sends raw data (such as pulser or simulated trigger data) to the Online Bufer.
-
-\item The data is detected by F-FTS1 and transmitted to EOS.
-
-\item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files
-are registered.
-
-\item Realistic Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
-
-\item Automated process initiates DQM streams in p3s using  CERN Tier-0. At a minimum, ADC and noise spectra (FFT) are produced
-and delivered to the user by a Web service.
-
-\item Production team at FNAL submits production jobs using the newly arrived data as input. Interfaces between software components,
-data etc as well as actual functionaltiy are close to final.
-
-\item Analysis chain is activated.
-
-\end{itemize}
-
-
-\section{Personnel and Responsibilities}
-
-\color{red} This list is currently being revised. \color{black}
-
-\begin{itemize}
-
-\item Online Buffer and the test agent -- DAQ team
-
-\item Beam Instrumentation Interface -- Beam Instrumentation Group, DB coordinator: J.Paley
-
-\item F-FTS -- FNAL team (lead: A.Norman)
-
-\item p3s -- prompt processing team (lead: M.Potekhin)
-
-\item DQM and production payloads -- DRA team (co-leads: D.Stefan, R.Sulej)
-
-\item Calibrations -- M.Mooney
-
-\item Integration consultant -- B.Viren
-
-\item Metadata and SAM -- FNAL SCD (T.Junk, S.Fuess)
-
-
-\item Production support at CERN and FNAL -- TBD
-
-\item Analysis -- TBD
-
-\item Coordination -- R.Pordes
-
-
-\end{itemize}
+DC1 s  defined and will be done independently from the Cold Box Test, while clearly  benefiting from the work being done for it. If the DAQ group leaders agree at the time,  stretch goals of the Data Challenge will be to move: statically placed simulated data files from the online buffer through the system; and, if detector data does become available in time, statically placed acquired data files statically placed in the online disk buffer.
 
 \clearpage
+
+\section{Data Challenge 2}
+This will be listed nearer the date - at the moment sometime in March 2018.
+%\begin{itemize}
+%\item DAQ sends raw data (such as pulser or simulated trigger data) to the Online Bufer.
+%\item The data is detected by F-FTS1 and transmitted to EOS.
+%\item F-FTS2 initiates data transfer to dCache at FNAL. Contact is made with the Metadata system (SAM) where the files are registered.
+%\item Realistic Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+%\item Automated process initiates DQM streams in p3s using  CERN Tier-0. At a minimum, ADC and noise spectra (FFT) are produced and delivered to the user by a Web service.
+%\item Production team at FNAL submits production jobs using the newly arrived data as input. Interfaces between software components,
+data etc as well as actual functionaltiy are close to final.
+%\item Analysis chain is activated.
+%\end{itemize}
+
+
+%\section{Personnel and Responsibilities}
+%\color{red} This list is currently being revised. \color{black}
+%\begin{itemize}
+%\item Online Buffer and the test agent -- DAQ team
+%\item Beam Instrumentation Interface -- Beam Instrumentation Group, DB coordinator: J.Paley
+%\item F-FTS -- FNAL team (lead: A.Norman)
+%\item p3s -- prompt processing team (lead: M.Potekhin)
+%\item DQM and production payloads -- DRA team (co-leads: D.Stefan, R.Sulej)
+%\item Calibrations -- M.Mooney
+%\item Integration consultant -- B.Viren
+%\item Metadata and SAM -- FNAL SCD (T.Junk, S.Fuess)
+%\item Production support at CERN and FNAL -- TBD
+%\item Analysis -- TBD
+%\item Coordination -- R.Pordes
+%\end{itemize}
+
+\clearpage
+
+
 \begin{thebibliography}{1}
 
 \bibitem{docdb1794}
