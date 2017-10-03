@@ -247,15 +247,19 @@ Data Challenge 1 (DC1) is taking place the week of November 6th. It is currently
 \item Files are updated in SAM
 \end{itemize}
 
-\item Beam Instrumentation data is captured by \pd systems and is stored either on a DB server or as files on EOS.
+\item The original plan called for the Beam Instrumentation data to be captured
+by \pd systems and stored either on a DB server or as files on EOS.
 These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
+There is an alternative proposal now to replicate the BI data to FNAL which would be then the only
+source of offline processing including DQM.
 
 
-\item Automated process initiates DQM streams in p3s. In DC1, full-blown processing on CERN Tier-0\,\cite{lxbatch}
-will not be required and at a minimum the operation of p3s will be validated on the Neutrino Platform cluster\,\cite{neut}.
+\item Automated process initiates DQM streams in p3s which operates using
+CERN Tier-0\,\cite{lxbatch}. The Neutrino Platform cluster\,\cite{neut} will not be used at this point.
 
-\item Production team at FNAL submits production jobs using the newly arrived data as input. This includes prototype interfaces
-to software components of the LArTPC, Photon Detector and Beam Instrumentation systems.
+\item Production team at FNAL submits production jobs using the newly arrived data as input.
+This primarily includes reading the LArTPC data, and the Photon Detector and Beam Instrumentation
+systems will be included if ready in time.
 
 \end{itemize}
 
