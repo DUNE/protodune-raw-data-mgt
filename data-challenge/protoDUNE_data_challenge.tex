@@ -247,12 +247,11 @@ Data Challenge 1 (DC1) is taking place the week of November 6th. It is currently
 \item Files are updated in SAM
 \end{itemize}
 
-\item The original plan called for the Beam Instrumentation data to be captured
-by \pd systems and stored either on a DB server or as files on EOS.
-These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
-There is an alternative proposal now to replicate the BI data to FNAL which would be then the only
-source of offline processing including DQM.
+\item  Beam Instrumentation Data
 
+An  instance of the standard IFBeam Database deployed at FNAL for existing Intensity Frontier experiments will be implemented for the protoDUNE-Single Phase Beam Instrumentation database.  A collector process will be running at CERN  reading some device(s) from existing experiment BI databases -  not related to ProtoDUNE.  The Collector produces data files and ingests them into the Fermilab protoDUNE-SP BI database. The latency and throughput of this application will be measured.
+
+In parallel, the offline group is working to populate the  protoDUNE BI DB with simulation generated data. The mock data will then be accessed by an offline algorithm using the standard IFBeam LArSoft API.  If available in time the web interface will be used by the DQM to access this data also. 
 
 \item Automated process initiates DQM streams in p3s which operates using
 CERN Tier-0\,\cite{lxbatch}. The Neutrino Platform cluster\,\cite{neut} will not be used at this point.
