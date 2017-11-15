@@ -46,8 +46,8 @@ The first Data Challenge  (DC1) took place the week of November 6th. The followi
 
 
 \begin{itemize}
-\item 25 Terabytes of already reconstructed simulation data files from Monte Carlo Challenge 9 were available on EOS at the CERN Tier-0. In total 28 TB  were copied (some files were copied more than once) using F-FTS-Lite running on an OpenStack VM to an EOS data buffer. From there they were copied using F-FTS to the Data Quality Monitoring dropbox/input buffer, to tape at CERN (on Castor) and Fermilab (on Enstore) and to disk at Fermilab (dCache). 
-will be deposited into a Test/Simulated Online Buffer by a specially created test agent.
+\item 25 Terabytes of already reconstructed simulation data files from Monte Carlo Challenge 9 were available on EOS at the CERN Tier-0. In total 28 TB  were copied (some files were copied more than once) using F-FTS-Light running on an OpenStack VM to an EOS data buffer. From there they were copied using F-FTS to the Data Quality Monitoring dropbox/input buffer, to tape at CERN (on Castor) and Fermilab (on Enstore) and to disk at Fermilab (dCache). 
+
 \item  The Data Quality Monitor automatically noticed the input files and processed them through 3 payload algorithms: one to measure purity, noise filtering and event display, and the CRT matching. 
 \item A POMS campaign for processing the files arriving at Fermilab was run in three phases: the first with just the infrastructure of the current DUNETPC to read in and write out the data; the second to .. and the third with the full current payload for the upcoming protoDUNE Single Phase Monte Carlo Data Challenge 10. 
 \item In parallel fake data was loaded into the IFBEAM Beam Instrumentation database and existing LHC Beam Line data was ingested into IFBEAM by transfering data from CERN. 
@@ -80,14 +80,15 @@ Much progress was made during the week that  will stand in good stead for rampin
 
 
 \section {Data Movement}
-The tests to move data included:  Copying data from an existing dataset already available on EOS to the EOS file cache on the CERN Tier-0 using  FTS-lite running on a CERN openstack VM; Copying data using FTS from EOS to the Data Quality Monitor (DQM)/p3s infrastructure EOS input directory in parallel with writing the data to dCache/Enstore at Fermilab and Castor at CERN. 
+\subsection {Definitions}
+F-FTS refers to the Fermi File Transfer Service, the standard Fermilab utility which is used to transfer files from a DAQ system to permanent storage and declare them to SAM (Sequential Access with Metadata) database.  F-FTS-Light is a similar program but can operate behind a private net or firewall and does not need to be in contact with SAM or anything else at Fermilab.
 
 The event data used was the dataset of MCC9 data set already available on disk at the CERN EOS, which consisted of
 23TBytes,  ~3000 files of average size 8GB, with the data being in  "mergeana" (post merging/processing)  format. There were 
 40 subdirectories each corresponding to a different beam energy and with or without space charge effect.
 
 \subsection{Initial Copy Script Details}
-From the simulated data buffer (MCC9 files)  an initial copy script (copy\_mcc9\_data.py): took the files to the EOS file cache using FTS-Light via 3rd party xrdcp; Added a process ID and a timestamp to the filename; and was configured to ensure a maximum rate at which the xrdcp happened at some point doing the test. 
+From the original location of the MCC9 file  an initial copy script (copy\_mcc9\_data.py): took the files to the simulated DAQ buffer in the EOS file cache via 3rd party xrdcp; added a process ID and a timestamp to the filename; and was configured to ensure a maximum rate at which the xrdcp happened at some point doing the test. It also created a rudimentary set of metadata,
 
 The script could also be configured to stagger copies of files for N seconds between each one or be asked for a specific  count of files. As part of the copy new (SAM) metadata was created. This initial copy broke the 40 directories into 4 chunks and copied 10 directories at once into the buffer, for the goal rate of 500MB/s. As a side-product the test ended up twice launching 5 copies of the copy script rather than one, so 50 xrdcp commands were going at once on the first two days of the DC. This all worked fine with nothing breaking down. See Fig.\ref{fig:EOStoEOS} for monitoring information of the copy. 
 
@@ -99,13 +100,19 @@ The script could also be configured to stagger copies of files for N seconds bet
   \label{fig:EOStoEOS}
 \end{figure}
 
+\subsection{F-FTS and F-FTS-Light Operation}
+From the emulated DAQ buffer in EOS, F-FTS-Light was used to transfer files into the F-FTS dropbox which was also in EOS.  F-FTS-Light also used 3rd-party xrdcp as its means of file discovery and transport.  It transferred the file, received the checksum that was returned from the xrdcp command, and then added it to the metadata.  Throughout the course of this challenge, F-FTS-Light was configured to transfer 10 files in parallel.   When 10 copy scripts were running upstream, F-FTS-Light was able to keep up to that data flow.  For this test F-FTS-Light ran on an OpenStack VM with 2 cores.  It will eventually run on a server in EHN-1.
+
+For the purposes of this test F-FTS was configured with three destinations:  the input dropbox of the prompt processing P3S, which was also in EOS, Castor tape servers, and dCache/Enstore at CERN.  F-FTS also runs on an OpenStack VM.
+For the EOS-to-EOS copy and the EOS-to-Castor copy, 3rd-party xrdcp was used.  For the EOS-to-Fermilab copy we used 3rd party gridftp (globus-url-copy).
+FTS was configured to make 10 transfers in parallel to each of the three destinations. Files were declared to the dc1\_input data set in SAM.
 
 
 
 \subsection{Results and Observations}
-The full set of data files was moved to the 2 archival facilities over the period of about 5 days. There were a variety of throughtput rates sustained. Changes in configuration of the CERN EOS interface helped with stability of the scripts/services being run. 
+The full set of data files was moved to the 2 archival facilities over the period of about 5 days.  This included gaps of several hours during each day when we did not start any new copies. There were a variety of throughput rates sustained. Changes in configuration of the CERN EOS interface helped with stability of the scripts/services being run. 
 
-On the CERN side a rate of 200MByte/s was sustained - which is almost equivalent to the expected rate coming out of the detector. FTS-Light kept up with the input files. which means it can also handle sending at that rate from the detector. (These  rates can be increased by adding more xrdcp processes as needed). See \ref{fig:FTSLite}
+On the CERN side an aggregate rate of 200MByte/s was sustained. FTS-Light kept up with the input files, which means it can also handle sending at that rate from the detector. (These rates can be increased by adding more xrdcp processes as needed). Individual file transfer rates show a bimodal distribution due to the fact that some files are stored at Wigner and some at Meyrin.  See \ref{fig:FTSLite}
 
 
 \begin{figure}[tbh]
@@ -118,9 +125,9 @@ On the CERN side a rate of 200MByte/s was sustained - which is almost equivalent
 
 On the CERN Tier-0 the monitoring showed that the EOS traffic generated clearly dominated the EOS accessed during the time of the tests without crashing any EOS servers. (For short periods the monitoring showed that the EOS can even take much higher influx and then recover.)
 
-For the transfers from CERN EOS to Fermilab dCache the best ? hr average we saw to Fermilab about 180MByte/sec. Rates of each stage of the file movement, archiving and declaration to the SAM metadata catalog are shown in  Fig.\ref{fig:FTStoFermilab}
+For the transfers from CERN EOS to Fermilab dCache the best 1/2 hr average we saw to Fermilab about 180MByte/sec. Rates of each stage of the file movement, archiving and declaration to the SAM metadata catalog are shown in  Fig.\ref{fig:FTStoFermilab}
 
-Note that the Eospublicftp gateways in use to copy the data from CERN to Fermilab should be able to source more than that. The parallelisim was kept to 10 simultaneous globus-url-copys for this test. We have  been advised that this should be able to scale up by a factor of 10.
+Note that the Eospublicftp gateways in use to copy the data from CERN to Fermilab should be able to source more than that. The parallelism was kept to 10 simultaneous globus-url-copy processes for this test. We have  been advised that this should be able to scale up by a factor of 10.
 
 \begin{figure}[tbh]
   \centering
@@ -141,8 +148,7 @@ We need to move the FTS Virtual Machine from a private project OpenStack to the 
 
 For the test the files moved to the DQM were declared to SAM since that is what FTS automatically does. We need to define the configuration of and move the files relevent to the DQM inbox without declaring them to SAM. From that point the DQM is responsible for their management.
 
-Clean all this stuff off of tape and SAM
-?
+We plan to clean this data challenge data set off of tape and SAM when the keep-up processing is completed.
 
 
 \section {Data Quality Monitoring}
