@@ -1,5 +1,10 @@
 #+TITLE: Data Challenge Documents
 
+* Status
+
+Steve Timm - done
+Maxim Potekhin - currently editing...
+
 * What's here
 
 This directory contains some documents or figures related to the first
