@@ -176,48 +176,67 @@ of the ProtoDUNE Single Phase offline system. Overall this was a success.
 
 During the work-up to DC1 the week before, the following was validated
 \begin{itemize}
+
 \item The p3s infrastructure was pushed to utilize 1000 cores in CERN Tier-0 and kept that level of resource utilization for ~1hr
+with realistic payloads
 \item It was verified that p3s can accept jobs (means Apache and DB throughput) at ~100Hz rate
+
 \end{itemize}
-\noindent We did not need this levels of throughput in DC1 but had to know the system capability.
+\noindent Technically this levels of throughput was not required in DC1 but it was considered important to know the system capability.
+Characteristics of the HTCondor batch system in CERN Tier-0 were studied from the point of view of the DQM job sumbission and
+execution.
+
+In addition, automation for data discovery was created with periodic polling of the p3s ``inbox'' for new data according to a predefined pattern
+and registration of these data for processing in the system. The p3s GUI was simplified and cleaned up. The current look of the p3s
+dashboard screen is presented in Fig.\ref{fig:p3s_dash}.
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=1.0\textwidth]{./ReportImages/p3s_20171113_1.png}
+  \caption{The p3s dashboard}
+  \label{fig:p3s_dash}
+\end{figure}
 
 \subsection{Operation}
-The p3s/DQM component of the Data Challenge remained operational throughout the data challenge  and kept up with the nominal data rate dictated by the data transmission segment of the test and roughly of the same scale as the real data rate expected in the experiment. The format and content of the files were very different, of course.
+The p3s/DQM component of the Data Challenge remained operational throughout the testing period with virtually no human intervention.
+It was monitored through its GUI and log files, and a few infrastructure issues that were discovered (see \ref{sec:p3s_issues}) were communicated
+to CERN ITD. Processing kept up with the nominal data rate dictated by the rate of data transmission of DC1, with substantial headroom in
+terms of the load on the p3s servers and also in terms of computing power available in CERN Tier-0.
+
 \subsection{Payloads}
 Three kinds of DQM payloads were used during DC1:
-
- \color{red} It would be very useful to have pointers and information about the payloads run here.. I will be looking at what Bruce, David and Joe have available at this time in terms of presentations, documents in DocDB and code.. any other ideas and  pointers would be very useful
- \color {black}
- 
 \begin{itemize}
-\item Event Display
-This payload performs signal processing on each ADC channel and display the raw Fig.\ref{fig:adcraw} and prepared information 
- Fig.\ref{fig:adcprep}
-
-\begin{figure}[tbh]
-  \centering
-  \includegraphics[width=0.5\textwidth]{./ReportImages/adcraw_evt1661_ch0-2559.png}
-  \caption{Event Display of raw signals}
-  \label{fig:adcraw}
-\end{figure}
-
-
-\begin{figure}[tbh]
-  \centering
-  \includegraphics[width=0.5\textwidth]{./ReportImages/adcprep_evt1661_ch0-2559.png}
-  \caption{Event Display post Signal Processing}
-  \label{fig:adcprep}
-\end{figure}
-
-\item Purity Monitor
-\item CRT-to-TPC track match
+\item A simple Event Display (channel vs time for each TPC section)
+\item Purity Monitor (estimation of the electron lifetime based on a group of tracks)
+\item CRT-to-TPC track match (tracking with Cosmic Ray Tagger, correlation with TPC)
 \end{itemize}
- 
+\noindent These payloads performed without apparent failures. An example of the Event Display output
+is presented in Fig.\ref{fig:evdisp}, demonstrating the functionality of this application.
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=0.6\textwidth]{./ReportImages/adcraw_evt33_ch0-2559.png}
+  \includegraphics[width=0.6\textwidth]{./ReportImages/adcprep_evt33_ch0-2559.png}
+
+  \caption{Event Display of same event before and after signal processing}
+  \label{fig:evdisp}
+\end{figure}
+
+\noindent  A an auxiliary "presentation server" p3s-content.cern.ch
+was used to serve the event display images and timestamped purity tables.
+
+\subsection{Mode of Data Access}
+The mode of data access by the payload jobs (both input and output) was FUSE mount of EOS.
+Depending on the results of future data challenges this may provide enough performance and
+stability for the \pd operations. If proven otherwise, migration to XRootD interface (such as \textit{xrdcp})
+will be considered.
+
+The presentation Web service was also accessing the DQM outputs via the FUSE mount which was 
+soft linked to a directory included in the Apache server configuration. No problems were detected
+with this setup during DC1.
 
 
-These payloads performed without apparent failures. A an auxiliary "presentation server" p3s-content.cern.ch was used to serve the event display images and timestamped purity tables.
-The mode of data access by the payload jobs (both input and output) was FUSE mount of EOS. Depending on the results of future data challenges this may be enough, if not we should be able to change to xrdcp.
+
 \subsection{What we found}
+\label{sec:p3s_issues}
 A few potential problem areas were discovered when running with a large number of pilots:
 \begin{itemize}
 \item Indications of AFS clients losing connectivity in fraction of cases which also changes over time. Also reported in an unrelated situation by Robert. Results in the "bus error" message and loss of pilots - no good. Work in progress to find mitigation but not a show stopper
