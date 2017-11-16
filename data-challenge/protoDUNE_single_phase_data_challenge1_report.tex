@@ -199,15 +199,19 @@ dashboard screen is presented in Fig.\ref{fig:p3s_dash}.
 \subsection{Operation}
 The p3s/DQM component of the Data Challenge remained operational throughout the testing period with virtually no human intervention.
 It was monitored through its GUI and log files, and a few infrastructure issues that were discovered (see \ref{sec:p3s_issues}) were communicated
-to CERN ITD. Processing kept up with the nominal data rate dictated by the rate of data transmission of DC1, with substantial headroom in
+to CERN ITD. The DQM processing kept up with the nominal data rate dictated by the rate of data transmission of DC1, with substantial headroom in
 terms of the load on the p3s servers and also in terms of computing power available in CERN Tier-0.
 
 \subsection{Payloads}
 Three kinds of DQM payloads were used during DC1:
 \begin{itemize}
-\item A simple Event Display (channel vs time for each TPC section)
+
+\item A simple Event Display (channel vs time for each TPC section) combined with signal processing
+and filtering
 \item Purity Monitor (estimation of the electron lifetime based on a group of tracks)
+
 \item CRT-to-TPC track match (tracking with Cosmic Ray Tagger, correlation with TPC)
+
 \end{itemize}
 \noindent These payloads performed without apparent failures. An example of the Event Display output
 is presented in Fig.\ref{fig:evdisp}, demonstrating the functionality of this application.
@@ -224,10 +228,13 @@ is presented in Fig.\ref{fig:evdisp}, demonstrating the functionality of this ap
 was used to serve the event display images and timestamped purity tables.
 
 \subsection{Mode of Data Access}
-The mode of data access by the payload jobs (both input and output) was FUSE mount of EOS.
+The mode of data access by the payload jobs running on Worker Nodes (both input and output) was the FUSE mount of EOS.
 Depending on the results of future data challenges this may provide enough performance and
 stability for the \pd operations. If proven otherwise, migration to XRootD interface (such as \textit{xrdcp})
 will be considered.
+
+The specific method by which the input data are placed in the p3s ``inbox'' is outside of the p3s scope and is
+under the umbrella of the FTS/Data Handling Team.
 
 The presentation Web service was also accessing the DQM outputs via the FUSE mount which was 
 soft linked to a directory included in the Apache server configuration. No problems were detected
@@ -235,27 +242,60 @@ with this setup during DC1.
 
 
 
-\subsection{What we found}
+\subsection{Problems encountered}
 \label{sec:p3s_issues}
-A few potential problem areas were discovered when running with a large number of pilots:
+A few potential problem areas were discovered when running with a large number of pilots (i.e. a few hundred):
 \begin{itemize}
-\item Indications of AFS clients losing connectivity in fraction of cases which also changes over time. Also reported in an unrelated situation by Robert. Results in the "bus error" message and loss of pilots - no good. Work in progress to find mitigation but not a show stopper
+\item Indications of AFS clients losing connectivity/timing out. This happens in fraction of cases which variable over time
+and is not specific to p3s, it has also reported by other groups. Note that we never use AFS to store or read actual data,
+it is used solely as the medium for software provisioning for both p3s and also for its payload jobs.
+This type of malfunction may result in the "bus error" message and crashes of
+pilot jobs used in p3s for workload management. Work in progress to find mitigation for this such as optimizing access patterns to
+the code deployed in AFS. Despite being a problem, it was not a show stopper.
+
 \item Condor vacating pilot jobs i.e. not respecting the required time limit. Filed a ticket. An error was found in the Condor cinfoguration, testing ongoing.
+
+\item Infrequent filesystem errors when periodically flushing certain directories in EOS. This does not happen often but will be investigated.
 \end{itemize}
 
  
-\subsection{What else to test/develop}
+\subsection{Directions for future work}
 
 \begin{itemize}
-\item Request from DRA to support full workflow mechanism in p3s - it has been implemented but not tested with realistic payloads.
-\item The "basic metadata" issue - how to cross reference DQM and raw data potentially at sub-event level. Example - event display for an APA in a particular run/subrun/event. Or, account for purity data - list of events as reference to raw data.
-Very different from the "Metadata" in the sense of the word we are typically using e.g. SAM etc. It is a product of DQM rather than of the data handling system.
-\item Need "standard" JSON schemas and tools to facilitate this work for payload developers.
-\item Beam Instrumentation payloads have not been tested in DQM.
+
+\item Request from DRA to support workflows in p3s with LArSoft payloads. The DAG-style workflow mechanism in p3
+(including a library of workflow templates) has been implemented a while ago but not tested with realistic payloads and/or at scale.
+
+\item Work with the DRA group to identify, create, test and deploy other crucial payloads as a part of the \pd DQM portfolio.
+
+\item The "basic metadata" issue i.e. how to cross reference DQM outputs and raw data. This can be the sub-event level such as the event
+display for a single APA in a particular run/subrun/event. Alternatively, the purity data must refer to a list of events and run number in reference
+to actual raw data. This is very different from the "Metadata" in the sense of the word we are typically using e.g. SAM etc.
+It is a product of DQM rather than of the data handling system. Need "standard" JSON schemas and tools to facilitate this work for payload developers.
+
+\item Beam Instrumentation payloads have not been tested in DQM. This is upon the BI/DRA groups to implement.
+
+\item Migration of p3s Web and DB services from personal to group/production accounts.
+
+\item Easy to access, efficient documentation for shifters evailable from the p3s pages.
+
+\item Miscellaneous imporovements in the GUI.
+
+\item Archiving of older DB entries to shrink active tables and preserve performance.
+
+\item Interfacing SAM/FTS for archiving of selected DQM outputs.
+
+\item Policies and tools for cleaning out input/output storage areas.
+
+\item Logging of external events (i.e. output of services managing the HTCondor submission, data cleanup etc) in a proper database
+in p3s itself as opposed to string of e-mail coming from cron. This work has already started.
+
 \end{itemize}
 
 \subsection{Summary}
-If we had to use DQM p3s system tomorrow during data taking, it would likely meet many of its objectives, perhaps lacking somewhat in interfaces.
+The \textit{ \pd prompt processing system} performed well and in a stable manner during DC1. It has proven itself as a solid tool for addressing the Data Quality Monitoring needs
+of \pd. A few infrastructure issues have been identified and are being addressed.
+Directions for future work have been defined.
  
  
 

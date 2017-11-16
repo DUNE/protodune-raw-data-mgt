@@ -1,9 +1,10 @@
 #+TITLE: Data Challenge Documents
 
-* Status
+* Status (who has the baton)
 
-Steve Timm - done
-Maxim Potekhin - currently editing...
+- Steve Timm - done
+
+- Maxim Potekhin - done
 
 * What's here
 
