@@ -14,6 +14,7 @@
 
 \newcommand{\fixme}[1]{\textbf{FIXME: #1}}    
 \newcommand{\pd}{protoDUNE\xspace}
+\newcommand{\dtpc}{\textit{dunetpc}\xspace}
 
 \title{Report from ProtoDUNE Single-Phase Data Challenge 1}
 \date{\today}
@@ -46,13 +47,29 @@ The first Data Challenge  (DC1) took place the week of November 6th. The followi
 
 
 \begin{itemize}
-\item 25 Terabytes of already reconstructed simulation data files from Monte Carlo Challenge 9 were available on EOS at the CERN Tier-0. In total 28 TB  were copied (some files were copied more than once) using F-FTS-Light running on an OpenStack VM to an EOS data buffer. From there they were copied using F-FTS to the Data Quality Monitoring dropbox/input buffer, to tape at CERN (on Castor) and Fermilab (on Enstore) and to disk at Fermilab (dCache). 
 
-\item  The Data Quality Monitor automatically noticed the input files and processed them through 3 payload algorithms: one to measure purity, noise filtering and event display, and the CRT matching. 
-\item A POMS campaign for processing the files arriving at Fermilab was run in three phases: the first with just the infrastructure of the current DUNETPC to read in and write out the data; the second to .. and the third with the full current payload for the upcoming protoDUNE Single Phase Monte Carlo Data Challenge 10. 
-\item In parallel fake data was loaded into the IFBEAM Beam Instrumentation database and existing LHC Beam Line data was ingested into IFBEAM by transfering data from CERN. 
-\item An initial attempt to run a user dunetpc job using the  usual project.py interface to running grid jobs at Fermilab was attempted using the site CERN (Tier-0) and a data file stored in Castor provided to the job locally (ie without transferring the data back from Fermilab to the CERN EOS). 
+\item 25 Terabytes of already reconstructed simulation data files from Monte Carlo Challenge 9 were available on EOS at the CERN Tier-0.
+In total 28 TB  were copied (some files were copied more than once) using F-FTS-Light running on an OpenStack VM to an EOS data buffer.
+From there they were copied using F-FTS to the Data Quality Monitoring dropbox/input buffer, to tape at CERN (on Castor) and Fermilab
+(on Enstore) and to disk at Fermilab (dCache). 
+
+\item   The \textit{protoDUNE prompt processing system} (p3s) operated throughout DC1. Its primary goal was to support
+the Data Quality Monitoring (DQM)  functionality in \pd by running detector characterization algorithms with a short turnaround time.
+The system worked by automatically detecting new input files and running 3 applications on each file: the purity monitor,
+noise filtering and event display, and the CRT track matching. 
+
+\item A POMS campaign for processing the files arriving at Fermilab was run in three phases: the first with just the infrastructure
+of the current \dtpc to read in and write out the data; the second to .. and the third with the full current payload for the
+upcoming protoDUNE-SP MC Data Challenge 10. 
+
+\item In parallel fake data was loaded into the IFBEAM Beam Instrumentation database and existing LHC Beam Line data was ingested into IFBEAM by transfering data from CERN.
+
+\item An initial attempt to run a user \dtpc job using the  usual project.py interface to running grid jobs at Fermilab was
+attempted using the site CERN (Tier-0) and a data file stored in Castor provided to the job locally (i.e.~without transferring
+the data back from Fermilab to the CERN EOS). 
+
 \item Information about output displays and web pages, monitoring web pages and information, was collected on the wiki.dunescience.org
+
 \end{itemize}
 
  Fig.\ref{fig:dependencies} shows the components of the end-to-end system and their dependencies. Fig. \ref{fig:intermediate} shows those components included in the Data Challenge. 
@@ -152,7 +169,8 @@ We plan to clean this data challenge data set off of tape and SAM when the keep-
 
 
 \section {Data Quality Monitoring}
-DC1 was an extremely useful exercise to test and demonstrate the Data Quality Monitoring component of the ProtoDUNE Single Phase offline system. Overall this was a success.
+DC1 was an extremely useful exercise which helped to test and demonstrate the Data Quality Monitoring component
+of the ProtoDUNE Single Phase offline system. Overall this was a success.
 
 \subsection{Work-Up}
 
@@ -161,8 +179,7 @@ During the work-up to DC1 the week before, the following was validated
 \item The p3s infrastructure was pushed to utilize 1000 cores in CERN Tier-0 and kept that level of resource utilization for ~1hr
 \item It was verified that p3s can accept jobs (means Apache and DB throughput) at ~100Hz rate
 \end{itemize}
-
-We did not need this levels of throughput in DC1 but had to know the system capability.
+\noindent We did not need this levels of throughput in DC1 but had to know the system capability.
 
 \subsection{Operation}
 The p3s/DQM component of the Data Challenge remained operational throughout the data challenge  and kept up with the nominal data rate dictated by the data transmission segment of the test and roughly of the same scale as the real data rate expected in the experiment. The format and content of the files were very different, of course.
