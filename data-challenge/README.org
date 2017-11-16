@@ -11,9 +11,8 @@
 This directory contains some documents or figures related to the first
 protoDUNE data challenge.
 
-- integration.dot :: attempts to contain a conceptual dependency/data
-     flow graph showing all the parts
+- integration.dot :: attempts to contain a conceptual dependency/data flow graph showing all the parts
 
-- data challenge plan
+- data challenge plan :: created before DC1 and used in the exercise
 
-- data challenge 1(DC1) report
+- data challenge 1(DC1) report :: work in progress
