@@ -35,7 +35,6 @@ and address potential issues before they can impact the experiment.
 DCs will include defining and  testing interfaces, measuring rates and reliability of data transfers
 and job execution, understanding the set of processing workflows, and publishing the results of monitoring
 the infrastructure as well as the physics outputs.
-Please see the \textit{Revisions} section to learn about evolution of the document.
 
 
 \end{abstract}
@@ -44,26 +43,10 @@ Please see the \textit{Revisions} section to learn about evolution of the docume
 
 \pagebreak
 
-\section{Revisions}
-\begin{itemize}
-
-\item Version 1: May 2017 - Initial definition of components of the data challenges
-
-\item Version 2: In progress. Will be used to initially define and agree on the components of DC1. Add some consistent numbering/naming of the steps to be done. Add information on files used/needed.
-
-\end{itemize}
-
 \section{About this document}
-%There are two main factors that make it necessary to ensure 100\% readiness of the
-%end-to-end \pd software and computing complex during the detector commissioning period and
-%throughout data taking in 2018. First, due to the short run schedule spending any significant amout
-%of time on debugging will make fulfillment of
-%the run plan impossible. Second, the Collaboration will need to process and analyze the NP04 data
-%on a reasonably short time scale (months rather than years) in order to maximize benefits of the
-%prototype effort for the DUNE R\&D work and CDR cycle, so efficient resource management and
-%throughput of \pd processing will be of essence right at the beginning of data taking. For these
-%reasons, and given the \pd schedule,  we propose to conduct two Data Challenges in order to identify
-%and address potential issues before they can impact the experiment.
+This document is work in progress. It was first created in May 2017 descibing the initial components
+of the data challenges and it is being continuously updated to reflect work that is being done in this area.
+
 
 The goal of this document is to provide concise information about the proposed \pd Data Challenges
 to the individual working groups in order to coordinate effort and come to a consensus as to the scope,
@@ -71,11 +54,13 @@ plans and schedule of the proposed Data Challenges. \textit{It does not contain 
 and/or designs of the \pd computing
 infrastructure elements} and the reader is reffered to existing documentation where
 needed, with references provided in the text.
-Information regarding the \pd (NP04) computing is summarized in the \pd-SP Technical Design Report\cite{docdb1794}.
+General information regarding the \pd (NP04) computing is summarized in the \pd-SP Technical Design Report\cite{docdb1794}.
 
 \section{The Scope of the Data Challenges}
-\subsection{Assumptions about the software status}
-The Data Challenges will be done with the understanding that the software is not in its final state/readiness. 
+\subsection{Assumptions about the software status and provisioning}
+The Data Challenges will be done with the understanding that the software is not in its final state/readiness. It is assumed
+however that its platform is finalized as mainly based on LArSoft and the mechanism of software provisioning which leverage
+CVMFS are in place and close to final.
 
 \subsection{Components}
 The following components (including infrastructure, middleware and software) can be identified as relevant in the context
@@ -106,20 +91,22 @@ retrieval based on Metadata and can also be used for orchestration of production
 
 \item \textbf{Data Quality Monitoring} (DQM) which is tasked with running algorithms with turnaround time short enough to provide
 actionable results (under and hour) but which won't fit into the computational footprint of the Online Monitoring (a part of DAQ).
-To support DQM, the ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s} has been created and will run any type of\
-DQM workload as formulated and programmed by the working groups.
+To support DQM, the ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s} has been created and
+is capable ofl running any type ofDQM workload as formulated and programmed by the working groups. A dedicated Web
+service will provide access to visual and data products coming out of DQM.
 
 \item \textbf{Calibration} While it is not expected that these components will be finalized
 (and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
 data flow patterns and other crucial aspects of the \pd Calibration software.
  \item \textbf{Reconstruction}. While it is not expected that these components will be finalized
 (and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
-data flow patterns and other crucial aspects of the \pd Reconstruction Systems. Having prototypes in place is therefore crucial
-on the time scale of the Data Challenges.
-An important component of the overall production chain is the \textit{Data Reduction} step along the lines described
-in \cite{docdb2089}. It combines a few signal-processing procedures (cf. digital filtering and noise reduction), and it will be
-necessary in any version or architecture of the production software.
-Understanding the interfaces and practical implications of this component would be a useful part of the Data Challenge.
+data flow patterns and other crucial aspects of the \pd Reconstruction Systems.
+%Having prototypes in place is therefore crucial on the time scale of the Data Challenges.
+An optional (but desirable)  component of the overall production chain is the \textit{Data Reduction} step along the lines described
+in \cite{docdb2089}.
+% It combines a few signal-processing procedures (cf. digital filtering and noise reduction), and it will be
+%necessary in any version or architecture of the production software.
+%Understanding the interfaces and practical implications of this component would be a useful part of the Data Challenge.
 
 \item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\,while there is no expectation
 for the final design and implementation of the analysis chain to exist early in the experiment (especially that it is by nature the most
@@ -147,127 +134,144 @@ scope of Data Challenges presented here.
 
 
 
-\subsection{Files and Interfaces: ** Incomplete/Wrong  - For Discussion **}
-
-
-The information here will be built up as needed and known. In general it will be pointers to existing documentation  internal to the appropriate components. 
-\renewcommand{\theenumi}{\alph{enumi}}
-\begin{enumerate}
-\item Beam Instrumentation Database Interface - data format and name of code module and description of the database attributes and internface.
-\item Calibration data  -  data format and name of code module and description of the database attributes and interface for calibration information.
-\item DQM output files - information about files output from DQM, their location, type and internal format.
-\item Input data file - any directory and file naming conventions and details as well as scripts that use this information
-\item Input data format - internal format of an input data file
-\item POMS configuration files - means of access to and editing of POMS requests.
-\item Reduced data format - location of reduced data files (if any) and description of their internal format
-\item SAM metadata files  - what SAM metadata files are needed and their description.
-\item Slow Control data format - data format and name of code module and description of the database attributes and interface for slow control information.
-\end{enumerate}
-\renewcommand{\theenumi}{\alph{arabic}}
-
-An ongoing diagram of the workflows and their dependencies is shown in Figure 2: Schematic of Dependencies. It is another aim of the data challenges to check that terminology, and it's presentation, is consistent across components - work to be done!
-
-\begin{figure}[tbh]
-  \centering
-  \includegraphics[width=1.0\textwidth]{../figures/dc1_integration.png}
-  \caption{Schematic of Dependencies}
-  \label{fig:dependencies}
-\end{figure}
-
-
-
 \subsection{Work-up to the Data Challenges}
 Before any end-to-end data challenge can be meaningful, all individual components and interfaces must undergo
-their own functional testing. The scope of the pre-DC activity will include most of the components above and an understanding of what files, file and data formats, and interfaces are going to be used. An initial list is given below and will be modified as things are better understood.
+their own functional testing. The scope of the pre-DC activity includes most of the components above and an
+understanding of what files, file and data formats, and interfaces are going to be used. An initial list is given below and will be modified as things are better understood.
 \begin{itemize}
 
 \item \textbf{Slow Control and Online Monitoring}
+\begin{itemize}
+\item \emph{DC readiness: not a part of DC}
+\end{itemize}
+
+\item \textbf{Online Budder }
+\begin{itemize}
+\item \emph{DC readiness: won't be ready for DC1}
+\end{itemize}
 
 \item \textbf{Data Transfer and SAM interaction}.  Both F-FTS1 and F-FTS2 components as schematically depicted in Fig.\,\ref{fig:dc1}
 must undergo end-to-end functional testing including registration in SAM and sinking data to tape storage both at CERN and FNAL. A test
 agent will be created which simulates creation of the raw data files by DAQ, which are written to the Online Buffer and picked up
 by the F-FTS for transmission.
+\begin{itemize}
+\item \emph{DC readiness: done}
+\end{itemize}
 
 \item \textbf{Beam Instrumentation Interface}. At a minimum, prototype schemas for \pd beam detectors must be created in
 the CERN Beam Instrumentation Database, and populated with dummy data. An extraction process must be put in place which
 ``captures'' these data and commits it either to a database managed by \pd and/or as files on disk (EOS). A prototype
 of the merging process must be put in place. This will also require data access libraries to be utilized in the production process.
+\begin{itemize}
+\item \emph{DC readiness: new design in the works with ``collecors'' running at CERN and data transmitted to FNAL - sole copy kept at FNAL; won't be used in DC1}
+\end{itemize}
 
+% \newpage
 \item  \textbf{DQM/p3s}. The prompt processing system must be tested and validated to run with the primary data
 staging area being in EOS. The issues of deployment, updating and maintenance of LArSoft and other requisite software
 must be resolved.
+\begin{itemize}
+\item \emph{DC readiness: ready and tested at CERN}
+\end{itemize}
+
 
 \item  \textbf{Data Reduction Software}.
-% In one shape or another, data reduction will form a distinct stage in the production chain  in \pd.
 A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
 FNAL and facilities at CERN.
+\begin{itemize}
+\item \emph{DC readiness: not currently in scope}
+\end{itemize}
 
 \item  \textbf{Calibration}
 Prototypes of this software need to be put in place. They will
 include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
 merging and processing.
+
+\begin{itemize}
+\item \emph{DC readiness: not currently in scope but basic components will be added soon}
+\end{itemize}
+
+
 \item \textbf{Production Software} Prototypes of this software need to be put in place. They will
 include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
 merging and processing.
 
+\begin{itemize}
+\item \emph{DC readiness: given that DC1 is MC-based and LArSoft payloads were tested extensively we assume that it is in place}
+\end{itemize}
+
 \item  \textbf{Production Management and Support}. This includes running prototypes of this software utilizing the FNAL POMS.
+\begin{itemize}
+\item \emph{DC readiness: POMS in place, coordination is required Attn: Anna Mazzacane}
+\end{itemize}
+
 
 \item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
 components of the production system(s). There are no strict requirements to functionality and performance of the analysis
 software at this stage.
 
+\begin{itemize}
+\item \emph{DC readiness: not currently in scope}
+\end{itemize}
+
 \end{itemize}
 \noindent  One of the goals of the work-up period is to identify components that overlap and where software can be shared and reused. 
 
-\subsection{Collaboration Tools, Reporting and Documentation}
-We are using a mail list (DUNE-proto-sp-dc), DUNE SLACK channel (pd-sp-datachallenges) for planning and technical details.  Documentation to be retained will be submitted to the DUNE DocDB. Results/summary of the data challenge for the will be posted to the DUNE wiki.
+%\subsection{Collaboration Tools, Reporting and Documentation}
+%We are using a mail list (DUNE-proto-sp-dc) to communicate.
+%, DUNE SLACK channel (pd-sp-datachallenges) for planning and technical details.
+ %Documentation to be retained will be submitted to the DUNE DocDB. Results/summary of the data challenge for the will be posted to the DUNE wiki.
 
 \clearpage
 
-\section{Data Challenge 1}
+\section{DC 1: a proposed scenario}
 
-Data Challenge 1 (DC1) is taking place the week of November 6th. It is currently not sure when/how the Cold Box Test schedule for initial data taking overlaps with this week.  It is important for the Data Challenge not to perturb the needs for the Cold Box Test. 
-
+Data Challenge 1 (DC1) is taking place the week of November 6th.
+It is decoupled from the Cold Box Test taking place in Fall 2017 and aims to minimize impact on same.
+Initial deployment of F-FTS components will be on a CERN OpenStack VM for testing of functionality
+but not necessarily of performance. Proposed steps:
 \begin{itemize}
 
 \item Provide Input Data: 
 \begin{itemize}
-\item Simulated raw data files will be deposited into a Test/Simulated Online Buffer by a specially created test agent.
-\item  Initially this will be on a CERN OpenStack VM for testing of functionality but not performance. 
+\item Simulated raw data files will be deposited into an \emph{emulated Online Buffer ( an EOS parition)} by a specially created test agent.
 \item A script will be written to deposit or cycle through several files. 
 \end{itemize}
 \item SAM Metadata is created for the files either by hand or through a script
 
-\item The data files are automatically detected by F-FTS-Lite and transmitted to EOS.
+\item The data  are automatically detected by F-FTS-Lite and transmitted to an EOS dropbox.
 
-\item The input data files are transferred to storage at Fermilab and CERN and declared to the file catalog.
+\item The input data files are transferred to a few storage locations at Fermilab and CERN and
+declared to the file catalog.
 \begin{itemize}
-\item F-FTS initiates data transfer to dCache and Enstore at FNAL. 
-\item F-FTS initiated data transfer to Castor
+\item F-FTS initiates data transfer to dCache and Enstore at FNAL
+\item F-FTS initiates data transfer to the input directory of p3s for processing, these directory acts similar to a dropbox and files are then managed by p3s
+\item F-FTS initiates data transfer to CASTOR (ongoing discussions of access to tape)
 \item Files are updated in SAM
 \end{itemize}
 
-\item The original plan called for the Beam Instrumentation data to be captured
-by \pd systems and stored either on a DB server or as files on EOS.
-These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
-There is an alternative proposal now to replicate the BI data to FNAL which would be then the only
-source of offline processing including DQM.
-
+\item %The original plan called for the Beam Instrumentation data to be captured
+%by \pd systems and stored either on a DB server or as files on EOS.
+%These data do not need to be real at this point, as the purpose of this step is to test interfaces and protocols.
+The current proposal is to replicate the BI data to FNAL which would be then the only
+source of offline processing including DQM. This may not be ready in time for DC1
 
 \item Automated process initiates DQM streams in p3s which operates using
-CERN Tier-0\,\cite{lxbatch}. The Neutrino Platform cluster\,\cite{neut} will not be used at this point.
+CERN Tier-0\,\cite{lxbatch}.
 
-\item Production team at FNAL submits production jobs using the newly arrived data as input.
+\item DQM results (e.g. event display and purity tracker) are provided to users via a dedicated Web service.
+
+\item \textbf{Production team at FNAL submits production jobs using the newly arrived data as input.}
 This primarily includes reading the LArTPC data, and the Photon Detector and Beam Instrumentation
 systems will be included if ready in time.
 
-\end{itemize}
+\item The Neutrino Platform cluster\,\cite{neut} will not be used in DC1.
 
-DC1 s  defined and will be done independently from the Cold Box Test, while clearly  benefiting from the work being done for it. If the DAQ group leaders agree at the time,  stretch goals of the Data Challenge will be to move: statically placed simulated data files from the online buffer through the system; and, if detector data does become available in time, statically placed acquired data files statically placed in the online disk buffer.
+\end{itemize}
 
 \clearpage
 
-\section{Data Challenge 2}
+\section{DC2: TBD}
 This will be listed nearer the date - at the moment sometime in March 2018.
 %\begin{itemize}
 %\item DAQ sends raw data (such as pulser or simulated trigger data) to the Online Bufer.
@@ -298,6 +302,34 @@ data etc as well as actual functionaltiy are close to final.
 %\end{itemize}
 
 \clearpage
+
+\appendix
+\section{Files and Interfaces}
+\emph{Information here is still under development and subject to discussion. In general it will be pointers to existing documentation  internal to the appropriate components. }
+\\ 
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=1.0\textwidth]{../figures/dc1_integration.png}
+  \caption{Schematic of Dependencies}
+  \label{fig:dependencies}
+\end{figure}
+
+\renewcommand{\theenumi}{\alph{enumi}}
+\begin{enumerate}
+\item Beam Instrumentation Database Interface - data format and name of code module and description of the database attributes and internface.
+\item Calibration data  -  data format and name of code module and description of the database attributes and interface for calibration information.
+\item DQM output files - information about files output from DQM, their location, type and internal format.
+\item Input data file - any directory and file naming conventions and details as well as scripts that use this information
+\item Input data format - internal format of an input data file
+\item POMS configuration files - means of access to and editing of POMS requests.
+\item Reduced data format - location of reduced data files (if any) and description of their internal format
+\item SAM metadata files  - what SAM metadata files are needed and their description.
+\item Slow Control data format - data format and name of code module and description of the database attributes and interface for slow control information.
+\end{enumerate}
+\renewcommand{\theenumi}{\alph{arabic}}
+
+\noindent Conceptual diagram of the workflows and their dependencies is shown in Figure 2. We aim to make sure that the terminology and its presentation is consistent across components, and comments are welcome.
 
 
 \begin{thebibliography}{1}
