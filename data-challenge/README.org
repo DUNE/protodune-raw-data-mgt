@@ -13,3 +13,7 @@ protoDUNE data challenge.
 
 - integration.dot :: attempts to contain a conceptual dependency/data
      flow graph showing all the parts
+
+- data challenge plan
+
+- data challenge 1(DC1) report
