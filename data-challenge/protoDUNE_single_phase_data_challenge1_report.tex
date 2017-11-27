@@ -396,11 +396,13 @@ Particular thanks to Marc Mengel and all POMS developers of SCD for their passio
 
 Two parts of the beam instrumentation infrastructure were tested. The first is for sustained transfer data from an existing DIP (LHC) service at CERN to the IFBEAM database instance at Fermilab. The second is to ingest fake protoDUNE beam instrumentation data to the IFBEAM database and then read it back out into a data processing job using the LArSoft framework. 
 
- \color{red} Do Igor and/or Jon have any slides I can take from here or shall I just write up what we have in the various emails? 
- \color{black}
-
 
 \subsection {Ingest from DIP Service}
+
+A Collector was developed and deployed on protodune-bidb-dev virtual machine. The collector was reading 32 LHC Beam Position monitor devices from DIP server. There were constantly 2 redundant collectors running, so they
+duplicated the information. They wrote data in a format ingestible into IFBeam DB. These files were sent to FNAL using rsync with Kerberos client authentication. At FNAL, they were ingested into the production IFBeam
+database. Total redundant data traffic was about 2.4MB per minute uncompressed. Our estimate for production data rate for ProtoDUNE is 48 KB/sec or about 2.8 MB/minute for single collector, or about 6 MB/sec for 2 redundant
+collectors. We believe the network link will not be a problem here when we scale to the production rate. IFBeam ingestion ???
 
 All CERN data is currently stored as short-term data only.   Meaning the database will only retain it for a month.   We are leaving it like this until we start taking production, long-term, data.   As we near production, it will be very important that we know when to switch.  Even though this data is ?noise?, we would like to keep it running for testing purposes.
 \subsection {Fake data test}
