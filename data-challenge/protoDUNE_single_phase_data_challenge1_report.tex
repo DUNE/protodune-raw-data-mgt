@@ -244,18 +244,61 @@ with this setup during DC1.
 
 \subsection{Problems encountered}
 \label{sec:p3s_issues}
-A few potential problem areas were discovered when running with a large number of pilots (i.e. a few hundred):
+Problems enountered during the Data Challenge are outlined below. While some of them were serious, none
+were severe enough to disable p3s or critically slow it down. While the efficiency dropped on one occassion to 70\% due to an AFS problem
+this was an isolated incident and was not typical for the test period as a whole. Still, it is prudent to keep an eye
+open for similar issues in future data challenges and to develop fixes, workarounds and other types of mitigation
+to the fullest extent possible.
+
+\subsubsection{AFS}
+
+In DC1 AFS was not used as either temporary or principal data store for either emulated raw data or DQM data products.
+It was used to host two types of software in p3s/DQM:
 \begin{itemize}
-\item Indications of AFS clients losing connectivity/timing out. This happens in fraction of cases which variable over time
-and is not specific to p3s, it has also reported by other groups. Note that we never use AFS to store or read actual data,
-it is used solely as the medium for software provisioning for both p3s and also for its payload jobs.
-This type of malfunction may result in the "bus error" message and crashes of
-pilot jobs used in p3s for workload management. Work in progress to find mitigation for this such as optimizing access patterns to
-the code deployed in AFS. Despite being a problem, it was not a show stopper.
+\item p3s client software i.e.~a collection of Python and shell scripts driving the p3s server, performing service duties etc
+\item local builds of DQM software e.g. duneTPC
+\end{itemize}
 
-\item Condor vacating pilot jobs i.e. not respecting the required time limit. Filed a ticket. An error was found in the Condor cinfoguration, testing ongoing.
+\noindent In each case the software was hosted in the user space i.e.~the partition of AFS reserved for interactive sessions
+and which is not typically meant to be accessed by a large number of worker nodes etc. There is a separate class
+of AFS storage (``work space'') which has different characteristics and which may behave differently, which would
+be an action item for continued testing in DC1 etc.
 
-\item Infrequent filesystem errors when periodically flushing certain directories in EOS. This does not happen often but will be investigated.
+In DC1 there was a period when there were indications of AFS clients losing connectivity/timing out.
+This happened in fraction of cases which variable over time and is not specific to p3s, as it has also reported
+by the DRA group in a separate activity. This type of malfunction may result in the "bus error" message and crashes of
+pilot jobs used in p3s for workload management. The were occasional report about pats not found which are likely
+related to the same root cause. Conculsting with CERN ITD via the ticket system did not produce definitive results.
+
+We must look into optimizing access patterns to the code deployed in AFS.
+
+\subsubsection{EOS}
+Problems enountered with EOS were all due to the FUSE system and not to the underlying storage or XRootD.
+
+\begin{itemize}
+
+\item Infrequent filesystem errors when periodically flushing certain directories in EOS. This does not happen often (e.g. approx at 0.1\% level).
+Root cause has not been established by CERN ITD. Native EOS interface did work as expected for deletion of directories.
+
+\item Occasional failure to find a path in EOS. The frequency of this occurrence has not been quantified but it was not large.
+
+\item At the time of writing, inability to use EOS to keep HTCondor log files (see below).
+
+\end{itemize}
+
+
+
+\subsubsection{HTCondor}
+\begin{itemize}
+
+\item Condor vacating pilot jobs i.e. not respecting the required time limit. Filed a ticket. An error was found in the Condor configuration, testing ongoing.
+
+\item Ongoing problems with the FUSE mount when used at scale lead to cropping up of HTCondor problems when for a example a COndor
+process needs to keep its log file in EOS via FUSE. This has led to substantial problems to part of the Tier-0 HTCondor infrastructure and
+resulted in enforcement of policy which forbids dependency of Condor submission (at the level of stdout, stderr and log) on EOS/FUSE.
+This has happened immediately after completion of DC1 and may be an issue going forward. A fix is promised in early 2018. Until then,
+the current recommendation is to use AFS for such purposes.
+
 \end{itemize}
 
  
