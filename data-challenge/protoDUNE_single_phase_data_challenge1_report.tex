@@ -19,7 +19,7 @@
 \title{Report from ProtoDUNE Single-Phase Data Challenge 1}
 \date{\today}
 
-\author{S. Fuess, A. Mazzacane, R.Pordes, I. Mandrichenko, A. Norman, J.Paley \\
+\author{S. Fuess, A. Mazzacane,  I. Mandrichenko, R.Pordes,  A. Norman, J.Paley \\
 M.Potekhin, G. Savage, H. Schellman, D. Stefan, R.Sulej, S. Timm}
 
 
@@ -40,13 +40,14 @@ M.Potekhin, G. Savage, H. Schellman, D. Stefan, R.Sulej, S. Timm}
 
 
 
-\section{Introduction and Scope}
+\section{Introduction and Overview}
 
-The first Data Challenge  (DC1) took place the week of November 6th. The following components were included; 
+The first Data Challenge  (DC1) took place the week of November 6th. The overall goal was to test the functionality and interfaces of main components of the offline infrastructure solutions.  Interfaces to the data sources in EHN1 (DAQ, Online and Beam Instrumentation) were emulated or provided via test components. 
+\subsection  {Scope}
 
-
-
+The components of the overall offline system that were included in the Data Challenge were:
 \begin{itemize}
+
 
 \item 25 Terabytes of already reconstructed simulation data files from Monte Carlo Challenge 9 were available on EOS at the CERN Tier-0.
 In total 28 TB  were copied (some files were copied more than once) using F-FTS-Light running on an OpenStack VM to an EOS data buffer.
@@ -90,9 +91,10 @@ the data back from Fermilab to the CERN EOS).
   \label{fig:intermediate}
 \end{figure}
 
-The groups running each of the components  used in this data challenge analyzed  the latency, throughput and robustness of their software and services together with debugging and identifying problems and solutions. 
+\subsection {Outside of Scope}
 
-Much progress was made during the week that  will stand in good stead for ramping up the whole system to the full data rate and sustainability needed for commissioning and beam running in 2018. 
+The scope of this data challenge did not include assessing the overall throughput, sustainability, and performance  of the system. However,  the groups running each of the components  analyzed  the latency, throughput and robustness of their software and services. This was a very valuable outcome of the work,   together with debugging and identifying problems and solutions. 
+
 
 
 
@@ -144,7 +146,8 @@ On the CERN Tier-0 the monitoring showed that the EOS traffic generated clearly 
 
 For the transfers from CERN EOS to Fermilab dCache the best 1/2 hr average we saw to Fermilab about 180MByte/sec. Rates of each stage of the file movement, archiving and declaration to the SAM metadata catalog are shown in  Fig.\ref{fig:FTStoFermilab}
 
-Note that the Eospublicftp gateways in use to copy the data from CERN to Fermilab should be able to source more than that. The parallelism was kept to 10 simultaneous globus-url-copy processes for this test. We have  been advised that this should be able to scale up by a factor of 10.
+Note that the Eospublicftp gateways in use to copy the data from CERN to Fermilab should be able to source more than that. The parallelism was kept to 10 simultaneous globus-url-copy processes for this test. We have  been advised by CERN experts that this should be able to scale up by a factor of 10.  This should allow the full rate needed for the protoDUNEs to be achieved. In addition, further tests will be done to measure how far the scaling can be done.
+
 
 \begin{figure}[tbh]
   \centering
@@ -207,10 +210,10 @@ Three kinds of DQM payloads were used during DC1:
 \begin{itemize}
 
 \item A simple Event Display (channel vs time for each TPC section) combined with signal processing
-and filtering
-\item Purity Monitor (estimation of the electron lifetime based on a group of tracks)
+and filtering (provided by David Adams)
+\item Purity Monitor (estimation of the electron lifetime based on a group of tracks, provided by Bruce Baller). The software is described in a presentation \href{https://indico.fnal.gov/event/14840/contribution/0/material/slides/0.pdf}{here}.
 
-\item CRT-to-TPC track match (tracking with Cosmic Ray Tagger, correlation with TPC)
+\item CRT-to-TPC track match (tracking with Cosmic Ray Tagger and correlation with TPC,  provided by Joe Prividi). The software is described in a presentation \href{https://indico.fnal.gov/event/13293/session/6/contribution/112/material/slides/0.pdf}{here}
 
 \end{itemize}
 \noindent These payloads performed without apparent failures. An example of the Event Display output
@@ -492,25 +495,36 @@ We used a
 \item physical and virtual rooms 
 we were more or less successful in having  a regular meeting using zoom as part of the challenge. Since only Maxim travelled to CERN for this data challenge the use of a physical meeting room was less successful
 
-\section {Input to the Data Challenge 2 Planning}
+
+\section {Conclusion from Data Challenge 1}
+
+Much progress was made during the week that  will stand in good stead for ramping up the whole system to the full data rate and sustainability needed for commissioning and beam running in 2018. 
+
+\section {Input to the Joint Data Challenge Planning}
+Following the work on DC1 the  agreement is to have a Joint Data Challenge in March 2018 as a collaboration between ProtoDUNE Single Phase (NP04) and ProtoDUNE Dual Phase (NP02). In January we plan a DC1.5 to test the throughput from the NP04 DAQ Online storage buffer to EOS and to do a preliminary test of the EOS access patterns. 
+
+The data challenge will include
 
 \begin{itemize}
-\item Following the work on DC1 the hope is to have DC2 as a collaboration between ProtoDUNE Single Phase (NP04) and ProtoDUNE Dual Phase (NP02). 
 
-\item DC2 will be a test of the full data flow, archiving and processing rate + some overhead to allow for contingency in cosmic ray and beam data volumes as well as event processing times. 
+\item  A  test of the full data flow, archiving and processing rate + some overhead to allow for contingency in cosmic ray and beam data volumes as well as event processing times. 
 
-\item Event data files read out from the detector will be used.
+\item Event data files read out from the detector; this will necessarily be a subset of the full detector as only some detector readout elements will be present to this schedule.
 
-\item It is clear that some operational effort is needed to keep the system flowing. DC2 should plan for and implement operations as if data taking was happening. 
+\item Test of the managament and sharing features of the system at CERN, including the Tier-0 compute farm, the EHN1 networking etc. 
 
-\item There are some functions with "Single points of resource failure". We should try to obviate these for DC2 and ensure more than one person for each function is handling the operation/execution/debugging. All offline services should be running as "DUNE services" rather than in individuals areas or computers. 
+\item Operations processes, monitoring, notification and response. This will include having all offline services running as "DUNE services". 
+
+
+\item  Identification and,  if possible,  testing of "fall back" and redundancy features  
+
+\end{itemize}
+
 
 
 \end{itemize}
 
 
-
-\end{itemize}
 
 
 
