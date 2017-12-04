@@ -102,7 +102,7 @@ F-FTS refers to the Fermi File Transfer Service, the standard Fermilab utility w
 
 The event data used was the dataset of MCC9 data set already available on disk at the CERN EOS, which consisted of
 23TBytes,  ~3000 files of average size 8GB, with the data being in  "mergeana" (post merging/processing)  format. There were 
-40 subdirectories each corresponding to a different beam energy and with or without space charge effect.
+40 subdirectories each corresponding to a different beam energy and with or without the simulation of the space charge effect.
 
 \subsection{Initial Copy Script Details}
 From the original location of the MCC9 file  an initial copy script (copy\_mcc9\_data.py): took the files to the simulated DAQ buffer in the EOS file cache via 3rd party xrdcp; added a process ID and a timestamp to the filename; and was configured to ensure a maximum rate at which the xrdcp happened at some point doing the test. It also created a rudimentary set of metadata,
