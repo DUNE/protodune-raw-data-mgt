@@ -340,68 +340,108 @@ The \textit{ \pd prompt processing system} performed well and in a stable manner
 of \pd. A few infrastructure issues have been identified and are being addressed.
 Directions for future work have been defined.
  
- 
-
-\section {Keep up Processing}
 
 
+\section {Keepup Processing}
 
-The Data Challenge 1 Keep Up Processing  included end to end testing of the offline processing infrastructure, physics payloads to be used for reconstructed simulation data in the upcoming monte carlo challenges, and declaration of output files back into the catalog and archival storage.  
+The Data Challenge 1 Keepup Processing  included end to end testing of the offline processing infrastructure, physics payloads to be used for reconstructed simulation data in the upcoming Monte Carlo challenge, and declaration of output files back into the catalog and archival storage.  
 In order to decouple infrastructure issues from  payloads problems, it was agreed to split the Data Challenge into three phases and run the processing more than a week if needed:
 \begin {itemize}
 
-\item Phase 1: Simple "null" script
- Copies in input from the SAM dataset.  Sleeps for a well defined amount of time.  Renames the file and copies it out with appropriate metadata to the offline dropbox.
+\item Phase 1: Simple  ''null" job.\\
+ This phase consists of the copy the file in  from the SAM input dataset, sleeps for a well defined amount of time, renames the file and copies it out with appropriate metadata to the offline dropbox.\\
 This stage is designed to completely decouple from ANY art or LarSoft dependancies or reconstruction code. 
 
 
-
-\begin{figure}[tbh]
-  \centering
-  \includegraphics[width=0.8\textwidth]{./ReportImages/Phase1keepup.jpg}
-  \caption{POMS Monitoring of Phase 1 of Keep Up Processing Jobs}
-  \label{fig:keepupprocessingphase1}
-\end{figure}
+\item Phase 2: Simple art/Larsoft based "null" jobs.\\
+ In this phase the Lar executable is introduced to run using a fcl file. As in the previous stage, the processing consists of the copy in and the copy out after a delay of a well amount of time that mimic the reconstruction time. \\
+ This stage is designed to identify any potential problems with the use of the experiment framework and workflows, but NOT be dependent on a specific set of reconstruction algorithms.  
 
 
-\item Phase 2: Simple art/Larsoft based "null" jobs
- ?Real art/Larsoft job, but one that does effectively nothing.  This stage is designed to identify and potential problems with the use of the framework and workflows, but NOT be dependent on a specific set of reconstruction algorithms.  
- This stage is ready to run but will not be run until the simpler null jobs have been throughly tested at scale.
-
-
-\item Phase 3: Full payload art/Larsoft "mini-reco" jobs
-
- Run  a mini-reco processing using the configurations provided by Robert and Dorota. This stage will defer till stages 1 and 2 have been successful.
+\item Phase 3: Full payload art/Larsoft "mini-reco" jobs.\\
+ This phase consists of running  a mini-reco processing using payloads provided by Robert and Dorota. \\
+ Respect the real simulated daq  data, the processing of the mcc9 files as input dataset required the stripping of all info, but the simulation and the digitization of the data event.
 
 \end{itemize}
 
 \subsection {Preparation}
 
-POMS campaigns and configurations scripts are tested.
+During the preparation phase, POMS campaigns and configurations scripts are created and tested.
 For each campaign, a keepup processing is setup to run every 4 hours (6 submission/24 hours).
-At each submission, all new files coming in the input SAM dataset are processed.
-The files are renamed and copied with appropriate metadata to the offline dropbox where an FTS instance is configured to copy them on tape (@FNAL and @CERN if requested).
-POMS is also configured to automatically  recover:  ?- files that have not been consumed?- files from failed jobs.
-Mergeana files as input of DC1 required particular care and additional tests.
-Grid jobs submitted  without the additional layer of project.py required some more work but with the advantage of a better control of the entire workflow.
+At each submission, all new files  copied in the input SAM dataset at FANL are processed.
+The output files are renamed and copied with appropriate metadata to the offline dropbox where an FTS instance is configured to copy them on tape (@FNAL and @CERN).
+POMS is also configured to automatically  recover data files that were not processed.
+Configurations scripts were created to submit grid jobs on the FermiGrid using jobsub without the additional layer of project.py  that is usually used for DUNE/pDUNE  Monte Carlo production.
+This step required some more work but with the advantage of a better control of the entire workflow.
+
+\subsection {Processing}
 
 \begin{itemize}
-\item Phase 1 
-Copy in, then Copy out, with a 2 min sleep between them.
+\item Phase 1: Copy in, then Copy out, with a 2 min sleep between them.\\
 The keepup processing ran smoothly after several fine tunings.
-A bug related to the input dataset (there was no control that input files were copied to FNAL) where found and immediately fixed.
+A bug related to the input dataset (there was no control that input files were actually copied to FNAL) where found and immediately fixed.
+The stable processing started on November 8th, followed by a submission every 4 hours. 
+The SAM projects for each submission (keepup and recovery) are  the links shown in the second column of the POMS webpage (Fig.\ref{fig:keepupprocessingphase1}).
 
-\item Phase 2 
-Copy in then  Copy out, using LarSoft executable where the algortihm code is just a 7 min sleep. It?s on going and running smoothly since last midnight.
-The processing is monitored to identify problems and bottlenecks.
 
-\item Phase 3
-\color{red} to be added
-\color{black}
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./ReportImages/DC1_Phase1.png}
+  \caption{POMS Monitoring of Phase 1 of Keepup Processing}
+  \label{fig:keepupprocessingphase1}
+\end{figure}
+
+\item Phase 2 : Copy in then  Copy out, using LarSoft executable where the algorithm code is just a 7 min sleep. \\
+This phase was affected by a significant slowness of dCache due to another process that was deleting a non-empty directory through gridftp at a rate over 500-700 operations/minute. \\
+The Phase 2 processing started running smoothly since the midnight of November 10th.
+Like the previous phase, the processing is monitored through the POMS webpages (Fig.\ref{fig:keepupprocessingphase2}) to identify problems and bottlenecks.
+\pagebreak
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./ReportImages/DC1_Phase2_2.png}
+  \caption{POMS Monitoring of Phase 2 of Keepup Processing}
+  \label{fig:keepupprocessingphase2}
+\end{figure}
+
+\item Phase 3: Processing of physics payloads.\\
+Quite $38\%$ of 584 jobs  ($15\%$ of the data from CERN) submitted during this phase went hold  because of  time ($11\%$) and memory limit ($27\%$) issues.
+The memory and the time requested were 4000 MB and 12 hrs respectively.
+The keepup was put  on hold for further investigation.
+POMS monitoring webpage is shown in Fig.\ref{fig:keepupprocessingphase3}.
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./ReportImages/DC1_Phase3.png}
+  \caption{POMS Monitoring of Phase 3of Keepup Processing}
+  \label{fig:keepupprocessingphase3}
+\end{figure}
+
+The resource usage from the profiling CI validation of the Phase 3 dataset with an increased request of time and memory (24 hrs and 8000 MB) is shown in Fig.\ref{fig:ciphase3}.
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./ReportImages/DC1_Phase3_CI.png}
+  \caption{Continuous Integration webpage}
+  \label{fig:ciphase3}
+\end{figure}
 
 \end{itemize}
 
+In summary: \\
+1 job exceeded the required memory (8000MB),
+1 job exceeded the expected lifetime (24h),
+4 jobs crashed with a segmentation violation,
+3 jobs failed to access the input file,
+582 jobs used up to  5800MB of memory and needed  22.3 hours  to complete 583 jobs, more details are in the CI webpage plots.\\
+The average processing time per file was 8 hours (~12min/event).  Each file contained ~40 events, corresponding to about 1.6 seconds of ProtoDUNE-SP running (at the nominal 25 Hz rate).
+
+
+\pagebreak
+
 \subsection {Sam Projects and File Copy Status}
+
+The pool of files available for delivery, and the collection of processes pulling files from the pool are described by  SAM projects.
 Last SAM Project of Phase 2 (Submission @ 4am CST)
 
 \href{http://samweb.fnal.gov:8480/station_monitor/dune/stations/dune/projects/dunepro-null_lar.sh_20171110_040116_3425472}{Sam Catalog}
@@ -423,15 +463,6 @@ Last SAM Project of Phase 2 (Submission @ 4am CST)
   \caption{Monitoring of Batch Jobs associated with Keep Up Processing}
   \label{fig:FIFEmon}
 \end{figure}
-
-
-
-\subsection {Summary}
-
-DC1 ProtoDUNE SP has been a BIG step forward for next production processing.
-The infrastructure for production processing is in place.
-Many thanks to everybody who has contributed for this success.
-Particular thanks to Marc Mengel and all POMS developers of SCD for their passionate work. Thanks to them our team has an excellent system for production and data processing.
 
 
 
