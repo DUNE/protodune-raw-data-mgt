@@ -33,11 +33,12 @@ A. Norman, M. Potekhin, G. Savage, H. Schellman, S. Timm}
 
 \noindent It is important to ensure 100\% readiness of the
 end-to-end \pd software and computing complex during the detector commissioning period and
-throughout data taking in 2018.  Following a \pd \singp  specific first data challenge in 2017 we propose Joint ProtoDUNEs  Data Challenge (DC2) in order to identify
+throughout data taking in 2018.  Following a \pd \singp  specific first data challenge in 2017 we propose a Joint ProtoDUNE  Data Challenge (known as DC2 or JDC) in order to identify
 and address potential issues before they can impact the experiments.
 This data challenge will include end-to-end testing of all components to be used for cosmic and beam data taking as far as they are available in the time frame. It is understood that these will not be final versions, especially as the data challenge aim is to find gaps and issues that could impact successful accomplishment of the experiments goals. 
 
-The Joint Data Challenge is planned to take place the week of April 8th 2018.  Working documents are to be found on the DUNE wiki at 
+The Joint Data Challenge is planned to take place the week of April 9th 2018.  We are using a mail list (dune-proto-joint-data-challenge@fnal.gov) and a DUNE SLACK channel (pd-datachallenges) for planning and technical details.  Documentation to be retained will be submitted to the DUNE DocDB. 
+Working documents and results are being posted to the DUNE wiki
 \url{https://wiki.dunescience.org/wiki/ProtoDUNE_Dual_Phase_and_Single_Phase_Joint_Data_Challenge}
 \end{abstract}
 
@@ -47,75 +48,83 @@ The Joint Data Challenge is planned to take place the week of April 8th 2018.  W
 
 \section{About this document}
 
-The goal of this document is to provide concise information about the Joint  \pd Data Challenge
-to the individual working groups in order to coordinate effort and come to a consensus as to the scope,
-plans and schedule. 
-
-It does not contain detailed descriptions
+The goal of this document is to provide the high level information and plan for  the Joint  \pd Data Challenge. The audience is the collaboration as a whole and  the  working groups contributing to the activities.
+The document does not contain detailed descriptions
 and/or designs of the computing
 infrastructure elements and the reader is referred to existing documentation where
 needed, with references provided in the text and references. 
 
 \section{The Scope of the Joint Data Challenge}
+This section will briefly describe the functional components, their scope and goals for the data challenge,  and any dependencies on other activities. During the planning stage we will aim to identify components that overlap and where software and functionalities might be shared and reused. 
+
+Before any end-to-end data challenge can be meaningful, all individual components and interfaces must undergo
+their own functional testing. The scope of the DC activity includes initial work on most of the components below and an
+understanding of what files, file and data formats, and interfaces are going to be used. The evolving activities will be listed and tracked on the DUNE wiki. 
+
+\subsection{Dual Phase Specifics}
+\subsection{Single Phase Specifics}
+
 \subsection{Assumptions about the software status and provisioning}
 The Data Challenge will be done with the understanding that the software is not in its final state/readiness. It is assumed
-however that the mechanism of software provisioning which leverages
-CVMFS are in place and close to final.
+however that the mechanism of software provisioning which leverage git and  CVMFS are in place and close to final.
 
-\subsection{Components}
-The following components (including infrastructure, middleware and software) can be identified as relevant in the context
-of Data Challenge (which will be also referred to as \textit{``DC2''} in this document):
+\subsection{DAQ Online Buffer}
+The DAQ Online Buffer which stores raw data assembled by the Event Builders, as files on disk. The internals
+of the DAQ system itself are not within the scope of the DC, however the performance of the Online Buffer in the face of simultaneous data reading and writing will be tested. The DAQ Online Buffer will also be operated in two different modes - where simulated data files are provided and where data is being acquired in real time.
 
-\begin{enumerate}
-\item The DAQ \textbf{Online Buffer} which stores raw data assembled by the Event Builders, as files on disk. The internals
-of the DAQ system itself are not within the scope.
+\subsection{Beam Instrumentation} 
 
-\item  \textbf{Beam Instrumentation Interface} as it becomes available
+\subsection{Slow Control Data}
 
+\subsection{Online Monitoring System - do we actually need this component at this point?}
+ 
+\subsection{Data Management}
+The data management system is heavily used for data transport, archiving to tape at CERN and Fermilab, and access to the data in real time (including for data quality monitoring, remote archiving systems,  just in time processing and analysis at the CERN TIer-0, etc.). It includes the data cataloguing system (SAM).
 
-
-\item The \textbf{Slow Control and Online Monitoring System} which provide control, monitoring and display of the data acquisition readout and detector parameters. 
-
-\item The \textbf{Data Management System}\cite{docdb1212}  which performs data transfers between a few endpoints
+The \textbf{Data Management System}\cite{docdb1212}  performs data transfers between a few endpoints
 at CERN and FNAL starting with EOS (\dualp) and the Online Buffer (\singp), including output from DQM,  and which is also tasked with proper accounting and handling of the file catalog and other metadata
 by interacting with the SAM system at FNAL (see next item). The Data Management/Handling System will also interface the disk-based mass storage
 at CERN and FNAL (i.e.\,EOS\cite{eos} and dCache) as well as tape systems (CASTOR and Enstore respectively).
 We anticipate using the \textit{Fermi File Transfer System} (also abbreviated as F-FTS\cite{fts}).
 
-\item The \textbf{File Catalog (Metadata)}  -- SAM system at FNAL which comprises the functionality of the file catalog, data storage and
+The \textbf{File Catalog (Metadata)}  -- SAM system at FNAL comprises the functionality of the file catalog, data storage and
 retrieval based on Metadata and can also be used for orchestration of production workflows.
 
-\item \textbf{Data Quality Monitoring} (DQM \singp only)) which is tasked with running algorithms with turnaround time short enough to provide
+\subsection{Data Quality Monitoring - Single Phase only}
+
+\textbf{Data Quality Monitoring} (DQM \singp only))  is tasked with running algorithms with turnaround time short enough to provide
 actionable results (under and hour) but which won't fit into the computational footprint of the Online Monitoring (a part of DAQ).
 
 The DQM consists of the infrastructure and the payloads. The ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s}  has been created and
 is capable of running any type of DQM workload as formulated and programmed by the working groups. A dedicated Web
-service will provide access to visual and data products coming out of DQM. DC2 will include the most important physics workloads (payloads) as explicit components in the test.
+service will provide access to visual and data products coming out of DQM.
 
+DC2 will include the most important physics workloads (payloads) as explicit components in the test.
+
+\subsection{Keep Up Offline Reconstruction}
+
+The Production Operations Management System is based on POMS. This FNAL-based service includes using the DUNE service portal, production workflows executed by POMS \cite{poms}, including the management and automation of  jobs
+submission on distributed resources on the Grid. It will be the primary platform for \pd on which to run production and analysis.
+
+\subsection{Offline Physics Processes}
+\begin{itemize}
 \item \textbf{Calibration}  TBD
  \item \textbf{Reconstruction}. While it is not expected that these components will be finalized
 (and some even exist) at the time of the first Data Challenge it is important to have a firm grasp of the required interfaces,
 data flow patterns and other crucial aspects of the \pd Reconstruction Systems.
-
-
-An optional (but desirable)  component of the overall \singp production chain is the \textit{Data Reduction} step along the lines described
+\item \textbf{Data Reduction}.An optional (but desirable)  component of the overall \singp production chain is the Data Reduction step along the lines described
 in \cite{docdb2089}.
-
 \item \textbf{Analysis Suite Prototypes}. Same comment applies here as to the previous item, i.e.\,while there is no expectation
 for the final design and implementation of the analysis chain to exist early in the experiment (especially that it is by nature the most
 dynamic and fluid part of all software) it is important to put in place, document and optimize its interfaces with various components
 of infrastructure e.g.\,calibration databases, Metadata, software and data provenance controls etc.
-
-\item \textbf{Production Operations Management System (based on POMS)}. This FNAL-based service includes using the DUNE service portal, production workflows executed by POMS \cite{poms}, including the management and automation of  jobs
-submission on distributed resources on the Grid. It will be the primary platform for \pd on which to run production and analysis.
+\end{itemize}
 
 
-\end{enumerate}
-\noindent The relationship between the various infrastructure and other components listed above is schematically illustrated in
-Fig.\ref{fig:dc1}. This diagram relflects the fact that transmission of \pd data is a multistage process and in particular there
-will be separate instances of F-FTS transferring the data from the Online Buffer to mass storage at CERN, and then from
-CERN to FNAL and elsewhere.
-
+\subsection{Figures}
+\noindent The relationship between the various infrastructure and other components listed above are schematically illustrated in
+Fig.\ref{fig:dc2dp} and Fig.\ref{fig:dc1}. These diagram reflect the fact that transmission of \pd data is a multistage process and in particular there 
+will be separate instances of some components operating across \dualp and \singp and in different  parts of the workflow processes. 
 \begin{figure}[tbh]
   \centering
   \includegraphics[width=1.0\textwidth]{../figures/DualPhaseDataFlow.png}
@@ -131,103 +140,13 @@ CERN to FNAL and elsewhere.
   \label{fig:dc1}
 \end{figure}
 
-
-
-\subsection{Work-up to the Data Challenges}
-
-Needs Updating
-
-Before any end-to-end data challenge can be meaningful, all individual components and interfaces must undergo
-their own functional testing. The scope of the pre-DC activity includes most of the components above and an
-understanding of what files, file and data formats, and interfaces are going to be used. An initial list is given below and will be modified as things are better understood.
-\begin{itemize}
-
-\item \textbf{Slow Control and Online Monitoring}
-\begin{itemize}
-\item \emph{DC readiness: not a part of DC}
-\end{itemize}
-
-\item \textbf{Online Buffer }
-\begin{itemize}
-\item \emph{DC readiness: won't be ready for DC1}
-\end{itemize}
-
-\item \textbf{Data Transfer and SAM interaction}.  Both F-FTS1 and F-FTS2 components as schematically depicted in Fig.\,\ref{fig:dc1}
-must undergo end-to-end functional testing including registration in SAM and sinking data to tape storage both at CERN and FNAL. A test
-agent will be created which simulates creation of the raw data files by DAQ, which are written to the Online Buffer and picked up
-by the F-FTS for transmission.
-\begin{itemize}
-\item \emph{DC readiness: done}
-\end{itemize}
-
-\item \textbf{Beam Instrumentation Interface}. At a minimum, prototype schemas for \pd beam detectors must be created in
-the CERN Beam Instrumentation Database, and populated with dummy data. An extraction process must be put in place which
-``captures'' these data and commits it either to a database managed by \pd and/or as files on disk (EOS). A prototype
-of the merging process must be put in place. This will also require data access libraries to be utilized in the production process.
-\begin{itemize}
-\item \emph{DC readiness: new design in the works with ``collecors'' running at CERN and data transmitted to FNAL - sole copy kept at FNAL; won't be used in DC1}
-\end{itemize}
-
-\item  \textbf{DQM/p3s}. The prompt processing system must be tested and validated to run with the primary data
-staging area being in EOS. The issues of deployment, updating and maintenance of LArSoft and other requisite software
-must be resolved.
-\begin{itemize}
-\item \emph{DC readiness: ready and tested at CERN}
-\end{itemize}
-
-
-\item  \textbf{Data Reduction Software}.
-A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
-FNAL and facilities at CERN.
-\begin{itemize}
-\item \emph{DC readiness: not currently in scope}
-\end{itemize}
-
-\item  \textbf{Calibration}
-Prototypes of this software need to be put in place. They will
-include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
-merging and processing.
-
-\begin{itemize}
-\item \emph{DC readiness: not currently in scope but basic components will be added soon}
-\end{itemize}
-
-
-\item \textbf{Production Software} Prototypes of this software need to be put in place. They will
-include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
-merging and processing.
-
-\begin{itemize}
-\item \emph{DC readiness: given that DC1 is MC-based and LArSoft payloads were tested extensively we assume that it is in place}
-\end{itemize}
-
-\item  \textbf{Production Management and Support}. This includes running prototypes of this software utilizing the FNAL POMS.
-\begin{itemize}
-\item \emph{DC readiness: POMS in place, coordination is required Attn: Anna Mazzacane}
-\end{itemize}
-
-
-\item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
-components of the production system(s). There are no strict requirements to functionality and performance of the analysis
-software at this stage.
-
-\begin{itemize}
-\item \emph{DC readiness: not currently in scope}
-\end{itemize}
-
-\end{itemize}
-\noindent  One of the goals of the work-up period is to identify components that overlap and where software can be shared and reused. 
-
-\subsection{Collaboration Tools, Reporting and Documentation}
-
-We are using a mail list (DUNE-proto-sp-dc) to communicate, a, DUNE SLACK channel (pd-atachallenges) for ongoing activities, and the DUNE wiki for detailed planning and tasks 
-\url{https://wiki.dunescience.org/wiki/ProtoDUNE_Dual_Phase_and_Single_Phase_Joint_Data_Challenge}. The plan and final report will be submitted to the DUNE DocDB. 
-
-
 \section{Workflows for the Joint Data Challenge - NEEDS Updating}
+
+\subsection{\dualp}
+
+\subsection{\singp}
+
 \begin{itemize}
-
-
 
 \item Provide Input Data: 
 \begin{itemize}
@@ -521,69 +440,21 @@ The information here will be built up as needed and known. In general it will be
 \end{enumerate}
 \renewcommand{\theenumi}{\alph{arabic}}
 
-An ongoing diagram of the workflows and their dependencies is shown in Figure 2: Schematic of Dependencies. It is another aim of the data challenges to check that terminology, and it's presentation, is consistent across components - work to be done!
+%An ongoing diagram of the workflows and their dependencies is shown in Figure 2: Schematic of Dependencies. It is another %aim of the data challenges to check that terminology, and it's presentation, is consistent across components - work to be done!
 
-\begin{figure}[tbh]
-  \centering
-  \includegraphics[width=1.0\textwidth]{../figures/dc1_integration.png}
-  \caption{Schematic of Dependencies}
-  \label{fig:dependencies}
-\end{figure}
+%\begin{figure}[tbh]
+% \centering
+%  \includegraphics[width=1.0\textwidth]{../figures/dc1_integration.png}
+%  \caption{Schematic of Dependencies}
+%  \label{fig:dependencies}
+%\end{figure}
 
 
+\section{Data Challenge Process Flow}
+\subsection{\dualp}
 
-\subsection{Work-up to the Data Challenges}
-Before any end-to-end data challenge can be meaningful, all individual components and interfaces must undergo
-their own functional testing. The scope of the pre-DC activity will include most of the components above and an understanding of what files, file and data formats, and interfaces are going to be used. An initial list is given below and will be modified as things are better understood.
-\begin{itemize}
+\section{ \singp}
 
-\item \textbf{Slow Control and Online Monitoring}
-
-\item \textbf{Data Transfer and SAM interaction}.  Both F-FTS1 and F-FTS2 components as schematically depicted in Fig.\,\ref{fig:dc1}
-must undergo end-to-end functional testing including registration in SAM and sinking data to tape storage both at CERN and FNAL. A test
-agent will be created which simulates creation of the raw data files by DAQ, which are written to the Online Buffer and picked up
-by the F-FTS for transmission.
-
-\item \textbf{Beam Instrumentation Interface}. At a minimum, prototype schemas for \pd beam detectors must be created in
-the CERN Beam Instrumentation Database, and populated with dummy data. An extraction process must be put in place which
-``captures'' these data and commits it either to a database managed by \pd and/or as files on disk (EOS). A prototype
-of the merging process must be put in place. This will also require data access libraries to be utilized in the production process.
-
-\item  \textbf{DQM/p3s}. The prompt processing system must be tested and validated to run with the primary data
-staging area being in EOS. The issues of deployment, updating and maintenance of LArSoft and other requisite software
-must be resolved.
-
-\item  \textbf{Data Reduction Software}.
-% In one shape or another, data reduction will form a distinct stage in the production chain  in \pd.
-A prototype of this software module must be tested with simulated data and packaged in a way that is portable across
-FNAL and facilities at CERN.
-
-\item  \textbf{Calibration}
-Prototypes of this software need to be put in place. They will
-include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
-merging and processing.
-\item \textbf{Production Software} Prototypes of this software need to be put in place. They will
-include components specific to LArTPC, the Photon Detector and the Beam Instrumentation data, which will also require
-merging and processing.
-
-\item  \textbf{Production Management and Support}. This includes running prototypes of this software utilizing the FNAL POMS.
-
-\item  \textbf{Analysis}. The main point in this exercise to to ready the interface of the analysis software to SAM and other
-components of the production system(s). There are no strict requirements to functionality and performance of the analysis
-software at this stage.
-
-\end{itemize}
-\noindent  One of the goals of the work-up period is to identify components that overlap and where software can be shared and reused. 
-
-\subsection{Collaboration Tools, Reporting and Documentation}
-We are using a mail list (DUNE-proto-sp-dc), DUNE SLACK channel (pd-sp-datachallenges) for planning and technical details.  Documentation to be retained will be submitted to the DUNE DocDB. Results/summary of the data challenge for the will be posted to the DUNE wiki.
-
-\clearpage
-
-\section{Data Challenge Process Flow - \dualp}
-
-\section{Data Challenge Process Flow - \singp}
-The Joint Data Challenge will take place the week of April 9th 2018. 
 \begin{itemize}
 
 \item Provide Input Data: 
