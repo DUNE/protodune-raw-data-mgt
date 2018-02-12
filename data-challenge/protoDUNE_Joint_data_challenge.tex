@@ -38,8 +38,11 @@ and address potential issues before they can impact the experiments.
 This data challenge will include end-to-end testing of all components to be used for cosmic and beam data taking as far as they are available in the time frame. It is understood that these will not be final versions, especially as the data challenge aim is to find gaps and issues that could impact successful accomplishment of the experiments goals. 
 
 The Joint Data Challenge is planned to take place the week of April 9th 2018.  We are using a mail list (dune-proto-joint-data-challenge@fnal.gov) and a DUNE SLACK channel (pd-datachallenges) for planning and technical details.  Documentation to be retained will be submitted to the DUNE DocDB. 
-Working documents and results are being posted to the DUNE wiki
-\url{https://wiki.dunescience.org/wiki/ProtoDUNE_Dual_Phase_and_Single_Phase_Joint_Data_Challenge}
+Working documents and results are being posted to the DUNE wiki:
+\begin{verbatim}
+https://wiki.dunescience.org/wiki/
+ProtoDUNE_Dual_Phase_and_Single_Phase_Joint_Data_Challenge
+\end{verbatim}
 \end{abstract}
 
 \tableofcontents
@@ -90,13 +93,19 @@ We anticipate using the \textit{Fermi File Transfer System} (also abbreviated as
 The \textbf{File Catalog (Metadata)}  -- SAM system at FNAL comprises the functionality of the file catalog, data storage and
 retrieval based on Metadata and can also be used for orchestration of production workflows.
 
-\subsection{Data Quality Monitoring - Single Phase only}
+\subsection{Data Quality Monitoring (Single Phase only)}
 
-\textbf{Data Quality Monitoring} (DQM \singp only))  is tasked with running algorithms with turnaround time short enough to provide
-actionable results (under and hour) but which won't fit into the computational footprint of the Online Monitoring (a part of DAQ).
+In this Data Challenge, \textbf{Data Quality Monitoring} (DQM) will only be implemented for the Single Phase \pd.
 
-The DQM consists of the infrastructure and the payloads. The ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s}  has been created and
-is capable of running any type of DQM workload as formulated and programmed by the working groups. A dedicated Web
+The role of DQM is to run algorithms with turnaround time short enough to provide
+actionable results  but which won't fit into the computational footprint of the Online Monitoring which is a part of the DAQ.
+Typically DQM jobs are expected to run in under and hour and may involve workflows i.e. collections of jobs connected
+by data and logic.
+
+The DQM consists of the infrastructure part and the \textit{``payloads''} i.e. physics applications. 
+The ProtoDUNE Prompt Processing System (\textbf{p3s}) \cite{docdb1811,p3s}  is the centerpiece
+of the DQM infrastructure and is capable of running any type of DQM computations
+as formulated and implemented by the detector experts. A dedicated Web
 service will provide access to visual and data products coming out of DQM.
 
 DC2 will include the most important physics workloads (payloads) as explicit components in the test.
