@@ -74,87 +74,36 @@ commissioning and operations phases:
 %infrastructure jobs which exist to support the function of the overall system.
 
 
-section{Design of the p3s and DQM services}
+\section{Design of the p3s and DQM services}
 
 
 The  p3s  allows the experiment to benefit from combination
 of high capacity, high performance distributed storage (CERN EOS), CERN networking
 resources and its Tier-0 computing facility. It utilizes  the pilot-based approach \cite{eps}
 to workload management characteristic of such well-known systems as PanDA and
-DIRAC \cite{panda,dirac} and a web interface which provides excellent job monitoring capabilities.
-
-
-\subsection{Design of the DQM Content Service}
-The results produced by the payload jobs managed by p3s can only be useful if there is an
-efficient interface for the users to access these derived data. Such interface is provided in \pd-SP
-by a web service accessible through a web browser and a few \textit{CLI} (command line interface) utilities.
-The DQM output (the ``content'') can be stored in the system in two ways:
-\begin{itemize}
-
-\item when the basic unit of data that needs to be stored is a file, e.g.\,an image in the PNG format, such
-file is stored on disk (EOS) and its location is recorded in a database so it can be later retrieved
-and accessed through a dynamically generated web page,  based on some selection criteria; 
-this is simplified by the fact that the EOS storage is directly accessible from the Apache server
-used for this purpose
-
-\item when the basic unit of data is an array of numbers these are for the most part stored directly
-in the database and are used in dynamically generated web pages either in tabulated format or
-to generate graphs by using JavaScript
-
-\end{itemize}
-
-
-
-\section{Technologies and Interfaces}
-\subsection{Web Services}
+DIRAC \cite{panda,dirac} and a Web interface which provides excellent job monitoring capabilities.
+The DQM jobs running within the p3s framework generate output which is made
+accessible to the users by means of the Web-based DQM Content Service.
 
 Both the p3s server and the DQM content server are implemented as Django
-\cite{django} applications written in Python with standard components such
-as the Apache web server and PostgreSQL RDBMS as the back-end storage
-(a few other RDBMS can be used as well). All interactions with either service
-are conducted via HTTP either from a web browser or one of the included \textit{CLI} utilities.
-While the p3s instance deployed for \pd-SP is configured to use
-the resources provided by CERN the system itself is platform-agnostic in the sense that
-it can manage the resources of any cluster or group of worker nodes and in fact has
-been succesfully tested in these scenarios as well.
+Web applications \cite{django}. While the p3s instance deployed for \pd-SP is configured to use
+the resources provided by CERN it can in fact manage the resources of any cluster,
+local or remote and has been succesfully tested in these scenarios as well.
 
-The p3s server is responsible for workload management by matching available pilots to the job requests,
-and also provides monitoring capabilities by allowing the user to browse and navigate
-tabulated data describing the state of the various objects in the system (e.g. pilots, jobs, data files \textit{etc.}).
-The design of the monitoring pages leverages the Django web page template functionality and
-the well known \textit{django-tables2} package which results
-in a very small amout of application code. An example of pages served by p3s is
-presented in Figure \ref{fig:p3s_dash} (the p3s dashboard).
+\section{The Self-Describing DQM Output}
 
-
- A suite of CLI clients is provided as a component of p3s for managing pilots, jobs and
-other entities. In case interaction with the server requires exhange of messages these are
-formatted as JSON, pimarily because it is trivial to parse it in Python.
-
-There is a centralized log of critical system messages stored in the p3s database which
-is used to troubleshoot the system. It is also used to automatically generate alarms
-for the operators should certain parameters fall out of their nominal range.
-
-\subsection{The Content Server Interface: the Self-Describing Data}
-Due to highly dynamic nature of application development in the context of the \pd beam
+Due to dynamic nature of application development in the context of the \pd beam
 test it is not practical to create static menus, links or make many assumptions about
 the categories and content of plots and other data products coming out of the DQM
-application. Any such information or logic included in the server code in a static manner
-would result in frequent and time-consuming updates of the server code. Instead,
-each DQM application is expected to produce two or more files in accordance
-with simple JSON schemas. One file is referred to as \textit{summary} and it contains basic
-information about the attributes of the raw data file used as input, such as the run number
-and a few other indices. This file is stored as a JSON string in the back-end database
-of the DQM server. It may also optionally contain a number of summary metrics
-that are then parsed by the page-generating logic of the server and presented
-in the DQM tables.
-
-The second JSON file (or a group of files) referred to as \textit{description} or \textit{file list}
-provides references to plots produced in formats such as PNG, as well as description of
-\textit{categories} and \textit{sub-categories} which are automatically translated by the server into
+application. Instead,
+each DQM application is expected to produce two JSON files in compliance
+with simple templates. One file is referred to as \textit{summary} and it contains basic
+information about the attributes of the raw data file used as input. The second JSON file
+referred to as \textit{description} provides references to plots produced in formats such
+as PNG, as well as description of \textit{categories} and \textit{sub-categories} which
+are \textbf{dynamically} translated by the server into
 groups of menus with links necessary to access these plots on the dynamically generated
-web pages. An example of such menus is presented in Figure \ref{fig:tpc_monitor}.
-This approach greatly simplifies integration of different types of payload jobs 
+web pages. This approach greatly simplifies integration of different types of payload jobs 
 and data into the DQM content service, with minimal or no changes to the
 server code.
 
@@ -165,7 +114,7 @@ Javascript code making use of Google Charts functionality, so that the time seri
 plots are generated on the fly at the time of the user's request, based on the content
 of the DQM database.
 
-\subsection{Deployment, Testing and Operations}
+\section{Deployment, Testing and Operations}
 
 The code of p3s and the DQM content server is version-controlled using \textit{git}
 and GitHub. The p3s and DQM web services as well as their back-end database server have been deployed on
@@ -176,22 +125,48 @@ distributed version of crontab used at the \textit{lxplus} interactive Linux fac
 
 The system was tested in two data challenges preceding the data taking period, running
 at data rates and job count exceeding the expected operation parameters by roughly
-a factor of two. During this testing and actual operation the p3s proved exceptionally stable,
+a factor of two. During this testing and actual operation the p3s proved exceptionally stable \cite{chep18},
 with infrequent failures due to outages of some elements of the local infrastructure
 (e.g.\,storage and the batch facility) but not the system itself.
 
-\section{Conclusions}
+\section{Prompt Processing and DQM Design for DUNE}
 
-The \pd-SP experiment running at CERN in 2018-2019 requires adequate Data
-Quality Monitoring. To meet these requirements the DUNE Collaboration has developed
-and deployed web services which manage the execution of the DQM jobs on the CERN
-facilities and dynamic handling of the DQM data content with efficient user interfaces.
-The design was based on existing and proven technologies such as Django
-for the web applicaiton framework,  pilot jobs for efficient interface to
-the batch system, standard  JavaScript libraries and a number of others. The DQM software
-running on the \pd-SP prompt processing system was  successfully used during
-the commissioning phase of the experiment and will remain an imporant part
-of its ongoing operation.
+The concept and design of the \pd-SP prompt processing system and the DQM content
+service have been successful in helping the experiment to achieve its goals. The system
+was of great value to the team commissioning and operating the detector. It can certainly
+be expected that similar functionality will be required during the commissioning
+and operation of the full-scale DUNE LArTPC. The following design features proven in
+\pd-SP may be incorporated:
+\begin{itemize}
+\item Clean separation of DQM monitoring and prompt processing system, designed, deployed and operated as two independent entities
+
+\item The ability of the prompt processing system to utilize any available computing
+platform (clusters, data centers, cloud resources etc)
+
+\item The self-describing data produced by DQM applications which allows for dynamic
+behavior if of the DQM Content Web Service and quick turnaround cycle for new and
+modified applications
+
+\item Technology choices that favor well established, industry standard and easy to maintain
+platforms
+
+\end{itemize}
+
+\noindent In addition to the above, given the anticipated long-term operation of DUNE, the following
+may be of value when implementing the prompt processing and DQM for the full experiment:
+
+\begin{itemize}
+
+\item Container-based deployment model for Web services
+
+\item Web tools to aid developers in creation of data descriptors for integration of applications into DQM
+
+\item Given the scale of the detector, adequate mapping services which would facilitate correlation
+of specific plots and metrics to groups of channels, electronics module, sections of the TPC etc.
+
+\end{itemize}
+
+
 
 %For tables use syntax in table~\ref{tab-1}.
 %\begin{table}
@@ -234,7 +209,7 @@ doi:10.1088/1742-6596/219/6/062049
 \bibitem{django}
 N. George \emph{Mastering Django: Core. The Complete Guide to Django 1.8 LTS}~ GNW Independent Publishing, ISBN: 099461683X
 
-
+\bibitem{chep18} M.Potekhin et al.  \emph{The Prompt Processing System and Data Quality Monitoring in the protoDUNE-SP Experiment}, FNAL DocDB 14137.
 
 \end{thebibliography}
 
