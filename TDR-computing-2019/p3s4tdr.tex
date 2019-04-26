@@ -12,153 +12,76 @@
 \newcommand{\filesize}{8\,GB\xspace}
 \begin{document}
 %
-\title{The Prompt Processing System and Data Quality Monitoring in the Experiment}
+\title{Supporting Materials for the DUNE TDR Computing sections on the Prompt Processing System and Data Quality Monitoring in \pd-SP and DUNE in general}
 
 
-\author{}
+\author{M.\,Potekhin}
 
-\abstract{
-The DUNE Collaboration is conducting an experimental program (named protoDUNE)
-which involves a beam test of two large-scale prototypes of the DUNE Far Detector
-at CERN operating in 2018-2019. The volume of data to be collected by the protoDUNE-SP
-(the single-phase detector)
-will amount to a few petabytes and the sustained rate of data sent to mass
-storage is in the range of a few hundred MB per second. After collection the data
-is committed to storage at CERN and transmitted to Fermi National
-Accelerator Laboratory in the US for processing, analysis and long-term preservation.
-The protoDUNE experiment requires substantial Data Quality Monitoring
-capabilities in order to ascertain the condition of the detector and its various subsystems.
-We present the design of the protoDUNE Prompt Processing System, its deployment at
-CERN and its performance during the data challenges and actual data taking.
-
-}
 %
 \maketitle
 %
-\section{Introduction}
-\label{sec:intro}
-The \pd-SP experiment is designed to study a large-scale prototype of the single-phase version of
-the Liquid Argon Time Projection Chamber (LArTPC) which will eventually become one of
-the principal elements of the DUNE apparatus to be constructed at the Sanford Underground
-Research Facility \cite{cdrVol1, cdrVol4}. The prototype (CERN designation NP04) is located
-in the CERN North Experimental Hall and is tested utilizing a dedicated beam line from the CERN SPS
-accelerator complex. The run plan also includes a large number of cosmic ray triggers.
-Commisioning of the detector took place in September of 2018.
+\section{Motivations for p3s and DQM}
+\label{sec:motivations}
+%The DUNE Collaboration has developed and utilized a prompt processing system to support
+%the Data Quality Monitoring activities crucial to the commissioning and operations of
+%\pd-SP.
 
-
-
-In order to provide the cosmic ray triggering capability a large array of scintillation
-counters is installed outside of the cryostat. A number of beam instrumentation devices
-are used to feed the  trigger logic and to characterize the beam. Figure \ref{fig:np04_photo}
-shows the view of the top of the \pd-SP apparatus and a part of its readout hardware.
-There is a dedicated 20 Gb/s network connection from the experiment to the CERN central storage facilities.
 
 The \pd-SP Data Acquisition (DAQ) is equipped with a capable online monitoring system
 which receives data via the network and does processing in real time.
-However, certain types of processing, e.g.\,application of digital filtering to the TPC channels, counting hit candidates \textit{etc.}\,which belong to the
-category of Data Quality Monitoring (DQM), require more resources than are available within
-the DAQ footprint, and include jobs that take substantially longer time than processes run in the
-online monitor. That could present a resource and data management problem for the DAQ.
-The online monitor is a real-time system and is not well suited for long term preservation and
-cataloging of the data produced, such as plots, histograms, tables \textit{etc.}\,as this would
-substantially complicate the system.
-
-A separate consideration is the necessity to insulate DAQ from
-potential disruptions due to frequent software updates of the DQM software dictated by
-the dynamic nature of the test beam experiment. 
+However, certain types of processing required for Data Quality Monitoring (DQM), 
+require more resources than are available within the DAQ footprint, and include jobs
+that take substantially longer time than processes run in the online monitor.
+That could present a resource and data management problem for the DAQ and
+intefere with the crucial DAQ function. We note that it is necessary to insulate the DAQ
+from frequent software updates of the DQM software dictated by the dynamic nature comissioning
+and operations of the experiment. 
 For these reasons a separate \textit{\pd Prompt Processing System} (abbreviated as p3s) was put
 in place  with the following characteristics \cite{eps}:
 \begin{itemize} 
 
-\item turnaround time on the scale of minutes (and in some cases tens of minutes)
+\item turnaround time on the scale of minutes (in limited cases tens of minutes)
 
-\item lower bandwidth compared to the online monitor (\textit{i.e.}\,a small fraction of events is processed,
-but in more detail and with a variety of methods)
+\item processing a small fraction of events compared  to the online monitor
+but in more detail and with a variety of methods
 
 \item extensive and scalable computing resources provided by the CERN batch facility
 
-\item reading data from files committed to CERN central storage, with no direct coupling to the DAQ system
+\item accessing data in CERN central storage, with no direct coupling to the DAQ system
 
-\item flexibility in introducing, modifying and configuring software without any risk of disruption of
-critical DAQ functionality
+\item considerable flexibility in introducing, modifying and configuring software 
 
-\item substantial storage and browsing capability allowing the users to access and study
-the DQM results in an efficient manner
+\item substantial storage and browsing capability for accessing the DQM results
 
 \end{itemize}
 
 
-\section{The protoDUNE-SP Data}
-\subsection{Raw Data Parameters}
-\label{sec:np04_data_rate}
-
-The detector features the \textit{cold electronics} design in which the amplifiers and digitizers
-are placed within the cryostat and operate at cryogenic temperatures. There are
-\textit{warm interface boards} located outside of the cryostat which concentrate data
-and transmit it to the DAQ systems via an optic fiber.
-There are 15,360 TPC channels read out at the 2\,MHz digitization frequency. There is also
-a photon detector integrated in the TPC internal structure, but the amount of data
-produced by this subsystem is substantially smalled than that of the TPC.
-The size of the data read out from the detector in a single trigger cycle is approximately 230\,MB. At the nominal
-trigger rate and lossless compression applied in the DAQ instantaneous data rate is about
-1.5\,GB/s, and the sustained data rate to disk is 300\,MB/s.
-
-\subsection{Data Flow and Distribution}
-Principal elements of data transmission and storage in \pd are illustrated in Figure \ref{fig:dataflow}.
-Once the raw data are captured by the data acquisition system and written to the online buffer
-located in the vicinity of the detector in the experimental hall  they are picked up by an instance of
-the \textit{Fermi FTS} data handling system \cite{sam,fts} which manages the transfer to EOS \cite{castoreos}
-(the CERN distributed disk storage system).
-
-EOS serves as the principal staging area  \cite{eos_role} from which the data get copied to tape
-storage at CERN (\textit{CASTOR})  and are also transmitted to FNAL for replication, distribution and
-offline processing by a separate instance of \textit{Fermi FTS}.
-Importantly, EOS also serves to stage the input data for the prompt processing system and to
-store and preserve  the various data products produced by DQM jobs. This design
-ensures a large degree of independence of prompt processing and DQM from the DAQ and vice
-versa (which is desirable),
-but it also introduces a latency due to the way data transfer from the Online Buffer operates. This latency
-is of the order of a few minutes and is considered acceptable in the context of DQM.
-
-
-
-
-\section{Data Quality Monitoring and Prompt Processing}
-\subsection{DQM Applications}
-The following types of applications were developed by the members of the DUNE Collaboration and
-included in the \pd DQM suite during the detector
-commissioning:
+\section{The DQM Content}
+The following types of DQM applications were used at various times during
+commissioning and operations phases:
 \begin{itemize}
-\item monitoring of front-end motherboards
+\item monitoring of the Front-End Motherboards
 \item individual LArTPC channel signal processing (noise reduction, deconvolution)
 \item basic event visualization in 2D projections
-\item initial data preparation for an advanced 3D event display running on a separate system
+\item initial data preparation for an advanced 3D event display running on a separate remotesystem
 \item liquid Argon purity monitoring using cosmic $\mu$ tracks
-\item estimation of the number of hits and charge collected in each section of the LArTPC, RMS of these values
+\item estimation of the number of hits and charge collected in each section of the LArTPC
 \item estimation of signal-to-noise ratio
 \end{itemize}
 
-\noindent For a few of these metrics the system produces time-series plots in addition to the tabulated data.
-The DQM applications are often called \textit{payload jobs} so as to distinguish them from service and
-infrastructure jobs which exist to support the function of the overall system.
+%\noindent For a few of these metrics the system produces time-series plots in addition to the tabulated data.
+%The DQM applications are often called \textit{payload jobs} so as to distinguish them from service and
+%infrastructure jobs which exist to support the function of the overall system.
 
 
-\subsection{Design of the Prompt Processing System}
+section{Design of the p3s and DQM services}
 
-Computing resources for the Data Quality Monitoring in \pd-SP are managed by
-the  \textit{\pd Prompt Processing System}
-which is separate from both the DAQ and the main production system.
-This is similar to a few High-Energy Physics experiments which implement
- \textit{express streams} to perform preliminary calculations on the data very soon
-after it leaves the DAQ.
 
-The  p3s allows the experiment to benefit from combination of high capacity, high
-performance distributed storage (CERN EOS), CERN networking resources and its Tier-0 computing facility.
-By utilizing the pilot-based approach \cite{eps} to workload management, which is the cornerstone of such well-known
-systems as PanDA and DIRAC \cite{panda,dirac}, p3s achieves low latency of automated job submission
-compared to running jobs directly on the batch resource (which is currently HTCondor at CERN Tier-0).
-In addition, since it combines a web service and a back-end database this approach provides excellent
-job monitoring capabilities.
+The  p3s  allows the experiment to benefit from combination
+of high capacity, high performance distributed storage (CERN EOS), CERN networking
+resources and its Tier-0 computing facility. It utilizes  the pilot-based approach \cite{eps}
+to workload management characteristic of such well-known systems as PanDA and
+DIRAC \cite{panda,dirac} and a web interface which provides excellent job monitoring capabilities.
 
 
 \subsection{Design of the DQM Content Service}
@@ -295,51 +218,12 @@ of its ongoing operation.
 
 \begin{thebibliography}{99}
 
-
-
-\bibitem{cdrVol1}
-R. Acciarri et al.
-\emph{Long-Baseline Neutrino Facility (LBNF) and Deep Underground Neutrino Experiment (DUNE) Conceptual Design Report Volume 1: The LBNF and DUNE Projects}.\\ ~e-Print: arXiv:\textbf{1601.05471}
- %DUNE CDR Vol 1 -- The LBNF and DUNE Projects.~e-Print: arXiv:1601.05471
-%\url{http://arxiv.org/abs/1601.05471}
-
-\bibitem{cdrVol4}
-R. Acciarri et al.
-\emph{Long-Baseline Neutrino Facility (LBNF) and Deep Underground Neutrino Experiment (DUNE) Conceptual Design Report, Volume 4: The DUNE Detectors at LBNF}.\\~e-Print: arXiv:\textbf{1601.02984}
-%\url{http://arxiv.org/abs/1601.02984}
-
 \bibitem{eps} M.Potekhin et al. \emph{The protoDUNE-SP experiment and its prompt
 processing system}. Proceedings of Science (EPS-HEP2017) 513
-
-%\bibitem{uboone}
-%B. Jones et al.  \emph{The Status of the MicroBooNE Experiment.~J. Phys.: Conf. Series.} Vol.\textbf{408}. IOP Publishing, 2013,
-%doi:10.1088/1742-6596/408/1/012028
-
-
-\bibitem{sam}
-R. A. Illingworth \emph{A data handling system for modern and future Fermilab experiments.~J. Phys.: Conf. Series.} Vol.\textbf{513}. IOP Publishing, 2014,
-doi:10.1088/1742-6596/513/3/032045
-
-\bibitem{fts}
-A. Norman \emph{The Fermilab File Transfer System}.~e-Print: FNAL CD-DocDB-5412
-
-\bibitem{castoreos}
- L. Mascetti et al. \emph{Disk storage at CERN.~J. Phys.: Conf. Series.} Vol.\textbf{664}. IOP Publishing, 2015,
-doi:10.1088/1742-6596/664/4/042035
-
-\bibitem{eos_role}
-S. Fuess et al. \emph{Design of the protoDUNE raw data management
-infrastructure.~J. Phys.: Conf. Series.} Vol.\textbf{898}. IOP Publishing, 2017,
-doi:10.1088/1742-6596/898/6/062036
-
-%\bibitem{xrootd}
-%L. Bauerdick et al. \emph{Using Xrootd to Federate Regional Storage.~J. Phys.: Conf. Series.} Vol.\textbf{396}. IOP Publishing, 2012,
-%doi:10.1088/1742-6596/396/4/042009
 
 \bibitem{panda}
 T. Maeno et al. \emph{Overview of ATLAS PanDA Workload Management.~J. Phys.: Conf. Series.} Vol.\textbf{331}. IOP Publishing, 2011,
 doi:10.1088/1742-6596/331/7/072024
-
 
 
 \bibitem{dirac}
